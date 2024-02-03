@@ -1,6 +1,7 @@
 <template>
   <div class="hello">
-    <h1>Salam hasan</h1>
+    <h1>{{message}}</h1>
+    <button @click="fetchTasks">click to say hello world</button>
   </div>
 </template>
 
@@ -10,28 +11,40 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      tasks: [],
+      message:'',
     }
   },
   mounted() {
+    // this.fetchTasks();
     this.fetchTasks();
-  },
+    this.fetchTask(1);
+    },
   methods: {
     fetchTasks() {
-      axios.get('http://localhost:8000/api/hello/')
+      axios.get('http://localhost:8000/api/fetchall/')
           .then(response => {
             // this.tasks = response.data;
-            console.log(response.data.message);
+            // this.message=response.data.message;
+            console.log(response);
           })
           .catch(error => {
             console.error('Error fetching tasks:', error);
           });
     },
+
+    fetchTask(id){
+      axios.get('http://localhost:8000/api/fetch/'+id+'/')
+          .then(response => {
+            // this.tasks = response.data;
+            // this.message=response.data.message;
+            console.log(response);
+          })
+          .catch(error => {
+            console.error('Error fetching tasks:', error);
+          });
+    }
   }
-  // name: 'HelloWorld',
-  // props: {
-  //   msg: String
-  // }
+
 }
 </script>
 
