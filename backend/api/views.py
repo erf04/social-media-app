@@ -41,3 +41,14 @@ def getTask(request, id):
     print(serializer)
     return Response(data=serializer.data, status=status.HTTP_200_OK)
 
+
+@api_view(['POST'])
+def createTask(request:Request):
+    serialized=TaskSerializer(data=request.data)
+    if serialized.is_valid():
+        serialized.save()
+        return  Response(serialized.data,status=status.HTTP_201_CREATED)
+    return Response(serialized.errors,status=status.HTTP_400_BAD_REQUEST)
+
+
+
