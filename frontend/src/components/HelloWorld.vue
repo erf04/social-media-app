@@ -1,7 +1,9 @@
 <template>
   <div class="hello">
-    <h1>{{message}}</h1>
-    <button @click="fetchTasks">click to say hello world</button>
+    <ul v-for="task in messages" :key="task">
+      <li>{{task}}</li>
+    </ul>
+<!--    <button @click="showMessage">click to say hello world</button>-->
   </div>
 </template>
 
@@ -11,38 +13,41 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      message:'',
+      messages: [],
     }
   },
   mounted() {
     // this.fetchTasks();
-    this.fetchTasks();
+    // this.fetchTasks();
     this.fetchTask(1);
+    this.fetchTask(2);
     },
   methods: {
-    fetchTasks() {
-      axios.get('http://localhost:8000/api/fetchall/')
-          .then(response => {
-            // this.tasks = response.data;
-            // this.message=response.data.message;
-            console.log(response);
-          })
-          .catch(error => {
-            console.error('Error fetching tasks:', error);
-          });
-    },
+    // fetchTasks() {
+    //   axios.get('http://localhost:8000/api/fetchall/')
+    //       .then(response => {
+    //         this.tasks = response.data;
+    //         // this.message=response.data.message;
+    //         // console.log(response);
+    //         // console.log('tasks: ', this.tasks[0].description);
+    //       })
+    //       .catch(error => {
+    //         console.error('Error fetching tasks:', error);
+    //       });
+    // },
 
     fetchTask(id){
       axios.get('http://localhost:8000/api/fetch/'+id+'/')
           .then(response => {
             // this.tasks = response.data;
-            // this.message=response.data.message;
-            console.log(response);
+            this.messages[id-1] = response.data.description;
+            // console.log(response.data);
+            // console.log('response: ', this.messages);
           })
           .catch(error => {
             console.error('Error fetching tasks:', error);
           });
-    }
+    },
   }
 
 }
