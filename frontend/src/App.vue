@@ -1,15 +1,18 @@
 <template>
 <!--  <img alt="Vue logo" src="./assets/logo.png">-->
   <HelloWorld />
+  <TaskForm/>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import HelloWorld from './components/HelloWorld.vue';
+import TaskForm from './components/TaskForm.vue';
 
 export default {
   // name: 'App',
   components: {
-    HelloWorld
+    HelloWorld,
+    TaskForm
   }
 }
 </script>
