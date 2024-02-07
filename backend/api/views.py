@@ -2,10 +2,11 @@ from django.shortcuts import render
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
 from .serializers import TaskSerializer
 from .models import Task
 from django.shortcuts import get_object_or_404
+from rest_framework import permissions
 # Create your views here.
 
 
@@ -16,6 +17,7 @@ def hello(request:Request):
 
 
 @api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
 def getTasks(request:Request):
     tasks = Task.objects.all()
     serializer = TaskSerializer(tasks, many=True)
@@ -35,6 +37,7 @@ def getTasks(request:Request):
     
 
 @api_view(['GET'])
+
 def getTask(request, id):
     task = get_object_or_404(Task, pk=id)
     serializer = TaskSerializer(task)
