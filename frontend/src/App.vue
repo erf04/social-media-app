@@ -1,18 +1,21 @@
 <template>
 <!--  <img alt="Vue logo" src="./assets/logo.png">-->
-  <HelloWorld />
-  <TaskForm/>
+  <!-- <HelloWorld />
+  <TaskForm/> -->
+  <authTest/>
+  <HelloWorld/>
 </template>
 
 <script>
+
+import authTest from './components/authTest.vue';
 import HelloWorld from './components/HelloWorld.vue';
-import TaskForm from './components/TaskForm.vue';
 
 export default {
   // name: 'App',
   components: {
-    HelloWorld,
-    TaskForm
+    authTest,
+    HelloWorld
   }
 }
 </script>
