@@ -34,28 +34,32 @@ export default {
   },
   mounted() {
     this.fetchTasks();
-    this.getAccessToken("test","test1234@");
+    // this.getAccessToken("test","test1234@");
     // this.getUsers();
     },
   methods: {
     fetchTasks() {
+
     
-      axios.get('http://localhost:8000/api/fetchall/',{
-        headers:{
-          Authorization:"JWT "+localStorage.getItem("access_token")
-        }
-      })
-          .then(response => {
-            this.tasks = response.data;
-            
-          })
-          .catch(error => {
-            // this.state.isAuthenticated=false;
-            if (error.status===401){
-              console.log(401);
+          axios.get('http://localhost:8000/api/fetchall/',{
+          headers:{
+            Authorization:"JWT "+localStorage.getItem("access_token")
+          }
+          }).then(response=>{
+            this.tasks=response.data;
+          }).catch(error=>{
+            if (error.response.status===401){
+              console.log("unauthorized");
             }
-            // console.error('Error fetching tasks:', error);
-          });
+            else{
+              console.log("unexpected error");
+            }
+          })
+      
+      
+    
+      
+      
     },
 
     fetchTask(id){
@@ -68,19 +72,19 @@ export default {
           });
     },
 
-    getAccessToken(username,password){
-      var user={
-        "username":username,
-        "password":password
-      }
-      axios.post("http://localhost:8000/auth/jwt/create",user)
-      .then((response)=>{
-        console.log(response);
-      })
-      .catch(error=>{
-        console.log(error);
-      })
-    },
+    // getAccessToken(username,password){
+    //   var user={
+    //     "username":username,
+    //     "password":password
+    //   }
+    //   axios.post("http://localhost:8000/auth/jwt/create",user)
+    //   .then((response)=>{
+    //     console.log(response);
+    //   })
+    //   .catch(error=>{
+    //     console.log(error);
+    //   })
+    // },
 
     getUsers(){
       axios.get("https://localhost:8000/auth/users/")

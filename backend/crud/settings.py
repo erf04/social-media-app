@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-kq1mmt!d6+e$jxwh8x$5w0t1qyswc*8!r86c-6xze8_o^&31uz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost"]
 
 
 # Application definition
@@ -48,12 +48,13 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware', #new
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'crud.urls'
@@ -152,4 +153,21 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": False,
 
 
+}
+
+DJOSER = {
+    'HIDE_USERS': False,
+    # 'SERIALIZERS': {
+    #     'user': 'path.to.custom.UserSerializer',
+    #     'current_user': 'path.to.custom.CurrentUserSerializer',
+    # },
+    'PERMISSIONS': {
+        'user_list': ['djoser.permissions.CurrentUserOrAdmin'],
+        'user': ['djoser.permissions.CurrentUserOrAdmin'],
+        'user_create': ['rest_framework.permissions.AllowAny'],
+        'user_delete': ['djoser.permissions.CurrentUserOrAdmin'],
+    },
+    'CORS_ALLOWED_ORIGINS': [
+        "http://localhost:8080",  # Add your front-end origin here
+    ],
 }

@@ -3,65 +3,62 @@
       <div v-if="isLoggedIn">
         <task-list></task-list>
         <button @click="logout">Logout</button>
+        <p>hello {{ username }}</p>
       </div>
       <div v-else>
         <button @click="login">Login</button>
+      </div>
+      <div>
+        <router-link  to="/signup"><button>signup</button></router-link> 
       </div>
     </div>
   </template>
   
   <script>
-  import api from '../../services/api.js'; 
+  // import axios from 'axios';
+  import JWTAuth from '../../services/jwt.js';
+
   export default {
     data() {
       return {
         isLoggedIn: false,
+        username:'',
       };
     },
     methods: {
-      async login() {
-        // try {
-        //   const response = await api.post('jwt/create', {
-        //     username: 'test',
-        //     password: 'test1234@',
-        //   });
-  
-        //   // Save access token in localStorage
-        //   localStorage.setItem('access_token', response.data.access);
-  
-        //   // Update component state
-        //   this.isLoggedIn = true;
-        // } catch (error) {
-        //   console.error('Error logging in:', error);
-        // }
-        let user={
-          username:"test",
-          password:"test1234@"
-        }
-        api.post("jwt/create",user)
-        .then(response=>{
-          console.log(response);
-          localStorage.setItem("access_token",response.data.access);
-          localStorage.setItem("refresh_token",response.data.refresh);
-        })
-        .catch(error=>{
-          console.log(error);
-        })
+      async login(){
+        var jwtAuth=new JWTAuth('http://localhost:8000/auth/');
+      
+        this.isLoggedIn=await jwtAuth.login("test","test1234@");
+        location.reload();
+      
+      console.log("loggedIn:"+this.isLoggedIn);
       },
-      logout() {
-        // Clear access token from localStorage
-        localStorage.removeItem('access_token');
-  
-        // Update component state
-        this.isLoggedIn = false;
-      },
-    },
-    mounted() {
-      // Check if there is a token in localStorage
-      const accessToken = localStorage.getItem('access_token');
-      if (accessToken) {
-        this.isLoggedIn = true;
+      async logout(){
+        var jwtAuth=new JWTAuth('http://localhost:8000/auth/');
+        this.isLoggedIn=jwtAuth.logout();
+        location.reload();
+        console.log("loggedIn:"+this.isLoggedIn);
       }
+      
+
+    },
+    async mounted() {
+      var jwtAuth=new JWTAuth('http://localhost:8000/auth/');
+      
+      this.isLoggedIn=await jwtAuth.isAuthenticate();
+      if (this.isLoggedIn===true){
+        //go to the list
+        let user=await jwtAuth.getCurrentUser();
+        this.username=user.data.username;
+      }
+      else{
+        //go to login page
+      }
+
+      console.log("loggedIn:"+this.isLoggedIn);
+      
+
     },
   };
   </script>
