@@ -26,6 +26,8 @@
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
+import taskApi from '../../services/taskApi';
 export default {
   data() {
     return {
@@ -38,14 +40,11 @@ export default {
     // this.getUsers();
     },
   methods: {
-    fetchTasks() {
+    async fetchTasks() {
 
-    
-          axios.get('http://localhost:8000/api/fetchall/',{
-          headers:{
-            Authorization:"JWT "+localStorage.getItem("access_token")
-          }
-          }).then(response=>{
+          
+          taskApi.get('')
+          .then(response=>{
             this.tasks=response.data;
           }).catch(error=>{
             if (error.response.status===401){
@@ -55,15 +54,11 @@ export default {
               console.log("unexpected error");
             }
           })
-      
-      
-    
-      
-      
+
     },
 
     fetchTask(id){
-      axios.get('http://localhost:8000/api/fetch/'+id+'/')
+      taskApi.get(id+'/')
           .then(response => {
             console.log(response);
           })
@@ -71,20 +66,6 @@ export default {
             console.error('Error fetching tasks:', error);
           });
     },
-
-    // getAccessToken(username,password){
-    //   var user={
-    //     "username":username,
-    //     "password":password
-    //   }
-    //   axios.post("http://localhost:8000/auth/jwt/create",user)
-    //   .then((response)=>{
-    //     console.log(response);
-    //   })
-    //   .catch(error=>{
-    //     console.log(error);
-    //   })
-    // },
 
     getUsers(){
       axios.get("https://localhost:8000/auth/users/")

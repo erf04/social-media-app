@@ -14,13 +14,13 @@ class JWTAuth{
         this.api=api;
         // console.log(this.api);
     }
-    signup(username,password,email){
+    async signup(username,password,email){
         let newUser={
           username:username,
           password:password,
           email:email
         }
-        this.api.post('users/',newUser)
+        return await this.api.post('users/',newUser)
         .then(response=>{
           console.log(response);
           return true;
@@ -69,7 +69,7 @@ class JWTAuth{
         .then(response=>{
           
           if (response.status===200){
-            // console.log(response);
+           
             return true;
             
           }
@@ -81,14 +81,16 @@ class JWTAuth{
         })
         .catch(()=>{
           console.log("need to get refreshed");
-          // console.log(error);
+         
           let newAccess=this.getNewToken();
-          if (newAccess===null){
+      
+          if (newAccess==null){
             return false;
           }
           else{
             localStorage.setItem("access_token",newAccess);
             // this.#isAuthenticate=true;
+  
             return true;
           }
           

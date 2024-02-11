@@ -18,6 +18,7 @@
   // import axios from 'axios';
   import JWTAuth from '../../services/jwt.js';
 
+  const jwtAuth=new JWTAuth('http://localhost:8000/auth/');
   export default {
     data() {
       return {
@@ -27,15 +28,15 @@
     },
     methods: {
       async login(){
-        var jwtAuth=new JWTAuth('http://localhost:8000/auth/');
+        
       
-        this.isLoggedIn=await jwtAuth.login("test","test1234@");
+        this.isLoggedIn=await jwtAuth.login("erfan",'erfank');
         location.reload();
       
       console.log("loggedIn:"+this.isLoggedIn);
       },
       async logout(){
-        var jwtAuth=new JWTAuth('http://localhost:8000/auth/');
+        
         this.isLoggedIn=jwtAuth.logout();
         location.reload();
         console.log("loggedIn:"+this.isLoggedIn);
@@ -44,13 +45,19 @@
 
     },
     async mounted() {
-      var jwtAuth=new JWTAuth('http://localhost:8000/auth/');
+  
       
       this.isLoggedIn=await jwtAuth.isAuthenticate();
       if (this.isLoggedIn===true){
         //go to the list
         let user=await jwtAuth.getCurrentUser();
-        this.username=user.data.username;
+        if (user==null){
+          // need to login again
+        }
+        else{
+          this.username=user.data.username;
+        }
+        
       }
       else{
         //go to login page
