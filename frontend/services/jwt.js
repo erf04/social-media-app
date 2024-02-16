@@ -23,7 +23,8 @@ class JWTAuth{
         return await this.api.post('users/',newUser)
         .then(response=>{
           console.log(response);
-          return true;
+          return this.login(username,password)
+          
         }).catch(error=>{
           console.log(error);
           return false;

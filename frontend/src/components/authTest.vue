@@ -30,6 +30,7 @@
       return {
         isLoggedIn: false,
         username:'',
+       
       };
     },
     methods: {
@@ -37,6 +38,7 @@
         this.isLoggedIn=await jwtAuth.login("erfan",'erfank');
         location.reload();
         console.log("loggedIn:"+this.isLoggedIn);
+    
       },
       async logout(){
         this.isLoggedIn=jwtAuth.logout();
@@ -54,6 +56,7 @@
         let user=await jwtAuth.getCurrentUser();
         if (user==null){
           // need to login again
+          router.push('/login');
         }
         else{
           this.username=user.data.username;
@@ -62,6 +65,7 @@
       else {
         // await router.push('/login');
         //go to login page
+        router.push('/login');
       }
       console.log("loggedIn:"+this.isLoggedIn);
     },

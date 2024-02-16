@@ -13,6 +13,7 @@ export default {
   components: {
     authTest,
     tasksTable,
-  }
+  },
+  
 }
 </script>
