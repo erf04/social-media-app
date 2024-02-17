@@ -60,6 +60,7 @@
         }
         else{
           this.username=user.data.username;
+          router.push('/');
         }
       }
       else {

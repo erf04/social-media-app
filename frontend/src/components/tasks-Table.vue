@@ -36,16 +36,20 @@ export default {
       tasks: [],
     }
   },
-  mounted() {
-    this.fetchTasks();
-    // this.getAccessToken("test","test1234@");
-    // this.getUsers();
-    },
+  async mounted() {
+    // location.reload();
+    let taskAuth=await jwtAuth.isAuthenticate();
+    console.log(`task auth:${taskAuth}`);
+    if (taskAuth)
+      this.fetchTasks();
+
+  },
   methods: {
     async fetchTasks() {
 
-        if (await jwtAuth.isAuthenticate()) {
-          taskApi.get('')
+          taskApi.get('',{
+            headers:{Authorization:`JWT ${await jwtAuth.getAccessToken()}`}
+          })
           .then(response=>{
             this.tasks=response.data;
           }).catch(error=>{
@@ -56,10 +60,7 @@ export default {
               console.log("unexpected error");
             }
           })
-        } 
-        else{
-          console.log("unauthorized");
-        }
+       
           
 
     },
