@@ -26,7 +26,14 @@ class JWTAuth{
           return this.login(username,password)
           
         }).catch(error=>{
-          console.log(error);
+          console.log(error.response);
+          let obj=JSON.parse(error.response.request.responseText);
+          for(let err in obj ){
+            obj[err].forEach(element => {
+                console.log(element);              
+            });
+          }
+          // alert(error.response.request.responseText );
           return false;
         })
     }

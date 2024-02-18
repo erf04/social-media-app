@@ -80,6 +80,17 @@
 
 
         this.isLoggedIn=await jwtAuth.signup(this.username.trim(),this.password.trim(),this.email.trim());
+
+        // jwtAuth.signup(this.username.trim(),this.password.trim(),this.email.trim())
+        // .then(()=>{
+        //   this.isLoggedIn=true;
+        //   router.push('/');
+          
+        // }).catch(error=>{
+        //   alert(error);
+        //   this.isLoggedIn=false;
+
+        // })
         
         console.log(this.isLoggedIn);
         if (this.isLoggedIn==true){
@@ -87,8 +98,7 @@
           
         }
         else{
-          console.log("this user does not exist");
-          console.log("you must signup first");
+          console.log("");
         }
       },
       

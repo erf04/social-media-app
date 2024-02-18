@@ -36,7 +36,7 @@
     methods: {
       async login(){
         this.isLoggedIn=await jwtAuth.login("erfan",'erfank');
-        location.reload();
+        // location.reload();
         console.log("loggedIn:"+this.isLoggedIn);
     
       },
