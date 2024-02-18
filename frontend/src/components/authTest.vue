@@ -20,11 +20,12 @@
   
   <script>
   // import axios from 'axios';
-  import JWTAuth from '../../services/jwt.js';
+  import {JWTAuth,messages} from '../../services/jwt.js';
   import router from "@/router";
   // import { useRouter } from 'vue-router'
 
   const jwtAuth=new JWTAuth('http://localhost:8000/auth/');
+  console.log(messages);
   export default {
     data() {
       return {

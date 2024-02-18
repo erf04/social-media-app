@@ -59,11 +59,11 @@
 </template>
 
 <script>
-  import JWTAuth from '../../services/jwt.js';
+  import {JWTAuth,messages} from '../../services/jwt.js';
   import router from "@/router";
 
   const jwtAuth=new JWTAuth('http://localhost:8000/auth/');
-
+  // console.log(messages);
   export default{
     data(){
       return  {
@@ -98,7 +98,7 @@
           
         }
         else{
-          console.log("");
+          console.log(messages);
         }
       },
       

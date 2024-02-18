@@ -1,8 +1,12 @@
 
 import axios from 'axios';
-class JWTAuth{
 
-    #isAuthenticate
+
+export var messages=[];
+
+export class JWTAuth{
+
+    
 
     constructor(baseURL){
 
@@ -26,14 +30,8 @@ class JWTAuth{
           return this.login(username,password)
           
         }).catch(error=>{
-          console.log(error.response);
           let obj=JSON.parse(error.response.request.responseText);
-          for(let err in obj ){
-            obj[err].forEach(element => {
-                console.log(element);              
-            });
-          }
-          // alert(error.response.request.responseText );
+          messages.push(obj);
           return false;
         })
     }
@@ -51,7 +49,9 @@ class JWTAuth{
           return true;
         })
         .catch(error=>{
-          console.log(error);
+          // console.log(error);
+          let message=JSON.parse(error.response.request.responseText);
+          messages.push(message);
           return false;
         })
     }
@@ -154,4 +154,3 @@ class JWTAuth{
 
 }
 
-export default JWTAuth;

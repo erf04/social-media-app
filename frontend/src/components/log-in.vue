@@ -60,7 +60,7 @@
 </template>
 
 <script>
-  import JWTAuth from '../../services/jwt.js';
+  import {JWTAuth,messages} from '../../services/jwt.js';
   import router from "@/router";
 
   const jwtAuth=new JWTAuth('http://localhost:8000/auth/');
@@ -87,8 +87,7 @@
           
         }
         else{
-          console.log("this user does not exist");
-          console.log("you must signup first");
+          console.log(messages);
         }
       },
       
