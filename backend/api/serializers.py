@@ -20,4 +20,14 @@ class FollowerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follower
         fields= ['followers', 'following']
+
+
+class PostSerializer(serializers.ModelSerializer):
+
+    creator=UserSerializer(read_only=True,many=False)
+    
+    class Meta:
+        model = Post
+        fields = "__all__"
+
         

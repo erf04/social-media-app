@@ -3,7 +3,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view,permission_classes
-from .serializers import TaskSerializer
+from .serializers import TaskSerializer,UserSerializer,FollowerSerializer
 from .models import Task
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions
@@ -53,5 +53,9 @@ def createTask(request:Request):
         return  Response(serialized.data,status=status.HTTP_201_CREATED)
     return Response(serialized.errors,status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['GET'])
+def show_posts(request:Request):
+    serialized=
 
 
