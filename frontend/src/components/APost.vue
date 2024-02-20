@@ -1,7 +1,8 @@
 <template>
   <div class="container mt-3">
     <div class="card" style="width: 18rem; margin: 0 auto">
-      <img src="../assets/logo.png" class="card-img-top" alt="vue-logo">
+      <img :src="getAbsoluteUrl(postImage)" class="card-img-top" alt="vue-logo">
+      <h5>{{title}}</h5>
       <div class="card-body">
         <div class="d-flex w-25 justify-content-between">
           <button style="border: none; background-color: white" @click="liked()">
@@ -27,6 +28,7 @@
           </a>
         </div>
         <p class="card-text">{{caption}}</p>
+        <p class="card-text">{{authorName}}</p>
       </div>
     </div>
   </div>
@@ -42,11 +44,15 @@ import taskApi from '../../services/taskApi';
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 export default {
-  props: ['imageSrc', 'caption'],
+  // props: ['imageSrc', 'caption'],
   data() {
     return {
       tasks: [],
       likeFillColor: 'none',
+      title: '',
+      caption: '',
+      authorName: '',
+      postImage: '',
     }
   },
   async mounted() {
@@ -54,6 +60,8 @@ export default {
     let taskAuth = await jwtAuth.isAuthenticate();
     // console.log(`task auth:${taskAuth}`);
     if (taskAuth) await this.fetchTasks();
+    this.getPosts();
+    // this.$emit('nam)
   },
   methods: {
     async fetchTasks() {
@@ -97,6 +105,26 @@ export default {
       if (this.likeFillColor === 'none') this.likeFillColor = 'red';
       else this.likeFillColor = 'none';
     },
+    getPosts() {
+      axios.get('http://localhost:8000/api/posts/all', {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("access_token")}`
+        }
+      })
+          .then(response => {
+            this.title = response.data[0].title;
+            this.caption = response.data[0].description;
+            this.authorName = response.data[0].author.username;
+            this.postImage = response.data[0].content;
+            console.log(this.postImage);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+    },
+    getAbsoluteUrl(relativeUrl){
+      return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
+    }
 
   },
 }

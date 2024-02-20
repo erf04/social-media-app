@@ -3,9 +3,9 @@
     <div class="container d-flex mt-5 justify-content-center">
       <div style="text-align: center">
         <div v-if="isLoggedIn">
-          <!--            <task-list></task-list>-->
-          <button @click="logout">Logout</button>
-          <p>hello {{ username }}</p>
+          <!--<task-list></task-list>-->
+<!--          <button @click="logout">Logout</button>-->
+<!--          <p>hello {{ username }}</p>-->
         </div>
         <div v-else>
           <button @click="login">Login</button>
@@ -28,7 +28,6 @@ export default {
     return {
       isLoggedIn: false,
       username: '',
-
     };
   },
   methods: {
@@ -38,11 +37,11 @@ export default {
       console.log("loggedIn:" + this.isLoggedIn);
 
     },
-    async logout() {
-      this.isLoggedIn = jwtAuth.logout();
-      location.reload();
-      console.log("loggedIn:" + this.isLoggedIn);
-    },
+    // async logout() {
+    //   this.isLoggedIn = jwtAuth.logout();
+    //   location.reload();
+    //   console.log("loggedIn:" + this.isLoggedIn);
+    // },
   },
   async mounted() {
     this.isLoggedIn = await jwtAuth.isAuthenticate();
@@ -59,9 +58,12 @@ export default {
     } else {
       // await router.push('/login');
       //go to login page
-      router.push('/login');
+      await router.push('/login');
     }
-    console.log("loggedIn:" + this.isLoggedIn);
+    // console.log("loggedIn:" + this.isLoggedIn);
+    this.$emit('name', this.username);
   },
+  // sendName() {
+  // }
 };
 </script>
