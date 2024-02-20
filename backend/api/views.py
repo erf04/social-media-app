@@ -3,8 +3,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view,permission_classes
-from .serializers import TaskSerializer,UserSerializer,FollowerSerializer
-from .models import Task
+from .serializers import TaskSerializer,UserSerializer,FollowerSerializer,PostSerializer
+from .models import *
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions
 # Create your views here.
@@ -55,7 +55,12 @@ def createTask(request:Request):
 
 
 @api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
 def show_posts(request:Request):
-    serialized=
+    serialized=PostSerializer(Post.objects.all(),many=True)
+    return Response(serialized.data,status=status.HTTP_200_OK)
+
+
+
 
 

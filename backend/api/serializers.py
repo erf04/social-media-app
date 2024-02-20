@@ -24,10 +24,10 @@ class FollowerSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
 
-    creator=UserSerializer(read_only=True,many=False)
-    
+    author=UserSerializer(read_only=True,many=False)
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
     class Meta:
         model = Post
-        fields = "__all__"
+        fields = ["title","author","description","content","created_at"]
 
         

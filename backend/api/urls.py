@@ -14,4 +14,5 @@ urlpatterns = [
     path("tasks/",views.getTasks,name="getTasks"),
     path("tasks/<int:id>/",views.getTask,name="getTask"),
     path("tasks/create/",views.createTask,name="createTask"),
+    path('posts/all',views.show_posts, name='all-posts'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
