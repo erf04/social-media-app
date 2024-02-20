@@ -1,9 +1,9 @@
 <template>
   <div class="container mt-3">
-    <div class="card" style="width: 18rem; margin: 0 auto">
-      <img :src="getAbsoluteUrl(postImage)" class="card-img-top" alt="vue-logo">
-      <h5>{{title}}</h5>
+    <div v-for="(post, index) in posts" :key="index" class="card" style="width: 18rem; margin: 0 auto">
+      <img :src="getAbsoluteUrl(post.content)" class="card-img-top" alt="vue-logo">
       <div class="card-body">
+        <h5>{{ post.title }}</h5>
         <div class="d-flex w-25 justify-content-between">
           <button style="border: none; background-color: white" @click="liked()">
             <svg xmlns="http://www.w3.org/2000/svg" :fill="likeFillColor" viewBox="0 0 24 24" stroke-width="1.5"
@@ -27,8 +27,9 @@
             </svg>
           </a>
         </div>
-        <p class="card-text">{{caption}}</p>
-        <p class="card-text">{{authorName}}</p>
+        <p class="card-text">{{ post.description }}</p>
+        <p class="card-text">{{ post.author.username }}</p>
+        <p class="card-text">{{ post.created_at }}</p>
       </div>
     </div>
   </div>
@@ -47,12 +48,20 @@ export default {
   // props: ['imageSrc', 'caption'],
   data() {
     return {
-      tasks: [],
+      name:'',
+      posts: [
+        {
+          title: "",
+          description: "",
+          content: "",
+          author: {
+            username: "",
+            image: null,
+          },
+          created_at: "",
+        }
+      ],
       likeFillColor: 'none',
-      title: '',
-      caption: '',
-      authorName: '',
-      postImage: '',
     }
   },
   async mounted() {
@@ -112,17 +121,14 @@ export default {
         }
       })
           .then(response => {
-            this.title = response.data[0].title;
-            this.caption = response.data[0].description;
-            this.authorName = response.data[0].author.username;
-            this.postImage = response.data[0].content;
-            console.log(this.postImage);
+            this.posts = response.data;
+            console.log(response.data);
           })
           .catch(error => {
             console.log(error);
           });
     },
-    getAbsoluteUrl(relativeUrl){
+    getAbsoluteUrl(relativeUrl) {
       return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
     }
 

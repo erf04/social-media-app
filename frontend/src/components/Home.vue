@@ -1,16 +1,11 @@
 <template>
   <div class="w-100 bg-gradient border-bottom p-2 d-flex justify-content-between">
-    <span class="circle-image">
-      <img src="../assets/logo.png" class="image" alt="logo"/>
-    </span>
+    <img src="../assets/logo.png" class="circle-image" alt="logo"/>
     <div class="d-flex align-items-baseline">
       <p ref="userName"></p>
       <div class="btn-group">
-        <button class="btn btn-lg" type="button">
-          <span class="circle-image">
-<!--            <img src="../assets/logo.png" class="image" alt="logo"/>-->
-            <img src="../assets/logo.png" class="image" alt="profile"/>
-          </span>
+        <button class="btn" type="button">
+          <img src="../assets/logo.png" class="circle-image" alt="profile"/>
         </button>
         <button type="button" class="btn btn-lg dropdown-toggle dropdown-toggle-split border-0"
                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -27,7 +22,7 @@
 
   </div>
   <authTest @name="username($event)"/>
-  <posts />
+  <posts/>
 </template>
 
 <script>
@@ -96,25 +91,13 @@ export default {
 }
 
 .circle-image {
-  display: inline-block;
-  overflow: hidden;
-  width: 33%;
-  padding-bottom: 33%;
-  height: 0;
-  position: relative;
-}
-
-.circle-image .image {
-  //width: 100%;
-  //height: 100%;
-  position: absolute;
   clip-path: circle(50%);
   object-fit: cover;
-}
-
-.image {
   width: 50px;
-  height: 50px
+  height: 50px;
 }
 
+.btn {
+  padding: 0;
+}
 </style>
