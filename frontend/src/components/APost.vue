@@ -75,7 +75,7 @@ export default {
   methods: {
     async fetchTasks() {
       taskApi.get('', {
-        headers: {Authorization: `JWT ${await jwtAuth.getAccessToken()}`}
+        headers: {Authorization: `JWT ${jwtAuth.isAuthenticate()? await jwtAuth.getAccessToken() : null}`}
       })
           .then(response => {
             this.tasks = response.data;
@@ -84,6 +84,7 @@ export default {
           }).catch(error => {
         if (error.response.status === 401) {
           console.log("unauthorized");
+          this.$router.push('/login');
         } else {
           console.log("unexpected error");
         }
