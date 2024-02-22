@@ -1,13 +1,12 @@
-import axios from 'axios';
+import API from "./api";
 // import JWTAuth from './jwt';
-const baseURL = 'http://localhost:8000/api/tasks';
 // const jwtAuth=new JWTAuth('http://localhost:8000/auth');
 
 
-const taskApi = axios.create({
-  baseURL: baseURL,
-  timeout: 5000,
+class TaskApi extends API{
+     constructor(baseURL,baseAuthURL){
+      super(baseURL,baseAuthURL);
+     }
+}
 
-});
-
-export default taskApi;
+export default TaskApi;
