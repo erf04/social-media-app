@@ -45,7 +45,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import {JWTAuth} from '../../services/jwt';
 
-import taskApi from '../../services/taskApi';
+import TaskApi from '../../services/taskApi';
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 export default {
@@ -79,41 +79,34 @@ export default {
   },
   methods: {
     async fetchTasks() {
-      taskApi.get('', {
-        headers: {Authorization: `JWT ${await jwtAuth.getAccessToken()}`}
+      let taskApi=new TaskApi("http://localhost:8000/api/tasks","http://localhost:8000/auth");
+      taskApi.getAuthorizedRequest()
+      .then(api=>{
+        return api.get('')
       })
-          .then(response => {
+        .then(response => {
             this.tasks = response.data;
             // console.log("TASKS:",this.tasks[1]);
 
           }).catch(error => {
         if (error.response.status === 401) {
           console.log("unauthorized");
+          this.$router.push('/login');
         } else {
           console.log("unexpected error");
         }
       })
     },
-    // fetchTask(id) {
-    //   taskApi.get(id + '/')
-    //       .then(response => {
-    //         console.log(response);
-    //       })
-    //       .catch(error => {
-    //         console.error('Error fetching tasks:', error);
-    //       });
-    // },
-    //
-    // getUsers() {
-    //   axios.get("https://localhost:8000/auth/users/")
-    //       .then((response) => {
-    //         console.log(response);
-    //       })
-    //       .catch(error => {
-    //         console.log(error);
-    //       })
-    // },
 
+    getUsers() {
+      axios.get("https://localhost:8000/auth/users/")
+          .then((response) => {
+            console.log(response);
+          })
+          .catch(error => {
+            console.log(error);
+          })
+    },
     liked() {
       if (this.likeFillColor === 'none') this.likeFillColor = 'red';
       else this.likeFillColor = 'none';

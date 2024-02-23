@@ -41,7 +41,7 @@
       </div>
 
       <!-- Submit button -->
-      <button type="button" class="btn btn-primary btn-block mb-4" @click="submit">login</button>
+      <button type="button" class="btn btn-primary btn-block mb-4" @keyup.enter="submit" @click="submit">login</button>
 
       <!-- Register buttons -->
       <div class="text-center">
