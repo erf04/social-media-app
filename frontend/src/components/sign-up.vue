@@ -11,14 +11,11 @@
   <div style="text-align: center; margin-top: 5rem" class="container w-25">
     <h2>signup</h2><br>
     <form>
-      <!-- Email input -->
       <div class="form-outline mb-4">
         <label class="form-label" for="form2Example1">username</label>
-
         <input type="email" id="form2Example1" class="form-control" v-model="username"/>
       </div>
 
-      <!-- Password input -->
       <div class="form-outline mb-4">
         <label class="form-label" for="form2Example2">Password</label>
         <input type="password" id="form2Example2" class="form-control" v-model="password"/>
@@ -26,10 +23,9 @@
 
       <div class="form-outline mb-4">
         <label class="form-label" for="form2Example3">Email</label>
-        <input type="password" id="form2Example3" class="form-control" v-model="email"/>
+        <input type="email" id="form2Example3" class="form-control" v-model="email"/>
       </div>
 
-      <!-- 2 column grid layout for inline styling -->
       <div class="row mb-4">
         <div class="col d-flex justify-content-center">
           <!-- Checkbox -->

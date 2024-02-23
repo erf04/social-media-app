@@ -1,7 +1,7 @@
 <template>
   <div class="container mb-3">
     <div v-for="(post, index) in posts" :key="index" class="card" style="margin: 0 auto; height: auto; width: 25rem">
-      <div class="p-2 pb-0 d-flex justify-content-between">
+      <div class="p-2 pb-0 mt-0 d-flex justify-content-between">
         <div class="d-flex" style="gap: 5px">
           <img src="../assets/logo.png" class="circle-image" alt="userProfile">
           <h5 style="font-weight: normal">{{post.author.username}}</h5>

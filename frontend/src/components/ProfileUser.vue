@@ -4,7 +4,7 @@
 <!--  </ul>-->
 <!--  <p>{{hasan}}</p>-->
   <div class="container emp-profile">
-    <form method="post">
+<!--    <form method="post">-->
       <div class="row">
         <div class="col-md-4">
           <div class="profile-img">
@@ -39,22 +39,28 @@
           </div>
         </div>
         <div class="col-md-2">
-          <input type="submit" class="profile-edit-btn" name="btnAddMore" value="Edit Profile"/>
+          <input type="submit" class="profile-edit-btn" name="btnAddMore" value="Edit Profile" />
+<!--          <router-link to="createPost">-->
+<!--            Create New Post-->
+<!--          </router-link>-->
+          <button class="btn btn-primary mt-2" @click="GoToCreatePost">
+            Create New Post
+          </button>
         </div>
       </div>
       <div class="row">
         <div class="col-md-4">
           <div class="profile-work">
             <p>WORK LINK</p>
-            <a href="">Website Link</a><br/>
-            <a href="">Bootsnipp Profile</a><br/>
-            <a href="">Bootply Profile</a>
+            <a href="#">Website Link</a><br/>
+            <a href="#">Bootsnipp Profile</a><br/>
+            <a href="#">Bootply Profile</a>
             <p>SKILLS</p>
-            <a href="">Web Designer</a><br/>
-            <a href="">Web Developer</a><br/>
-            <a href="">WordPress</a><br/>
-            <a href="">WooCommerce</a><br/>
-            <a href="">PHP, .Net</a><br/>
+            <a href="#">Web Designer</a><br/>
+            <a href="#">Web Developer</a><br/>
+            <a href="#">WordPress</a><br/>
+            <a href="#">WooCommerce</a><br/>
+            <a href="#">PHP, .Net</a><br/>
           </div>
         </div>
         <div class="col-md-8">
@@ -65,7 +71,7 @@
                   <label>User Id</label>
                 </div>
                 <div class="col-md-6">
-                  <p>Kshiti123</p>
+                  <p>{{ username }}</p>
                 </div>
               </div>
               <div class="row">
@@ -73,7 +79,7 @@
                   <label>Name</label>
                 </div>
                 <div class="col-md-6">
-                  <p>Kshiti Ghelani</p>
+                  <p>{{ username }}</p>
                 </div>
               </div>
               <div class="row">
@@ -152,7 +158,7 @@
           </div>
         </div>
       </div>
-    </form>
+<!--    </form>-->
   </div>
 </template>
 
@@ -160,6 +166,7 @@
 
 import {useRoute} from "vue-router";
 import {userInfo} from "@/mixins";
+import router from "@/router";
 
 export default {
   mixins: [userInfo],
@@ -168,6 +175,11 @@ export default {
       username: useRoute().params.name,
     }
   },
+  methods: {
+    GoToCreatePost() {
+      router.push(this.username + '/createPost');
+    }
+  }
 }
 </script>
 
@@ -285,5 +297,10 @@ body {
 .profile-tab p {
   font-weight: 600;
   color: #0062cc;
+}
+
+.btn {
+  border-radius: 50px;
+  font-size: 16px;
 }
 </style>

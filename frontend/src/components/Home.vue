@@ -1,12 +1,10 @@
 <template>
-  <div class="w-100 bg-gradient border-bottom p-2 d-flex justify-content-between">
+  <div class="w-100 bg-gradient border-bottom mb-0 pb-0 p-2 d-flex justify-content-between">
     <img src="../assets/logo.png" class="circle-image" alt="logo"/>
-    <div class="d-flex align-items-baseline">
+    <div class="d-flex align-items-center">
       <p ref="userName"></p>
       <div class="btn-group">
-        <button class="btn" type="button">
-          <img src="../assets/logo.png" class="circle-image" alt="profile"/>
-        </button>
+        <img src="../assets/logo.png" class="circle-image" alt="profile"/>
         <button type="button" class="btn btn-lg dropdown-toggle dropdown-toggle-split border-0"
                 style="color: black"
                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -24,7 +22,6 @@
         </ul>
       </div>
     </div>
-
   </div>
   <authTest @name="username($event)"/>
   <posts/>
@@ -40,6 +37,16 @@ import {JWTAuth} from '../../services/jwt.js';
 import router from "@/router";
 
 const jwtAuth = new JWTAuth('http://localhost:8000/auth/');
+
+// history.pushState(null, null, location.href);
+// window.onpopstate = function () {
+//   history.go(1);
+// };
+
+// history.pushState(null, null, document.URL);
+// window.addEventListener('popstate', function () {
+//   history.pushState(null, null, document.URL);
+// });
 
 export default {
   name: 'App',
@@ -102,4 +109,9 @@ export default {
   padding: 0;
   color: white;
 }
+
+p {
+  margin: 0;
+}
+
 </style>
