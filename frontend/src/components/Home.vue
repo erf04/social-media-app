@@ -8,17 +8,18 @@
           <img src="../assets/logo.png" class="circle-image" alt="profile"/>
         </button>
         <button type="button" class="btn btn-lg dropdown-toggle dropdown-toggle-split border-0"
+                style="color: black"
                 data-bs-toggle="dropdown" aria-expanded="false">
           <span class="visually-hidden">Toggle Dropdown</span>
         </button>
         <ul class="dropdown-menu">
           <li>
-            <button @click="GoToProfile">
+            <button @click="GoToProfile" class="btn">
               Profile
             </button>
           </li>
           <li>
-            <button @click="logout" class="logout">Logout</button>
+            <button @click="logout" class="btn">Logout</button>
           </li>
         </ul>
       </div>
@@ -26,6 +27,8 @@
 
   </div>
   <authTest @name="username($event)"/>
+  <posts/>
+  <posts/>
   <posts/>
 </template>
 
@@ -63,6 +66,8 @@ export default {
       router.push('/profile/' + this.userName)
     }
   },
+  mounted() {
+  }
 }
 </script>
 
@@ -82,16 +87,8 @@ export default {
   border-radius: 5px;
 }
 
-.dropdown-menu > li:hover,
-.logout:hover {
+.dropdown-menu > li:hover {
   background-color: #525252;
-}
-
-.logout {
-  color: white;
-  border: none;
-  background-color: inherit;
-//transition: 0.2s;
 }
 
 .circle-image {
@@ -103,5 +100,6 @@ export default {
 
 .btn {
   padding: 0;
+  color: white;
 }
 </style>
