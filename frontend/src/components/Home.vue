@@ -12,7 +12,11 @@
           <span class="visually-hidden">Toggle Dropdown</span>
         </button>
         <ul class="dropdown-menu">
-          <li>Profile</li>
+          <li>
+            <button @click="GoToProfile">
+              Profile
+            </button>
+          </li>
           <li>
             <button @click="logout" class="logout">Logout</button>
           </li>
@@ -30,6 +34,7 @@
 import authTest from './authTest.vue';
 import posts from './APost.vue';
 import {JWTAuth} from '../../services/jwt.js';
+import router from "@/router";
 
 const jwtAuth = new JWTAuth('http://localhost:8000/auth/');
 
@@ -41,11 +46,7 @@ export default {
   },
   data() {
     return {
-      imageSrc: '@/assets/logo.png',
-      captions: {
-        post1: 'Hi, This is my first sagi post!',
-        post2: 'Hi, This is my second sagi post!',
-      }
+      userName: '',
     }
   },
   methods: {
@@ -55,9 +56,12 @@ export default {
       console.log("loggedIn:" + this.isLoggedIn);
     },
     username(name) {
+      this.userName = name;
       this.$refs.userName.innerHTML = "<h4>Welcome " + name + "!</h4>";
     },
-
+    GoToProfile() {
+      router.push('/profile/' + this.userName)
+    }
   },
 }
 </script>

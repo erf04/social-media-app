@@ -1,4 +1,8 @@
 <template>
+  <ul>
+    <li v-for="(name, index) in usernames" :key="index">{{ name }}</li>
+  </ul>
+  <!--  <p>{{getPosts()}}</p>-->
   <div class="container mt-3">
     <div v-for="(post, index) in posts" :key="index" class="card" style="width: 18rem; margin: 0 auto">
       <img :src="getAbsoluteUrl(post.content)" class="card-img-top" alt="vue-logo">
@@ -48,7 +52,8 @@ export default {
   // props: ['imageSrc', 'caption'],
   data() {
     return {
-      name:'',
+      usernames: '',
+      name: '',
       posts: [
         {
           title: "",
@@ -89,26 +94,25 @@ export default {
         }
       })
     },
-
-    fetchTask(id) {
-      taskApi.get(id + '/')
-          .then(response => {
-            console.log(response);
-          })
-          .catch(error => {
-            console.error('Error fetching tasks:', error);
-          });
-    },
-
-    getUsers() {
-      axios.get("https://localhost:8000/auth/users/")
-          .then((response) => {
-            console.log(response);
-          })
-          .catch(error => {
-            console.log(error);
-          })
-    },
+    // fetchTask(id) {
+    //   taskApi.get(id + '/')
+    //       .then(response => {
+    //         console.log(response);
+    //       })
+    //       .catch(error => {
+    //         console.error('Error fetching tasks:', error);
+    //       });
+    // },
+    //
+    // getUsers() {
+    //   axios.get("https://localhost:8000/auth/users/")
+    //       .then((response) => {
+    //         console.log(response);
+    //       })
+    //       .catch(error => {
+    //         console.log(error);
+    //       })
+    // },
 
     liked() {
       if (this.likeFillColor === 'none') this.likeFillColor = 'red';
@@ -122,7 +126,7 @@ export default {
       })
           .then(response => {
             this.posts = response.data;
-            console.log(response.data);
+            console.log("response.data", response.data[0].author);
           })
           .catch(error => {
             console.log(error);
