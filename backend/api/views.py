@@ -72,22 +72,21 @@ def showUserPosts(request:Request):
     return Response(serialized.data,status=status.HTTP_200_OK)
 
 @api_view(['POST','PUT'])
-@permission_classes([permissions.AllowAny])
+@permission_classes([permissions.IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
 def create_post(request:Request):
-    image=request.FILES.get('image')
-    print(image)
-    post=PostSerializer(data=request.data,many=False)
 
-    post.author=request.user
-  
+    print(request.data)
+    post=PostSerializer(data=request.data,many=False)
+   
     if post.is_valid():
-        post.save()
+        post.save(author=request.user)
+        
         return Response({
         "ok":True,
         },status=status.HTTP_200_OK)
     else:
-        print(post._errors)
+        print(post.errors)
         return  Response("Error", status=status.HTTP_503_SERVICE_UNAVAILABLE)
     
 

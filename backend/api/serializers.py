@@ -24,10 +24,17 @@ class FollowerSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
 
-    author=UserSerializer(read_only=True,many=False)
+    author=UserSerializer(many=False,required=False)
     created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
     class Meta:
         model = Post
         fields = ["title","author","description","content","created_at"]
+
+
+    def save(self,**kwargs):
+        author=kwargs.get("author")
+        self.validated_data['author']=author
+        return super().save()  # Call the parent's save() method
+
 
         

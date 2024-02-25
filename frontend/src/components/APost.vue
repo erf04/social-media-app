@@ -79,11 +79,11 @@
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-// import {JWTAuth} from '../../services/jwt';
+import {JWTAuth} from '../../services/jwt';
 
 import TaskApi from '../../services/taskApi';
 
-// const jwtAuth = new JWTAuth("http://localhost:8000/auth");
+const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 export default {
   // props: ['imageSrc', 'caption'],
   data() {
@@ -162,10 +162,10 @@ export default {
       if (this.saveFillColor === 'none') this.saveFillColor = 'black';
       else this.saveFillColor = 'none';
     },
-    getPosts() {
+    async getPosts() {
       axios.get('http://localhost:8000/api/posts/all', {
         headers: {
-          Authorization: `JWT ${localStorage.getItem("access_token")}`
+          Authorization: `JWT ${await jwtAuth.getAccessToken()}`
         }
       })
           .then(response => {

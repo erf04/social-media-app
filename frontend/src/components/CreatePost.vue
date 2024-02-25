@@ -48,12 +48,13 @@ export default {
       const formData = new FormData();
       formData.append('title', this.title);
       formData.append('description',this.description);
-      formData.append('image',this.image);
+      formData.append('content',this.image);
       formData.append('created_at',new Date().toISOString());
-      // console.log(jwtAuth.getAccessToken());
+      
       axios.post(`${baseURL}/posts/create/`,formData,{
         headers:{
-          Authorization:`JWT ${await jwtAuth.getAccessToken()}`
+          Authorization:`JWT ${await jwtAuth.getAccessToken()}`,
+          "Content-Type": "multipart/form-data"
         }
       })
         .then(response =>{
