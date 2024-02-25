@@ -25,8 +25,6 @@
   </div>
   <authTest @name="username($event)"/>
   <posts/>
-  <posts/>
-  <posts/>
 </template>
 
 <script>

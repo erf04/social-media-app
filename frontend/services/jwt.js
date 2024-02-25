@@ -118,8 +118,8 @@ export class JWTAuth {
                 localStorage.setItem('access_token', newAccessToken);
                 return newAccessToken;
             })
-            .catch(error => {
-                console.log(error);
+            .catch((error) => {
+                console.log(error.data);
                 return null;
             })
     }
@@ -143,8 +143,8 @@ export class JWTAuth {
             .then(response => {
                 return response;
             })
-            .catch(error => {
-                console.log(error);
+            .catch(() => {
+                // console.log(error);
                 return null;
             })
     }

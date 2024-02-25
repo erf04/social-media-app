@@ -2,12 +2,13 @@ from django.shortcuts import render
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import api_view,permission_classes
+from rest_framework.decorators import api_view,permission_classes,parser_classes
 from .serializers import TaskSerializer,UserSerializer,FollowerSerializer,PostSerializer
 from .models import *
 from django.shortcuts import get_object_or_404
 from .permissions import IsOwnerOrReadOnly
-from rest_framework import permissions
+from rest_framework import permissions,generics
+from rest_framework.parsers import MultiPartParser, FormParser
 # Create your views here.
 
 
@@ -69,6 +70,26 @@ def showUserPosts(request:Request):
     posts= Post.objects.filter(author=request.user)
     serialized=PostSerializer(posts, many=True)
     return Response(serialized.data,status=status.HTTP_200_OK)
+
+@api_view(['POST','PUT'])
+@permission_classes([permissions.AllowAny])
+@parser_classes([MultiPartParser, FormParser])
+def create_post(request:Request):
+    image=request.FILES.get('image')
+    print(image)
+    post=PostSerializer(data=request.data,many=False)
+
+    post.author=request.user
+  
+    if post.is_valid():
+        post.save()
+        return Response({
+        "ok":True,
+        },status=status.HTTP_200_OK)
+    else:
+        print(post._errors)
+        return  Response("Error", status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    
 
 
 

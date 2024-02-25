@@ -1,6 +1,6 @@
 <template>
   <div class="container mb-3">
-    <div v-for="(post, index) in posts" :key="index" class="card" style="margin: 0 auto; height: auto; width: 25rem">
+    <div v-for="post in posts" :key="post.id" class="card" style="margin: 0 auto; height: auto; width: 25rem">
       <div class="p-2 pb-0 mt-0 d-flex justify-content-between">
         <div class="d-flex" style="gap: 5px">
           <img src="../assets/logo.png" class="circle-image" alt="userProfile">
@@ -79,11 +79,11 @@
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import {JWTAuth} from '../../services/jwt';
+// import {JWTAuth} from '../../services/jwt';
 
 import TaskApi from '../../services/taskApi';
 
-const jwtAuth = new JWTAuth("http://localhost:8000/auth");
+// const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 export default {
   // props: ['imageSrc', 'caption'],
   data() {
@@ -107,12 +107,10 @@ export default {
       saveFillColor: 'none',
     }
   },
-  async mounted() {
-    // location.reload();
-    let taskAuth = await jwtAuth.isAuthenticate();
-    // console.log(`task auth:${taskAuth}`);
-    if (taskAuth) await this.fetchTasks();
+  mounted() {
+  
     this.getPosts();
+    
     // this.$emit('nam)
   },
   methods: {
@@ -172,7 +170,8 @@ export default {
       })
           .then(response => {
             this.posts = response.data;
-            console.log("response.data", response.data[0].author);
+            console.log(this.posts);
+            // console.log("response.data", response.data[0].author);
           })
           .catch(error => {
             console.log(error);
