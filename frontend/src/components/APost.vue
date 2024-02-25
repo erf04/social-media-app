@@ -1,6 +1,6 @@
 <template>
   <div class="container mb-3">
-    <div v-for="post in posts" :key="post.id" class="card" style="margin: 0 auto; height: auto; width: 25rem">
+    <div v-for="post in posts" :key="post.id" class="card mb-5" style="margin: 0 auto; min-height: 300px; width: 25rem">
       <div class="p-2 pb-0 mt-0 d-flex justify-content-between">
         <div class="d-flex" style="gap: 5px">
           <img src="../assets/logo.png" class="circle-image" alt="userProfile">

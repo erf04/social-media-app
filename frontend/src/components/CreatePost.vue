@@ -27,6 +27,7 @@
 
 import axios from 'axios';
 import { JWTAuth } from '../../services/jwt';
+import router from "@/router";
 const baseURL="http://localhost:8000/api";
 const jwtAuth=new JWTAuth('http://localhost:8000/auth')
 export default {
@@ -60,7 +61,7 @@ export default {
         .then(response =>{
           console.log(response);
           alert("Your post has been created");
-          
+          router.push('/');
         })
         .catch(error=>{
           console.log(error);

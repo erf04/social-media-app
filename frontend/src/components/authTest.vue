@@ -52,7 +52,7 @@ export default {
         // need to login again
         await router.push('/login');
       } else {
-        this.username = user.data.username;
+        this.username = user.username;
         await router.push('/');
       }
     } else {

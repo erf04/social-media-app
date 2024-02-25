@@ -20,7 +20,7 @@
         <div class="col-md-6">
           <div class="profile-head">
             <h5>
-              {{ username }}
+              {{ userInfo.username }}
             </h5>
             <h6>
               Web Developer and Designer
@@ -71,7 +71,7 @@
                   <label>User Id</label>
                 </div>
                 <div class="col-md-6">
-                  <p>{{ username }}</p>
+                  <p>{{ userInfo.userId }}</p>
                 </div>
               </div>
               <div class="row">
@@ -79,7 +79,7 @@
                   <label>Name</label>
                 </div>
                 <div class="col-md-6">
-                  <p>{{ username }}</p>
+                  <p>{{ userInfo.username }}</p>
                 </div>
               </div>
               <div class="row">
@@ -87,7 +87,7 @@
                   <label>Email</label>
                 </div>
                 <div class="col-md-6">
-                  <p>kshitighelani@gmail.com</p>
+                  <p>{{ userInfo.email }}</p>
                 </div>
               </div>
               <div class="row">
@@ -164,21 +164,35 @@
 
 <script>
 
-import {useRoute} from "vue-router";
-import {userInfo} from "@/mixins";
 import router from "@/router";
+import {JWTAuth} from '../../services/jwt.js';
+
+const jwtAuth = new JWTAuth('http://localhost:8000/auth/');
 
 export default {
-  mixins: [userInfo],
+  // mixins: [userInfo],
   data() {
     return {
-      username: useRoute().params.name,
+      userInfo: {
+        email: '',
+        userId: null,
+        username: '',
+      },
     }
   },
   methods: {
     GoToCreatePost() {
       router.push(this.username + '/createPost');
+    },
+    async userData() {
+      const user = await jwtAuth.getCurrentUser();
+      this.userInfo = user;
+      this.userInfo.userId = user.id;
+      // console.log(user);
     }
+  },
+  mounted() {
+    this.userData();
   }
 }
 </script>

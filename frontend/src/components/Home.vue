@@ -1,12 +1,13 @@
 <template>
-  <div class="w-100 bg-gradient border-bottom mb-0 pb-0 p-2 d-flex justify-content-between">
-    <img src="../assets/logo.png" class="circle-image" alt="logo"/>
+  <div class="w-100 border-bottom mb-0 pb-0 p-2 d-flex justify-content-between" style="background-color: #29292e">
+    <img src="../assets/logo1.png" style="width: 250px; height: 60px" alt="logo"/>
     <div class="d-flex align-items-center">
-      <p ref="userName"></p>
+      <p style="color: white" ref="userName"></p>
       <div class="btn-group">
-        <img src="../assets/logo.png" class="circle-image" alt="profile"/>
+        <button @click="GoToProfile" class="border-0" style="background-color: inherit">
+          <img src="../assets/logo.png" class="circle-image" alt="profile"/>
+        </button>
         <button type="button" class="btn btn-lg dropdown-toggle dropdown-toggle-split border-0"
-                style="color: black"
                 data-bs-toggle="dropdown" aria-expanded="false">
           <span class="visually-hidden">Toggle Dropdown</span>
         </button>
@@ -31,8 +32,8 @@
 
 import authTest from './authTest.vue';
 import posts from './APost.vue';
-import {JWTAuth} from '../../services/jwt.js';
 import router from "@/router";
+import {JWTAuth} from '../../services/jwt.js';
 
 const jwtAuth = new JWTAuth('http://localhost:8000/auth/');
 
@@ -71,8 +72,6 @@ export default {
       router.push('/profile/' + this.userName)
     }
   },
-  mounted() {
-  }
 }
 </script>
 

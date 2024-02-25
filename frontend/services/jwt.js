@@ -144,7 +144,8 @@ export class JWTAuth {
             }
         })
             .then(response => {
-                return response;
+                // console.log("response.data", response.data)
+                return response.data;
             })
             .catch(() => {
                 // console.log(error);
