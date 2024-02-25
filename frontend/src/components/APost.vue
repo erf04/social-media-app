@@ -1,37 +1,40 @@
 <template>
   <div class="container mb-3">
-    <div v-for="post in posts" :key="post.id" class="card mb-5" style="margin: 0 auto; min-height: 300px; width: 25rem">
+    <div v-for="(post, index) in posts" :key="post.id" class="card mb-5"
+         style="margin: 0 auto; min-height: 300px; width: 25rem">
       <div class="p-2 pb-0 mt-0 d-flex justify-content-between">
         <div class="d-flex" style="gap: 5px">
           <img src="../assets/logo.png" class="circle-image" alt="userProfile">
-          <h5 style="font-weight: normal">{{post.author.username}}</h5>
+          <h5 style="font-weight: normal">{{ post.author.username }}</h5>
         </div>
         <div>
           <button type="button" class="btn btn-lg border-0"
                   style="color: black"
                   data-bs-toggle="dropdown" aria-expanded="false">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" style="width: 20px">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor" class="w-6 h-6" style="width: 20px">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"/>
             </svg>
           </button>
           <ul class="dropdown-menu">
             <li>
-                Option 1
+              Option 1
             </li>
             <li>
-                Option 2
+              Option 2
             </li>
           </ul>
         </div>
       </div>
-      <hr />
+      <hr/>
       <img :src="getAbsoluteUrl(post.content)" class="card-img-top" alt="vue-logo">
-      <hr />
+      <hr/>
       <div class="d-flex justify-content-between" style="padding: 0 1rem">
         <div class="d-flex w-25 justify-content-between">
-          <button style="border: none; background-color: white" @click="liked">
-            <svg xmlns="http://www.w3.org/2000/svg" :fill="likeFillColor" viewBox="0 0 24 24" stroke-width="1.5"
-                 stroke="currentColor" class="w-6 h-6" style="width: 25px">
+          <button style="border: none; background-color: white" @click="liked(index)" ref="likeBounce">
+            <svg xmlns="http://www.w3.org/2000/svg" :fill="likeFillColor[index]" viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor" class="w-6 h-6" ref="like" style="width: 25px">
               <path stroke-linecap="round" stroke-linejoin="round"
                     d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
             </svg>
@@ -51,13 +54,15 @@
             </svg>
           </a>
         </div>
-        <button style="border: none; background-color: white" @click="saved">
-          <svg xmlns="http://www.w3.org/2000/svg" :fill="saveFillColor" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" style="width: 25px">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+        <button style="border: none; background-color: white" @click="saved(index)" ref="savedBounce">
+          <svg xmlns="http://www.w3.org/2000/svg" :fill="saveFillColor[index]" viewBox="0 0 24 24" stroke-width="1.5"
+               stroke="currentColor" class="w-6 h-6" style="width: 25px">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"/>
           </svg>
         </button>
       </div>
-      <hr />
+      <hr/>
       <div class="card-body">
         <h4>{{ post.title }}</h4>
         <div id="read-more">
@@ -73,6 +78,11 @@
       </div>
     </div>
   </div>
+  <!--  <button @click="show = !show">Toggle</button>-->
+
+  <!--  <Transition name="bounce">-->
+
+  <!--  </Transition>-->
 </template>
 
 <script>
@@ -81,13 +91,23 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import {JWTAuth} from '../../services/jwt';
 
-import TaskApi from '../../services/taskApi';
+// import TaskApi from '../../services/taskApi';
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 export default {
   // props: ['imageSrc', 'caption'],
   data() {
     return {
+      likeFillColor: [],
+      saveFillColor: [],
+      likeStatus: {
+        like: false,
+        dislike: true,
+      },
+      saveStatus: {
+        save: false,
+        unsave: true,
+      },
       longCaption: false,
       usernames: '',
       name: '',
@@ -103,15 +123,12 @@ export default {
           created_at: "",
         }
       ],
-      likeFillColor: 'none',
-      saveFillColor: 'none',
+      // likeFillColor: 'none',
+      // saveFillColor: 'none',
     }
   },
   mounted() {
-  
     this.getPosts();
-    
-    // this.$emit('nam)
   },
   methods: {
     toggleReadMore() {
@@ -125,42 +142,81 @@ export default {
         buttonText.innerHTML = 'less';
       }
     },
-    async fetchTasks() {
-      let taskApi=new TaskApi("http://localhost:8000/api/tasks","http://localhost:8000/auth");
-      taskApi.getAuthorizedRequest()
-      .then(api=>{
-        return api.get('')
-      })
-        .then(response => {
-            this.tasks = response.data;
-            // console.log("TASKS:",this.tasks[1]);
+    // async fetchTasks() {
+    //   let taskApi = new TaskApi("http://localhost:8000/api/tasks", "http://localhost:8000/auth");
+    //   taskApi.getAuthorizedRequest()
+    //       .then(api => {
+    //         return api.get('')
+    //       })
+    //       .then(response => {
+    //         this.tasks = response.data;
+    //         // console.log("TASKS:",this.tasks[1]);
+    //
+    //       }).catch(error => {
+    //     if (error.response.status === 401) {
+    //       console.log("unauthorized");
+    //       this.$router.push('/login');
+    //     } else {
+    //       console.log("unexpected error");
+    //     }
+    //   })
+    // },
+    //
+    // getUsers() {
+    //   axios.get("https://localhost:8000/auth/users/")
+    //       .then((response) => {
+    //         console.log(response);
+    //       })
+    //       .catch(error => {
+    //         console.log(error);
+    //       })
+    // },
+    liked(index) {
+      let elements = this.$refs.likeBounce;
+      if (this.likeStatus.like === true) {
+        elements[index].classList.remove("bounce-enter-active");
+        elements[index].classList.remove("bounce-leave-active");
+      } else if (this.likeStatus.dislike === true) {
+        elements[index].classList.remove("bounceSagi-enter-active");
+        elements[index].classList.remove("bounceSagi-leave-active");
+      }
+      if (this.likeFillColor[index] === 'none') this.likeFillColor[index] = 'red';
+      else this.likeFillColor[index] = 'none';
+      if (this.likeStatus.dislike === true) {
+        elements[index].classList.add("bounce-enter-active");
+        elements[index].classList.add("bounce-leave-active");
+        this.likeStatus.like = true;
+        this.likeStatus.dislike = false;
+      } else if (this.likeStatus.like === true) {
+        elements[index].classList.add("bounceSagi-enter-active");
+        elements[index].classList.add("bounceSagi-leave-active");
+        this.likeStatus.dislike = true;
+        this.likeStatus.like = false;
+      }
+    },
+    saved(index) {
+      let elements = this.$refs.savedBounce;
+      if (this.saveStatus.save === true) {
+        elements[index].classList.remove("bounce-enter-active");
+        elements[index].classList.remove("bounce-leave-active");
+      } else if (this.saveStatus.unsave === true) {
+        elements[index].classList.remove("bounceSagi-enter-active");
+        elements[index].classList.remove("bounceSagi-leave-active");
+      }
+      if (this.saveFillColor[index] === 'none') this.saveFillColor[index] = 'black';
+      else this.saveFillColor[index] = 'none';
 
-          }).catch(error => {
-        if (error.response.status === 401) {
-          console.log("unauthorized");
-          this.$router.push('/login');
-        } else {
-          console.log("unexpected error");
-        }
-      })
-    },
-
-    getUsers() {
-      axios.get("https://localhost:8000/auth/users/")
-          .then((response) => {
-            console.log(response);
-          })
-          .catch(error => {
-            console.log(error);
-          })
-    },
-    liked() {
-      if (this.likeFillColor === 'none') this.likeFillColor = 'red';
-      else this.likeFillColor = 'none';
-    },
-    saved() {
-      if (this.saveFillColor === 'none') this.saveFillColor = 'black';
-      else this.saveFillColor = 'none';
+      if (this.saveStatus.unsave === true) {
+        elements[index].classList.add("bounce-enter-active");
+        elements[index].classList.add("bounce-leave-active");
+        this.saveStatus.save = true;
+        this.saveStatus.unsave = false;
+      } else if (this.saveStatus.save === true) {
+        elements[index].classList.add("bounceSagi-enter-active");
+        elements[index].classList.add("bounceSagi-leave-active");
+        this.saveStatus.unsave = true;
+        this.saveStatus.save = false;
+      }
     },
     async getPosts() {
       axios.get('http://localhost:8000/api/posts/all', {
@@ -170,8 +226,12 @@ export default {
       })
           .then(response => {
             this.posts = response.data;
-            console.log(this.posts);
-            // console.log("response.data", response.data[0].author);
+            console.log("response.data.length", response.data.length);
+            for (let i = 0; i!== response.data.length; i++) {
+              this.likeFillColor.push("none");
+              this.saveFillColor.push("none");
+            }
+            // console.log(this.posts);
           })
           .catch(error => {
             console.log(error);
@@ -179,8 +239,7 @@ export default {
     },
     getAbsoluteUrl(relativeUrl) {
       return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
-    }
-
+    },
   },
 }
 </script>
@@ -271,6 +330,46 @@ li {
   cursor: pointer;
   color: gray;
   text-decoration: none;
+}
+
+.bounce-enter-active {
+  animation: bounce-in 0.3s ease-in-out;
+}
+
+.bounce-leave-active {
+  animation: bounce-in 0.3s reverse ease-in-out;
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.bounceSagi-enter-active {
+  animation: bounce-in-sagi 0.3s ease-in-out;
+}
+
+.bounceSagi-leave-active {
+  animation: bounce-in-sagi 0.3s reverse ease-in-out;
+}
+
+@keyframes bounce-in-sagi {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 </style>
