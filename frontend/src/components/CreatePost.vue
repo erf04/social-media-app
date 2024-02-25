@@ -42,7 +42,6 @@ export default {
     handleFileUpload(event){
       const file=event.target.files[0];
       this.image=file;
-      console.log(this.image);
     },
     async createPost(){
       const formData = new FormData();
@@ -50,10 +49,11 @@ export default {
       formData.append('description',this.description);
       formData.append('content',this.image);
       formData.append('created_at',new Date().toISOString());
+      let access=await jwtAuth.getAccessToken();
       
       axios.post(`${baseURL}/posts/create/`,formData,{
         headers:{
-          Authorization:`JWT ${await jwtAuth.getAccessToken()}`,
+          Authorization:`JWT ${access}`,
           "Content-Type": "multipart/form-data"
         }
       })

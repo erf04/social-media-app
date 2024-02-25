@@ -88,10 +88,11 @@ export class JWTAuth {
 
 
             })
-            .catch(() => {
+            .catch(async() => {
                 console.log("need to get refreshed");
 
-                let newAccess = this.getNewToken();
+                let newAccess =await this.getNewToken();
+                // console.log(`from getNewToken:${newAccess}`);
 
                 if (newAccess == null) {
                     return false;
@@ -107,25 +108,27 @@ export class JWTAuth {
 
     }
 
-    getNewToken() {
+    async getNewToken() {
         let body = {
             "refresh": localStorage.getItem("refresh_token")
         };
-        this.api.post('jwt/refresh', body)
-            .then(response => {
+        return await this.api.post('jwt/refresh', body)
+            .then(async(response) => {
                 console.log(response);
                 let newAccessToken = response.data.access;
                 localStorage.setItem('access_token', newAccessToken);
-                return newAccessToken;
+                // console.log("from then in getNewToken:"+newAccessToken);
+                return await newAccessToken;
             })
-            .catch((error) => {
-                console.log(error.data);
+            .catch(async(error) => {
+                console.log("error in getNewToken catch"+error.data);
                 return null;
             })
     }
 
     async getAccessToken() {
-        if (await this.isAuthenticate()) return localStorage.getItem("access_token");
+        if (await this.isAuthenticate())
+            return localStorage.getItem("access_token");
         return null;
     }
 

@@ -72,7 +72,7 @@ def showUserPosts(request:Request):
     return Response(serialized.data,status=status.HTTP_200_OK)
 
 @api_view(['POST','PUT'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([permissions.AllowAny])
 @parser_classes([MultiPartParser, FormParser])
 def create_post(request:Request):
 
