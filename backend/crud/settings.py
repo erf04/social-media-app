@@ -32,19 +32,29 @@ ALLOWED_HOSTS = ["localhost"]
 # Application definition
 
 INSTALLED_APPS = [
+    #ASGI
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #for work with rest api
     'rest_framework',
+    #cleanup the unused media
     'django_cleanup.apps.CleanupConfig',
+    #for CORS
     'corsheaders',
+    #authentication
     'djoser',
     'rest_framework_simplejwt',
+    #websocket 
+    'channels',
+    #custom apps
     'api',
     'chat',
+    
 ]
 
 MIDDLEWARE = [
@@ -78,6 +88,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'crud.wsgi.application'
+ASGI_APPLICATION = "crud.asgi.application"
+
 
 
 # Database
@@ -177,4 +189,10 @@ DJOSER = {
     'CORS_ALLOWED_ORIGINS': [
         "http://localhost:8080",  # Add your front-end origin here
     ],
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
 }
