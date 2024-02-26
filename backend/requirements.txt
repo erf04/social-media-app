@@ -4,6 +4,9 @@ djangorestframework==3.14.0
 httpie==3.2.2
 Pillow==10.0.1
 django-cors-headers==4.3.1
-djoser
-djangorestframework_simplejwt
-social-auth-app-django
+djoser==2.2.2
+djangorestframework-simplejwt==5.3.1
+social-auth-app-django==5.4.0
+daphne==4.0.0
+channels==4.0.0
+asgiref==3.7.2
