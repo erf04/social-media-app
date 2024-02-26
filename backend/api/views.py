@@ -91,6 +91,16 @@ def create_post(request:Request):
     
 
 
+@api_view(['POST'])
+def getUserByUsername(request:Request):
+    username = request.data['username']
+    user= User.objects.get(username=username)
+    serializer = UserSerializer(user)
+    return Response(serializer.data)
+
+    
+
+
 
 
 

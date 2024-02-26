@@ -17,4 +17,7 @@ urlpatterns = [
     path('posts/all',views.show_allposts, name='all-posts'),
     path('posts/',views.showUserPosts,name="show-user-posts"),
     path('posts/create/',views.create_post),
+    path('get-user/',views.getUserByUsername,name="getUser"),
+
+    
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
