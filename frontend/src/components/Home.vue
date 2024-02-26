@@ -1,8 +1,8 @@
 <template>
-  <div class="w-100 border-bottom mb-0 pb-0 p-2 d-flex justify-content-between" style="background-color: #29292e">
+  <div class="w-100 border-bottom mb-4 pb-0 p-2 d-flex justify-content-between" style="background-color: #29292e">
     <img src="../assets/logo1.png" style="width: 250px; height: 60px" alt="logo"/>
     <div class="d-flex align-items-center">
-      <p style="color: white" ref="userName"></p>
+      <h4 style="color: white">Welcome {{userName}} !</h4>
       <div class="btn-group">
         <button @click="GoToProfile" class="border-0" style="background-color: inherit">
           <img src="../assets/logo.png" class="circle-image" alt="profile"/>
@@ -25,15 +25,19 @@
     </div>
   </div>
   <authTest @name="username($event)"/>
-  <posts/>
+  <posts />
+  <footerMenu />
 </template>
 
 <script>
 
 import authTest from './authTest.vue';
 import posts from './APost.vue';
-import router from "@/router";
+import footerMenu from './FooterMenu.vue';
+// import router from "@/router";
 import {JWTAuth} from '../../services/jwt.js';
+import {mixins} from "@/mixins";
+import router from "@/router";
 
 const jwtAuth = new JWTAuth('http://localhost:8000/auth/');
 
@@ -48,13 +52,16 @@ const jwtAuth = new JWTAuth('http://localhost:8000/auth/');
 // });
 
 export default {
+  mixins: [mixins],
   name: 'App',
   components: {
     authTest,
     posts,
+    footerMenu,
   },
   data() {
     return {
+      update: false,
       userName: '',
     }
   },
@@ -66,11 +73,11 @@ export default {
     },
     username(name) {
       this.userName = name;
-      this.$refs.userName.innerHTML = "<h4>Welcome " + name + "!</h4>";
+      // return name;
     },
     GoToProfile() {
-      router.push('/profile/' + this.userName)
-    }
+      router.push('/profile');
+    },
   },
 }
 </script>

@@ -1,8 +1,4 @@
 <template>
-<!--  <ul>-->
-<!--    <li v-for="(name, index) in usernames" :key="index">{{name}}</li>-->
-<!--  </ul>-->
-<!--  <p>{{hasan}}</p>-->
   <div class="container emp-profile">
 <!--    <form method="post">-->
       <div class="row">
@@ -160,17 +156,22 @@
       </div>
 <!--    </form>-->
   </div>
+  <footerMenu/>
 </template>
 
 <script>
 
 import router from "@/router";
 import {JWTAuth} from '../../services/jwt.js';
+import footerMenu from './FooterMenu.vue';
 
 const jwtAuth = new JWTAuth('http://localhost:8000/auth/');
 
 export default {
   // mixins: [userInfo],
+  components: {
+    footerMenu,
+  },
   data() {
     return {
       userInfo: {
@@ -182,13 +183,12 @@ export default {
   },
   methods: {
     GoToCreatePost() {
-      router.push(this.username + '/createPost');
+      router.push('profile/createPost');
     },
     async userData() {
       const user = await jwtAuth.getCurrentUser();
       this.userInfo = user;
       this.userInfo.userId = user.id;
-      // console.log(user);
     }
   },
   mounted() {
@@ -198,9 +198,6 @@ export default {
 </script>
 
 <style scoped>
-body {
-  background: -webkit-linear-gradient(left, #3931af, #00c6ff);
-}
 
 .emp-profile {
   padding: 3%;
@@ -317,4 +314,5 @@ body {
   border-radius: 50px;
   font-size: 16px;
 }
+
 </style>

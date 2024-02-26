@@ -1,17 +1,13 @@
 <template>
   <div id="app">
-    <div class="container d-flex mt-5 justify-content-center">
-      <div style="text-align: center">
-        <div v-if="isLoggedIn">
-          <!--<task-list></task-list>-->
-<!--          <button @click="logout">Logout</button>-->
-<!--          <p>hello {{ username }}</p>-->
-        </div>
-        <div v-else>
-          <button @click="login">Login</button>
-        </div>
-      </div>
-    </div>
+<!--    <div class="container d-flex mt-5 justify-content-center">-->
+<!--/*      <div style="text-align: center">*/-->
+<!--        <div v-if="isLoggedIn"></div>-->
+<!--        <div v-else>-->
+<!--          <button @click="login">Login</button>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
   </div>
 </template>
 
@@ -35,7 +31,6 @@ export default {
       this.isLoggedIn = await jwtAuth.login("erfan", 'erfank');
       // location.reload();
       console.log("loggedIn:" + this.isLoggedIn);
-
     },
     // async logout() {
     //   this.isLoggedIn = jwtAuth.logout();

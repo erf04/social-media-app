@@ -1,11 +1,13 @@
 <template>
-  <div class="container mb-3">
+  <div class="container">
     <div v-for="(post, index) in posts" :key="post.id" class="card mb-5"
          style="margin: 0 auto; min-height: 300px; width: 25rem">
       <div class="p-2 pb-0 mt-0 d-flex justify-content-between">
         <div class="d-flex" style="gap: 5px">
           <img src="../assets/logo.png" class="circle-image" alt="userProfile">
-          <h5 style="font-weight: normal">{{ post.author.username }}</h5>
+          <button @click="GoToUserPage($event.target.innerHTML)">
+            <h5 style="font-weight: normal">{{ post.author.username }}</h5>
+          </button>
         </div>
         <div>
           <button type="button" class="btn btn-lg border-0"
@@ -78,11 +80,6 @@
       </div>
     </div>
   </div>
-  <!--  <button @click="show = !show">Toggle</button>-->
-
-  <!--  <Transition name="bounce">-->
-
-  <!--  </Transition>-->
 </template>
 
 <script>
@@ -90,11 +87,12 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import {JWTAuth} from '../../services/jwt';
-
-// import TaskApi from '../../services/taskApi';
+import {mixins} from "@/mixins"
+import router from "@/router";
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 export default {
+  mixins: [mixins],
   // props: ['imageSrc', 'caption'],
   data() {
     return {
@@ -123,8 +121,6 @@ export default {
           created_at: "",
         }
       ],
-      // likeFillColor: 'none',
-      // saveFillColor: 'none',
     }
   },
   mounted() {
@@ -142,35 +138,11 @@ export default {
         buttonText.innerHTML = 'less';
       }
     },
-    // async fetchTasks() {
-    //   let taskApi = new TaskApi("http://localhost:8000/api/tasks", "http://localhost:8000/auth");
-    //   taskApi.getAuthorizedRequest()
-    //       .then(api => {
-    //         return api.get('')
-    //       })
-    //       .then(response => {
-    //         this.tasks = response.data;
-    //         // console.log("TASKS:",this.tasks[1]);
-    //
-    //       }).catch(error => {
-    //     if (error.response.status === 401) {
-    //       console.log("unauthorized");
-    //       this.$router.push('/login');
-    //     } else {
-    //       console.log("unexpected error");
-    //     }
-    //   })
-    // },
-    //
-    // getUsers() {
-    //   axios.get("https://localhost:8000/auth/users/")
-    //       .then((response) => {
-    //         console.log(response);
-    //       })
-    //       .catch(error => {
-    //         console.log(error);
-    //       })
-    // },
+
+    GoToUserPage(name) {
+      router.push('/' + name);
+    },
+
     liked(index) {
       let elements = this.$refs.likeBounce;
       if (this.likeStatus.like === true) {
@@ -227,7 +199,7 @@ export default {
           .then(response => {
             this.posts = response.data;
             console.log("response.data.length", response.data.length);
-            for (let i = 0; i!== response.data.length; i++) {
+            for (let i = 0; i !== response.data.length; i++) {
               this.likeFillColor.push("none");
               this.saveFillColor.push("none");
             }

@@ -1,39 +1,20 @@
-import axios from "axios";
+import router from "@/router";
+import home from "./components/Home.vue"
 
-export const userInfo = {
+export const mixins = {
+    components: [
+      home,
+    ],
     data() {
         return {
-            hasan: {},
-            name:'',
-            posts: [
-                {
-                    title: "",
-                    description: "",
-                    content: "",
-                    author: {
-                        username: "",
-                        image: null,
-                    },
-                    created_at: "",
-                }
-            ],
-            likeFillColor: 'none',
         }
     },
-    getPosts() {
-        axios.get('http://localhost:8000/api/posts/all', {
-            headers: {
-                Authorization: `JWT ${localStorage.getItem("access_token")}`
-            }
-        })
-            .then(response => {
-                this.posts = response.data;
-                console.log("response.data", response.data[0].author);
-                this.hasan = response.data;
-            })
-            .catch(error => {
-                console.log(error);
-                return error;
-            });
-    },
+    methods: {
+        GoToHome() {
+            router.push('/');
+        },
+        GoToProfile() {
+            router.push('/profile/');
+        },
+    }
 }
