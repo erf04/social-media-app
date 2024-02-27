@@ -1,171 +1,60 @@
 <template>
   <div class="container emp-profile">
-<!--    <form method="post">-->
-      <div class="row">
-        <div class="col-md-4">
-          <div class="profile-img">
-            <img
-                :src="getAbsoluteUrl(userInfo.image)"
-                alt=""/>
-            <div class="file btn btn-lg btn-primary">
-              Change Photo
-              <input type="file" name="file"/>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="profile-head">
-            <h5>
-              {{ userInfo.username }}
-            </h5>
-            <h6>
-              Web Developer and Designer
-            </h6>
-            <p class="proile-rating">RANKINGS : <span>8/10</span></p>
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-              <li class="nav-item">
-                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home"
-                   aria-selected="true">About</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab"
-                   aria-controls="profile" aria-selected="false">Timeline</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-md-2">
-          <input type="submit" class="profile-edit-btn" name="btnAddMore" value="Edit Profile" />
-<!--          <router-link to="createPost">-->
-<!--            Create New Post-->
-<!--          </router-link>-->
-          <button class="btn btn-primary mt-2" @click="GoToCreatePost">
-            Create New Post
-          </button>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-4">
-          <div class="profile-work">
-            <p>WORK LINK</p>
-            <a href="#">Website Link</a><br/>
-            <a href="#">Bootsnipp Profile</a><br/>
-            <a href="#">Bootply Profile</a>
-            <p>SKILLS</p>
-            <a href="#">Web Designer</a><br/>
-            <a href="#">Web Developer</a><br/>
-            <a href="#">WordPress</a><br/>
-            <a href="#">WooCommerce</a><br/>
-            <a href="#">PHP, .Net</a><br/>
-          </div>
-        </div>
-        <div class="col-md-8">
-          <div class="tab-content profile-tab" id="myTabContent">
-            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-              <div class="row">
-                <div class="col-md-6">
-                  <label>User Id</label>
-                </div>
-                <div class="col-md-6">
-                  <p>{{ userInfo.userId }}</p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <label>Name</label>
-                </div>
-                <div class="col-md-6">
-                  <p>{{ userInfo.username }}</p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <label>Email</label>
-                </div>
-                <div class="col-md-6">
-                  <p>{{ userInfo.email }}</p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <label>Phone</label>
-                </div>
-                <div class="col-md-6">
-                  <p>123 456 7890</p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <label>Profession</label>
-                </div>
-                <div class="col-md-6">
-                  <p>Web Developer and Designer</p>
-                </div>
-              </div>
-            </div>
-            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-              <div class="row">
-                <div class="col-md-6">
-                  <label>Experience</label>
-                </div>
-                <div class="col-md-6">
-                  <p>Expert</p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <label>Hourly Rate</label>
-                </div>
-                <div class="col-md-6">
-                  <p>10$/hr</p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <label>Total Projects</label>
-                </div>
-                <div class="col-md-6">
-                  <p>230</p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <label>English Level</label>
-                </div>
-                <div class="col-md-6">
-                  <p>Expert</p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <label>Availability</label>
-                </div>
-                <div class="col-md-6">
-                  <p>6 months</p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12">
-                  <label>Your Bio</label><br/>
-                  <p>Your detail description</p>
-                </div>
-              </div>
-            </div>
+    <div class="row">
+      <div class="col-md-4">
+        <div class="profile-img justify-content-start">
+          <img
+              :src="getAbsoluteUrl(userInfo.image)"
+              alt=""/>
+          <div class="file btn btn-lg btn-primary">
+            Change Photo
+            <input type="file" name="file"/>
           </div>
         </div>
       </div>
-<!--    </form>-->
+      <div class="col-md-6">
+        <div class="profile-head">
+          <h5>
+            {{ userInfo.username }}
+          </h5>
+          <h6>
+            Web Developer and Designer
+          </h6>
+          <p class="proile-rating">RANKINGS : <span>8/10</span></p>
+          <ul class="nav nav-tabs" style="margin-top: 60px;" id="myTab" role="tablist">
+            <li class="nav-item">
+              <button class="nav-link active" @click="showUserInfo = true; showPosts = false;" id="home-tab">
+                About
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" @click="showPosts = true; showUserInfo = false" id="profile-tab">Posts</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <input type="submit" class="profile-edit-btn" name="btnAddMore" value="Edit Profile"/>
+        <button class="btn btn-primary mt-2" @click="GoToCreatePost">
+          Create New Post
+        </button>
+      </div>
+    </div>
+    <profile-info v-if="showUserInfo"/>
+    <profile-posts v-if="showPosts"/>
   </div>
-  <footerMenu/>
+  <footerMenu :fromProfile="true"/>
 </template>
 
 <script>
-
 import router from "@/router";
 import {JWTAuth} from '../../services/jwt.js';
 import footerMenu from './FooterMenu.vue';
+import profileInfo from "@/components/ProfileInfo.vue";
+import profilePosts from "@/components/ProfilePosts.vue"
 import axios from "axios";
-const baseURL="http://localhost:8000/api";
+
+const baseURL = "http://localhost:8000/api";
 
 const jwtAuth = new JWTAuth('http://localhost:8000/auth/');
 
@@ -173,9 +62,14 @@ export default {
   // mixins: [userInfo],
   components: {
     footerMenu,
+    profileInfo,
+    profilePosts,
   },
   data() {
     return {
+      showUserInfo: false,
+      showPosts: true,
+      underline: "activeLink",
       userInfo: {
         email: '',
         userId: null,
@@ -190,13 +84,13 @@ export default {
     },
     async userData() {
       const user = await jwtAuth.getCurrentUser();
-      axios.post(`${baseURL}/get-user/`,{
-        username:user.username
+      axios.post(`${baseURL}/get-user/`, {
+        username: user.username
       })
-          .then(response=>{
-            this.userInfo=response.data;
+          .then(response => {
+            this.userInfo = response.data;
           })
-          .catch(err=>{
+          .catch(err => {
             console.log(err);
           })
       this.userInfo = user;
@@ -218,8 +112,8 @@ export default {
 
 .emp-profile {
   padding: 3%;
-  margin-top: 3%;
-  margin-bottom: 3%;
+  margin-top: 1%;
+  margin-bottom: 1%;
   border-radius: 0.5rem;
   background: #fff;
 }
@@ -330,6 +224,10 @@ export default {
 .btn {
   border-radius: 50px;
   font-size: 16px;
+}
+
+.activeLink {
+  text-decoration: underline;
 }
 
 </style>

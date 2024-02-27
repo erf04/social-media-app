@@ -86,7 +86,7 @@ export default {
     async userData() {
       const user = await jwtAuth.getCurrentUser();
       axios.post(`${baseURL}/get-user/`, {
-        username: user.username
+        username: user==null?null: user.username
       })
           .then(response => {
             this.userInfo = response.data;

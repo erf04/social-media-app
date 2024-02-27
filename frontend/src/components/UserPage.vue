@@ -6,6 +6,7 @@
         <div class="profile-img">
           <img
               :src="getAbsoluteUrl(userInfo.image)"
+              style="max-height: 200px"
               alt=""/>
           <div class="file btn btn-lg btn-primary">
             Change Photo
@@ -22,26 +23,20 @@
             Web Developer and Designer
           </h6>
           <p class="proile-rating">RANKINGS : <span>8/10</span></p>
-          <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <ul class="nav nav-tabs" id="myTab" style="margin-top: 55px;" role="tablist">
             <li class="nav-item">
-              <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home"
+              <a class="nav-link active" id="home-tab" data-toggle="tab" href="#" role="tab" aria-controls="home"
                  aria-selected="true">About</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab"
+              <a class="nav-link" id="profile-tab" data-toggle="tab" href="#" role="tab"
                  aria-controls="profile" aria-selected="false">Timeline</a>
             </li>
           </ul>
         </div>
       </div>
       <div class="col-md-2">
-        <input type="submit" class="profile-edit-btn" name="btnAddMore" value="Edit Profile" />
-        <!--          <router-link to="createPost">-->
-        <!--            Create New Post-->
-        <!--          </router-link>-->
-<!--        <button class="btn btn-primary mt-2" @click="GoToCreatePost">-->
-<!--          Create New Post-->
-<!--        </button>-->
+        <!--        <input type="submit" class="profile-edit-btn" name="btnAddMore" value="Edit Profile" />-->
       </div>
     </div>
     <div class="row">
@@ -78,7 +73,7 @@
                 <p>{{ userInfo.username }}</p>
               </div>
             </div>
-            <div class="row">
+            <div class="row" v-if="false">
               <div class="col-md-6">
                 <label>Email</label>
               </div>
@@ -86,7 +81,7 @@
                 <p>{{ userInfo.email }}</p>
               </div>
             </div>
-            <div class="row">
+            <div class="row" v-if="false">
               <div class="col-md-6">
                 <label>Phone</label>
               </div>
@@ -164,13 +159,12 @@
 import axios from "axios";
 import {useRoute} from "vue-router";
 
-const baseURL="http://localhost:8000/api";
+const baseURL = "http://localhost:8000/api";
 
 export default {
   data() {
     return {
-      userInfo: {
-      }
+      userInfo: {}
     }
   },
   methods: {
@@ -201,8 +195,8 @@ export default {
 <style scoped>
 .emp-profile {
   padding: 3%;
-  margin-top: 3%;
-  margin-bottom: 3%;
+  margin-top: 1%;
+  margin-bottom: 1%;
   border-radius: 0.5rem;
   background: #fff;
 }
@@ -313,6 +307,10 @@ export default {
 .btn {
   border-radius: 50px;
   font-size: 16px;
+}
+
+img {
+  object-fit: cover;
 }
 
 </style>
