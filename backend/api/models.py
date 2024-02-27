@@ -14,7 +14,7 @@ class Task(models.Model):
 
 
 class User(AbstractUser):
-    image=models.ImageField(upload_to='profile/', blank=True, null=True)
+    image=models.ImageField(upload_to='profile/', blank=True, null=True,default='default/userProfile/user.png')
     
 
 
