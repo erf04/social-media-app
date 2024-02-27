@@ -117,10 +117,20 @@
 </template>
 
 <script>
+/* eslint-disable */
+import ReconnectingWebSocket from 'reconnecting-websocket';
+
 export default {
   data() {
     return {}
-  }
+  },
+  created() {
+    this.websocket=new ReconnectingWebSocket('ws://localhost:8000/ws/chat/test');
+    this.websocket.addEventListener('open',()=>{
+      this.websocket.send("sagi");
+    })
+
+  },
 }
 </script>
 

@@ -14,7 +14,9 @@
     "core-js": "^3.8.3",
     "jquery": "^3.7.1",
     "mitt": "^3.0.1",
+    "reconnecting-websocket": "^4.4.0",
     "vue": "^3.2.13",
+    "vue-native-websocket": "^2.0.15",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {
