@@ -117,19 +117,29 @@
 </template>
 
 <script>
-/* eslint-disable */
-import ReconnectingWebSocket from 'reconnecting-websocket';
+
+import ReconnectingWebSocket from  "../lib/reconnecting-websocket.min.js";
 
 export default {
   data() {
     return {}
   },
-  created() {
-    this.websocket=new ReconnectingWebSocket('ws://localhost:8000/ws/chat/test');
-    this.websocket.addEventListener('open',()=>{
-      this.websocket.send("sagi");
-    })
-
+  mounted() {
+    this.websocket=new ReconnectingWebSocket('ws://localhost:8000/ws/chat/');
+    this.websocket.onopen=()=>{
+      console.log("open");
+      this.websocket.send(JSON.stringify({
+        "message":"hello world"
+      }))
+    }
+    this.websocket.onclose=(event)=>{
+      console.log("close");
+      console.log(event.data);
+    }
+    this.websocket.onmessage=(event)=>{
+      console.log("message");
+      console.log(JSON.parse(event.data));
+    }
   },
 }
 </script>
