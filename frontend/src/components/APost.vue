@@ -2,9 +2,12 @@
   <div class="container">
     <div v-for="(post, index) in posts" :key="post.id" class="card mb-5"
          style="margin: 0 auto; min-height: 300px; width: 25rem">
-      <div class="p-2 pb-0 mt-0 d-flex justify-content-between">
+      <div class="p-2 pb-0 mt-0 d-flex justify-content-between align-items-center">
         <div class="d-flex" style="gap: 5px">
-          <img src="../assets/logo.png" class="circle-image" alt="userProfile">
+          <button @click="GoToUserPage(post.author.username)">
+            <img :src="getAbsoluteUrl(post.author.image)" class="circle-image" style="width: 70px;height: 70px"
+                 alt="userProfile">
+          </button>
           <button @click="GoToUserPage($event.target.innerHTML)">
             <h5 style="font-weight: normal">{{ post.author.username }}</h5>
           </button>
@@ -14,7 +17,7 @@
                   style="color: black"
                   data-bs-toggle="dropdown" aria-expanded="false">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                 stroke="currentColor" class="w-6 h-6" style="width: 20px">
+                 stroke="currentColor" class="w-6 h-6" style="width: 30px">
               <path stroke-linecap="round" stroke-linejoin="round"
                     d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"/>
             </svg>

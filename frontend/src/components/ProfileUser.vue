@@ -5,7 +5,7 @@
         <div class="col-md-4">
           <div class="profile-img">
             <img
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS52y5aInsxSm31CvHOFHWujqUx_wWTS9iM6s7BAm21oEN_RiGoog"
+                :src="getAbsoluteUrl(userInfo.image)"
                 alt=""/>
             <div class="file btn btn-lg btn-primary">
               Change Photo
@@ -164,6 +164,8 @@
 import router from "@/router";
 import {JWTAuth} from '../../services/jwt.js';
 import footerMenu from './FooterMenu.vue';
+import axios from "axios";
+const baseURL="http://localhost:8000/api";
 
 const jwtAuth = new JWTAuth('http://localhost:8000/auth/');
 
@@ -178,6 +180,7 @@ export default {
         email: '',
         userId: null,
         username: '',
+        image: null,
       },
     }
   },
@@ -187,9 +190,23 @@ export default {
     },
     async userData() {
       const user = await jwtAuth.getCurrentUser();
+      axios.post(`${baseURL}/get-user/`,{
+        username:user.username
+      })
+          .then(response=>{
+            this.userInfo=response.data;
+          })
+          .catch(err=>{
+            console.log(err);
+          })
       this.userInfo = user;
       this.userInfo.userId = user.id;
-    }
+      console.log(user);
+    },
+    getAbsoluteUrl(relativeUrl) {
+      return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
+    },
+
   },
   mounted() {
     this.userData();

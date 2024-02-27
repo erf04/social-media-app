@@ -2,10 +2,10 @@
   <div class="w-100 border-bottom mb-4 pb-0 p-2 d-flex justify-content-between" style="background-color: #29292e">
     <img src="../assets/logo1.png" style="width: 250px; height: 60px" alt="logo"/>
     <div class="d-flex align-items-center">
-      <h4 style="color: white">Welcome {{userName}} !</h4>
+      <h4 style="color: white">Welcome {{ userInfo.username }} !</h4>
       <div class="btn-group">
         <button @click="GoToProfile" class="border-0" style="background-color: inherit">
-          <img src="../assets/logo.png" class="circle-image" alt="profile"/>
+          <img :src="getAbsoluteUrl(userInfo.image)" class="circle-image" alt="profile"/>
         </button>
         <button type="button" class="btn btn-lg dropdown-toggle dropdown-toggle-split border-0"
                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -25,8 +25,8 @@
     </div>
   </div>
   <authTest @name="username($event)"/>
-  <posts />
-  <footerMenu />
+  <posts/>
+  <footerMenu/>
 </template>
 
 <script>
@@ -38,8 +38,10 @@ import footerMenu from './FooterMenu.vue';
 import {JWTAuth} from '../../services/jwt.js';
 import {mixins} from "@/mixins";
 import router from "@/router";
+import axios from "axios";
 
 const jwtAuth = new JWTAuth('http://localhost:8000/auth/');
+const baseURL = "http://localhost:8000/api";
 
 // history.pushState(null, null, location.href);
 // window.onpopstate = function () {
@@ -62,7 +64,7 @@ export default {
   data() {
     return {
       update: false,
-      userName: '',
+      userInfo: {},
     }
   },
   methods: {
@@ -78,7 +80,29 @@ export default {
     GoToProfile() {
       router.push('/profile');
     },
+    getAbsoluteUrl(relativeUrl) {
+      return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
+    },
+    async userData() {
+      const user = await jwtAuth.getCurrentUser();
+      axios.post(`${baseURL}/get-user/`, {
+        username: user.username
+      })
+          .then(response => {
+            this.userInfo = response.data;
+            console.log("user info", this.userInfo);
+          })
+          .catch(err => {
+            console.log(err);
+          })
+      this.userInfo = user;
+      this.userInfo.userId = user.id;
+      console.log(user);
+    },
   },
+  mounted() {
+    this.userData();
+  }
 }
 </script>
 

@@ -5,7 +5,7 @@
       <div class="col-md-4">
         <div class="profile-img">
           <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS52y5aInsxSm31CvHOFHWujqUx_wWTS9iM6s7BAm21oEN_RiGoog"
+              :src="getAbsoluteUrl(userInfo.image)"
               alt=""/>
           <div class="file btn btn-lg btn-primary">
             Change Photo
@@ -67,7 +67,7 @@
                 <label>User Id</label>
               </div>
               <div class="col-md-6">
-<!--                <p>{{ userInfo.userId }}</p>-->
+                <p>{{ userInfo.pk }}</p>
               </div>
             </div>
             <div class="row">
@@ -75,7 +75,7 @@
                 <label>Name</label>
               </div>
               <div class="col-md-6">
-<!--                <p>{{ userInfo.username }}</p>-->
+                <p>{{ userInfo.username }}</p>
               </div>
             </div>
             <div class="row">
@@ -83,7 +83,7 @@
                 <label>Email</label>
               </div>
               <div class="col-md-6">
-<!--                <p>{{ userInfo.email }}</p>-->
+                <p>{{ userInfo.email }}</p>
               </div>
             </div>
             <div class="row">
@@ -170,7 +170,6 @@ export default {
   data() {
     return {
       userInfo: {
-
       }
     }
   },
@@ -180,12 +179,18 @@ export default {
         username: useRoute().params.name,
       })
           .then(response => {
-            console.log(response.data);
+            this.userInfo = response.data;
+            console.log(this.userInfo)
+            // console.log(response.data);
           })
           .catch(error => {
             console.log(error);
           })
-    }
+    },
+    getAbsoluteUrl(relativeUrl) {
+      return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
+    },
+
   },
   mounted() {
     this.getUserInfo();
