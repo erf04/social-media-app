@@ -6,6 +6,11 @@ from .models import *
 admin.site.register(Task)
 admin.site.register(User)
 admin.site.register(Follower)
-admin.site.register(Post)
+admin.site.register(Chat)
+admin.site.register(Message)
+admin.site.register(Forward)
+admin.site.register(CommentContainer)
+admin.site.register(Group)
+admin.site.register(PrivateChat)
 
 

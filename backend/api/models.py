@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 # Create your models here.
 
 class Task(models.Model):
@@ -31,22 +32,26 @@ class Follower(models.Model):
         
 
 #for likes ,saves and forwards
-class Content(models.Model):
-    liked_by=models.ManyToManyField(User,related_name='likes',blank=True,null=True)
-    saved_by=models.ManyToManyField(User,related_name='saves',blank=True,null=True)
+class AbstractContent(models.Model):
+    liked_by=models.ManyToManyField(User,blank=True)
+    saved_by=models.ManyToManyField(User,blank=True)
 
     class Meta:
         abstract=True
 
 
+
+
 # users can like , save and forward a post too    
-class Post(Content):
+class Post(AbstractContent):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField()
     content=models.FileField(upload_to='posts/')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    liked_by=models.ManyToManyField(User,related_name='post_likes',blank=True)
+    saved_by=models.ManyToManyField(User,related_name='post_saves',blank=True)
     
     def __str__(self) -> str:
         return f"Post by {self.author}: {self.title}"
@@ -54,19 +59,23 @@ class Post(Content):
 
 
 
-class Chat(models.Model):
+class AbstractChat(models.Model):
     creation_date=models.DateTimeField(auto_now_add=True)
-    creator=models.ForeignKey(User,on_delete=models.CASCADE,related_name='created_chats')
+    creator=models.ForeignKey(User,on_delete=models.CASCADE)
 
 
     class Meta:
         abstract=True
 
 
+class Chat(AbstractChat):
+    creator=models.ForeignKey(User,on_delete=models.CASCADE,related_name='created_chats')
 
 
-class Message(Content):
-    related_chat=models.ForeignKey(Chat,on_delete=models.CASCADE,related_name="messages")
+class AbstractMessage(AbstractContent):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    chat = GenericForeignKey('content_type', 'object_id')
     sender = models.ForeignKey(User,on_delete=models.CASCADE,related_name= "sent_messages")
     body = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -79,19 +88,33 @@ class Message(Content):
         return f"Message by {self.sender} at {self.timestamp}"
     
 
-# forward is a message about a content
-class Forward(Message):
-    content=models.ForeignKey(Content,on_delete=models.CASCADE,related_name='forwards')
+class Message(AbstractMessage):
+    
+    sender = models.ForeignKey(User,on_delete=models.CASCADE,related_name= "sent_chat_messages")
+    reply_to=models.ForeignKey('self',on_delete=models.CASCADE,null=True,blank=True)  # for replying to a message
+    liked_by=models.ManyToManyField(User,related_name='message_likes',blank=True)
+    saved_by=models.ManyToManyField(User,related_name='message_saves',blank=True)
 
-class CommentContainer(Chat):
+    
+
+# forward is a message about a content
+class Forward(AbstractMessage):
+    post=models.ForeignKey(Post,related_name="forward",on_delete=models.CASCADE)
+    liked_by=models.ManyToManyField(User,related_name='forward_likes',blank=True)
+    saved_by=models.ManyToManyField(User,related_name='forward_saves',blank=True)
+
+class CommentContainer(AbstractChat):
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment_containers_created')
     related_post=models.OneToOneField(Post, on_delete=models.CASCADE, primary_key=True,related_name= 'comment_container')
 
 
-class Group(Chat):
+class Group(AbstractChat):
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='groups_created')
     paticipants=models.ManyToManyField(User,blank=True)
     name=models.CharField(max_length=256)
 
 
-class PrivateChat(Chat):
+class PrivateChat(AbstractChat):
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='private_chats_created')
     the_other=models.ForeignKey(User,on_delete=models.CASCADE,related_name="private_chats")
 
