@@ -27,16 +27,7 @@ def getTasks(request:Request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response({"message": "No tasks found"}, status=status.HTTP_204_NO_CONTENT)
-
-# @api_view(['GET'])
-# def getTask(request:Request,id):
-#     try:
-#         task=Task.objects.get(pk=id)
-#         serialized=TaskSerializer(task,many=False)
-#         return Response(data=serialized.data,status=status.HTTP_302_FOUND)
-#     except:
-#         return Response({"error":"task not found"},status=status.HTTP_404_NOT_FOUND)
-    
+ 
 
 @api_view(['GET'])
 
