@@ -110,7 +110,7 @@ class CommentContainer(AbstractChat):
 
 class Group(AbstractChat):
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='groups_created')
-    paticipants=models.ManyToManyField(User,blank=True)
+    participants=models.ManyToManyField(User,blank=True)
     name=models.CharField(max_length=256)
 
 

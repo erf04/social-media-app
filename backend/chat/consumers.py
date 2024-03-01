@@ -2,7 +2,7 @@ import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from api.models import  User,PrivateChat,Message
+from api.models import  User,PrivateChat,Message,Group
 
 class GroupConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -49,14 +49,28 @@ class GroupConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def create_new_message(self,text_data):
         #reply_to,chat,body
-        user=self.scope['user']
+        user:User=self.scope['user']
         if not user.is_authenticated:
             return {'error':'Must be logged in'}
             
-        reply_to=text_data["reply_to"]
+        reply_to_id=text_data["reply_message_id"]
         body=text_data["body"]
-        chat=self.room_name
-        message=Message.objects.create(chat=chat,body=body,reply_to=reply_to)
+        chat_name=self.room_name
+        try:
+            replied_message=Message.objects.get(pk=reply_to_id) if reply_to_id!=None else None
+        except:
+            return {"error":f"there is no message with id:{reply_to_id} to be a replied message"}
+        
+        group=Group.objects.filter(participants=user,name=chat_name).first()
+        try:
+            message:Message=Message.objects.create(sender=user,chat=group,body=body,reply_to=replied_message)
+        except:
+            return {
+                "error":"something wrong in creating message"
+            }
+        
+
+            
 
 
 
