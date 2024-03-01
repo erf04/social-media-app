@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey,GenericRelation
 # Create your models here.
 
 class Task(models.Model):
@@ -106,15 +106,20 @@ class Forward(AbstractMessage):
 class CommentContainer(AbstractChat):
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment_containers_created')
     related_post=models.OneToOneField(Post, on_delete=models.CASCADE, primary_key=True,related_name= 'comment_container')
+    messages=GenericRelation(Message)
 
 
 class Group(AbstractChat):
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='groups_created')
     participants=models.ManyToManyField(User,blank=True)
     name=models.CharField(max_length=256)
+    messages=GenericRelation(Message)
+
 
 
 class PrivateChat(AbstractChat):
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='private_chats_created')
     the_other=models.ForeignKey(User,on_delete=models.CASCADE,related_name="private_chats")
+    messages=GenericRelation(Message)
+
 

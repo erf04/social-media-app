@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from api.models import Group,User,Message
-from api.serializers import UserSerializer
+from api.models import Group,User,Message,CommentContainer
+from api.serializers import UserSerializer,PostSerializer
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -11,3 +11,23 @@ class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model=Group
         fields=('id','name','creator','creation_date','paticipants')
+
+
+class CommentContainerSerializer(serializers.ModelSerializer):
+    # messages=MessageSerializer(many=True,required=False)
+    class Meta:
+        model=CommentContainer
+        fields=('id','messages')
+
+
+
+class MessageChatField(serializers.RelatedField):
+    
+    def to_representation(self, value):
+        if isinstance(value, Group):
+            serializer=GroupSerializer(value)
+
+        return serializer
+    
+
+# class MessageSerializer()
