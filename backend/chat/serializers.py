@@ -21,13 +21,21 @@ class CommentContainerSerializer(serializers.ModelSerializer):
 
 
 
-class MessageChatField(serializers.RelatedField):
+# class MessageChatField(serializers.RelatedField):
     
-    def to_representation(self, value):
-        if isinstance(value, Group):
-            serializer=GroupSerializer(value)
-
-        return serializer
+#     def to_representation(self, value):
+#         if isinstance(value, Group):
+#             serializer=GroupSerializer(value)
+#         elif isinstance(value,CommentContainer):
+#             serializer="CommentContainerSerializer"()
+#         return serializer
     
 
-# class MessageSerializer()
+class MessageSerializer(serializers.ModelSerializer):
+    sender=UserSerializer(many=False,required=False)
+    timestamp=serializers.DateTimeField(format='%Y-%m-%d',read_only=True)
+    liked_by=UserSerializer(many=True, required=False)
+    saved_by=UserSerializer(many=True,required=False)
+    class Meta:
+        model=Message
+        fields=('id','sender','reply_to','liked_by','saved_by','body','timestamp')

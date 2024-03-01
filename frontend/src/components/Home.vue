@@ -95,8 +95,8 @@ export default {
           .catch(err => {
             console.log(err);
           })
-      this.userInfo = user;
-      this.userInfo.userId = user.id;
+      // this.userInfo = user;
+      // this.userInfo.userId = user==null?null: user.id;
       console.log(user);
     },
   },

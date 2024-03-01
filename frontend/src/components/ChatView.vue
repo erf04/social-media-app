@@ -125,11 +125,15 @@ export default {
     return {}
   },
   mounted() {
-    this.websocket=new ReconnectingWebSocket('ws://localhost:8000/ws/chat/');
+    this.websocket=new ReconnectingWebSocket('ws://localhost:8000/ws/group/group1/');
     this.websocket.onopen=()=>{
       console.log("open");
       this.websocket.send(JSON.stringify({
-        "message":"hello world"
+        "command":"fetch_messages",
+        "message":{
+          "body":'Hello server!',
+          "reply_to_id":null
+        }
       }))
     }
     this.websocket.onclose=(event)=>{

@@ -95,6 +95,9 @@ class Message(AbstractMessage):
     liked_by=models.ManyToManyField(User,related_name='message_likes',blank=True)
     saved_by=models.ManyToManyField(User,related_name='message_saves',blank=True)
 
+    def message_order(self,roomname):
+        return Message.objects.filter(chat__name=roomname).order_by('timestamp')
+
     
 
 # forward is a message about a content
