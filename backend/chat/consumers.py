@@ -17,8 +17,14 @@ class GroupConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(
             self.room_group_name, self.channel_name
         )
+
         print('to accept')
         await self.accept()
+
+#      @database_sync_to_async
+#      def add_to_group(self):
+#         self.scope['user']
+
 
     async def disconnect(self, close_code):
         # Leave room group
@@ -83,13 +89,10 @@ class GroupConsumer(AsyncWebsocketConsumer):
             return {"error":f"there is no message with id:{reply_to_id} to be a replied message"}
         
         group:Group=Group.objects.filter(participants=user,name=chat_name).first()
-        # print(group)
-        try:
-            message:Message=Message.objects.create(sender=user,chat=group,body=body,reply_to=replied_message)
-        except:
-            return {
-                "error":"something wrong in creating message"
-            }
+        print(group)
+
+        message:Message=Message.objects.create(sender=user,chat=group,body=body,reply_to=replied_message)
+
         
         serialized=MessageSerializer(message,many=False)
         print(serialized.data)
