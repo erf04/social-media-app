@@ -163,9 +163,11 @@ export default {
       // console.log(data);
       if (data["command"] === "fetch_messages")
         this.messages = data["messages"];
-      else if (data["command"] === "new_message")
+      else if (data["command"] === "new_message"){
         console.log(data)
         this.new_message = data['data'];
+      }
+        
 
       // console.log(this.messages.length);
       // this.$refs.text.innerHTML = this.messages[0].body;

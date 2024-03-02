@@ -112,15 +112,9 @@ class GroupConsumer(AsyncWebsocketConsumer):
             "messages":dict_messages
         }
         
-        
-
-            
 
 
-
-
-
-class ChatConsumer(AsyncWebsocketConsumer):
+class PrivateChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         # await self.accept()
         print(self.scope)

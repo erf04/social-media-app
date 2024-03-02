@@ -2,6 +2,7 @@ from django.urls import path,include
 from . import views
 
 urlpatterns = [
-    path('<str:roomname>/',views.showRoom),
+    path('groups/',views.GroupApiView.as_view()),
+    
     
 ]

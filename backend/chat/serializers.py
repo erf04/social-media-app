@@ -6,11 +6,11 @@ from api.serializers import UserSerializer,PostSerializer
 class GroupSerializer(serializers.ModelSerializer):
     creator=UserSerializer(many=False,required=False)
     creation_date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
-    participants=UserSerializer(many=False,required=False)
+    participants=UserSerializer(many=True,required=False)
     
     class Meta:
         model=Group
-        fields=('id','name','creator','creation_date','paticipants')
+        fields=('id','name','creator','creation_date','participants')
 
 
 class CommentContainerSerializer(serializers.ModelSerializer):
