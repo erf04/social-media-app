@@ -87,7 +87,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
             replied_message=Message.objects.get(pk=reply_to_id) if reply_to_id!=None else None
         except:
             return {"error":f"there is no message with id:{reply_to_id} to be a replied message"}
-        
+        print(user)
         group:Group=Group.objects.filter(participants=user,name=chat_name).first()
         print(group)
 

@@ -11,6 +11,7 @@ window.$ = $;
 const emitter = mitt();
 const app = createApp(App);
 // const baseURL="http://localhost:8000/api";
+// Vue.use(require('vue-moment'));
 app.config.globalProperties.emitter = emitter;
 app.use(router);
 app.mount('#app');
