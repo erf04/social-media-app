@@ -11,48 +11,14 @@
               <input type="text" class="form-control" placeholder="Search...">
             </div>
             <ul class="list-unstyled chat-list mt-2 mb-0">
-              <li class="clearfix">
-                <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="avatar">
+              <li class="clearfix" v-for="group in groups" :key="group.id">
+                <img :src="getAbsoluteUrl(group.image)" alt="avatar">
                 <div class="about">
-                  <div class="name">Vincent Porter</div>
-                  <div class="status"><i class="fa fa-circle offline"></i> left 7 mins ago</div>
+                  <div class="name">{{ group.name }}</div>
+                  <div class="status"><i class="fa fa-circle offline"></i> {{ group.participants.length }} <span v-if="group.participants.length>1"> members</span><span v-else-if="group.participants.length<=1">member</span></div>
                 </div>
               </li>
-              <li class="clearfix active">
-                <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">
-                <div class="about">
-                  <div class="name">Aiden Chavez</div>
-                  <div class="status"><i class="fa fa-circle online"></i> online</div>
-                </div>
-              </li>
-              <li class="clearfix">
-                <img src="https://bootdey.com/img/Content/avatar/avatar3.png" alt="avatar">
-                <div class="about">
-                  <div class="name">Mike Thomas</div>
-                  <div class="status"><i class="fa fa-circle online"></i> online</div>
-                </div>
-              </li>
-              <li class="clearfix">
-                <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar">
-                <div class="about">
-                  <div class="name">Christian Kelly</div>
-                  <div class="status"><i class="fa fa-circle offline"></i> left 10 hours ago</div>
-                </div>
-              </li>
-              <li class="clearfix">
-                <img src="https://bootdey.com/img/Content/avatar/avatar8.png" alt="avatar">
-                <div class="about">
-                  <div class="name">Monica Ward</div>
-                  <div class="status"><i class="fa fa-circle online"></i> online</div>
-                </div>
-              </li>
-              <li class="clearfix">
-                <img src="https://bootdey.com/img/Content/avatar/avatar3.png" alt="avatar">
-                <div class="about">
-                  <div class="name">Dean Henry</div>
-                  <div class="status"><i class="fa fa-circle offline"></i> offline since Oct 28</div>
-                </div>
-              </li>
+ 
             </ul>
           </div>
           <div class="chat">
@@ -79,12 +45,12 @@
               <ul class="m-b-0">
                 <li v-for="message in messages" :key="message.id" class="clearfix">
                   <div class="message-data text-right">
-                    <span class="message-data-time">{{ message.timestamp }}
-                      <span v-if="message.timestamp === todayTime"> Today </span>
-                      <span v-else-if="message.timestamp === yesterdayTime"> Yesterday </span>
+                    <span class="message-data-time">
+                      <span v-if="getFormattedDate(message.timestamp) == todayTime"> Today </span>
+                      <span v-else-if="getFormattedDate(message.timestamp) == yesterdayTime"> Yesterday </span>
                       <span v-else> {{ message.timestamp }} </span>
                     </span>
-                    <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar" />
+                    <img :src="getAbsoluteUrl(message.sender.image)" alt="user profile picture" />
                   </div>
                   <div class="message other-message float-right">{{ message.body }}</div>
                 </li>
@@ -96,7 +62,7 @@
                 <div class="input-group-prepend">
                   <span class="input-group-text"><i class="fa fa-send"></i></span>
                 </div>
-                <input @keyup.enter="sendMessage" type="text" class="form-control" placeholder="Enter text here...">
+                <input @keyup.enter="sendMessage" v-model="new_message_body" type="text" class="form-control" placeholder="Enter text here...">
               </div>
             </div>
           </div>
@@ -110,8 +76,11 @@
 
 import ReconnectingWebSocket from "../lib/reconnecting-websocket.min.js";
 import {JWTAuth} from "../../services/jwt";
+import axios from "axios";
+
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
+const user=await jwtAuth.getCurrentUser();
 
 export default {
   data() {
@@ -122,35 +91,72 @@ export default {
       },
       todayTime: "",
       yesterdayTime: "",
+      new_message_body:'',
+      formatted_message_date:'',
+      groups:[
+        {
+          creator:{},
+          participants:[{}]
+        }
+      ]
     }
   },
   methods: {
     async sendMessage() {
       console.log("open");
-      let user=await jwtAuth.getCurrentUser();
+      
+      
       // console.log(user.id);
         this.websocket.send(JSON.stringify({
           "command":"new_message",
           "message":{
-            "body":'Hello server!',
+            "body":this.new_message_body,
             "reply_to_id":null,
             "sender_id":user.id ,
           }
         }))
     },
+
+    getAbsoluteUrl(relativeUrl) {
+      return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
+    },
+
+    formatDate(date) {
+      // let date = new Date();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`
+
+    },
+    getYesterday() {
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      
+      return yesterday;
+    },
+    getFormattedDate(date){
+      console.log(date.split(" ")[0]);
+      return date.split(" ")[0].trim();
+    }
+
   },
-  mounted() {
-    let today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
-    let month = new Date().getMonth();
-    let year = new Date().getFullYear();
-    this.todayTime = `${year}-${month + 1}-${today}`;
-    this.yesterdayTime = `${year}-${month + 1}-${yesterday}`;
+  async mounted() {
+    this.today=this.formatDate(new Date()).trim();
+    this.yesterday=this.formatDate(this.getYesterday()).trim();
+    console.log(`today:${this.today}  yesterday:${this.yesterday}`);
+
+
     this.websocket = new ReconnectingWebSocket('ws://localhost:8000/ws/group/group1/');
+
+
     this.websocket.onopen=()=>{
+      // const user=await jwtAuth.getCurrentUser();
+
       this.websocket.send(JSON.stringify({
         "command":"fetch_messages",
+        "sender_id":user.id
       }))
     }
     this.websocket.onclose = (event) => {
@@ -161,19 +167,33 @@ export default {
       // console.log("message");
       let data = JSON.parse(event.data);
       // console.log(data);
-      if (data["command"] === "fetch_messages")
+      if (data["command"] === "fetch_messages"){
+        console.log(data);
         this.messages = data["messages"];
+        
+      }
       else if (data["command"] === "new_message"){
         console.log(data)
         this.new_message = data['data'];
       }
         
-
-      // console.log(this.messages.length);
-      // this.$refs.text.innerHTML = this.messages[0].body;
     }
 
-    // this.messages=messages;
+
+    axios.get('http://localhost:8000/chat/groups/',{
+      headers:{
+        Authorization:`JWT ${await jwtAuth.getAccessToken()}`
+      }
+    })
+    .then(result=>{
+      this.groups = result.data;
+      console.log(this.groups);
+    })
+    .catch(error=>{
+      console.log(error);
+    })
+
+    
 
   },
 }

@@ -78,7 +78,7 @@ class AbstractMessage(AbstractContent):
     chat = GenericForeignKey('content_type', 'object_id')
     sender = models.ForeignKey(User,on_delete=models.CASCADE,related_name= "sent_messages")
     body = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField()
     reply_to=models.ForeignKey('self',on_delete=models.CASCADE,null=True,blank=True)  # for replying to a message
 
     class Meta:
@@ -95,8 +95,8 @@ class Message(AbstractMessage):
     liked_by=models.ManyToManyField(User,related_name='message_likes',blank=True)
     saved_by=models.ManyToManyField(User,related_name='message_saves',blank=True)
 
-    def message_order(self,roomname):
-        chat_id=Group.objects.get(name=roomname).id
+    def message_order(self,user,roomname):
+        chat_id=Group.objects.get(name=roomname,participants=user).id
         return Message.objects.filter(content_type__model="group",object_id=chat_id).order_by('timestamp')
 
     
@@ -118,6 +118,7 @@ class Group(AbstractChat):
     participants=models.ManyToManyField(User,blank=True)
     name=models.CharField(max_length=256)
     messages=GenericRelation(Message)
+    image=models.ImageField(upload_to='GroupProfile',default='default/groupProfile/group-profile.png', blank=True,null=True)
 
 
 

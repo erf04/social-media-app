@@ -3,8 +3,9 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from api.models import  User,PrivateChat,Message,Group
-from .serializers import MessageSerializer
+from .serializers import MessageSerializer,GroupSerializer
 from rest_framework.renderers import JSONRenderer
+import datetime
 
 class GroupConsumer(AsyncWebsocketConsumer):
 
@@ -12,7 +13,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
-
+        print(self.groups)
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name, self.channel_name
@@ -45,9 +46,16 @@ class GroupConsumer(AsyncWebsocketConsumer):
             await self.send_to_chat_message(result)
 
         elif command=="fetch_messages":
-            result=await self.fetch_messages() 
+            result=await self.fetch_messages(text_data_json) 
        
-            await self.chat_message(result)  
+            await self.chat_message(result)
+
+        # elif command=="change_permission":
+        #     type=text_data_json["command_type"]
+        #     selected_user_id=text_data_json["selected_user_id"]
+        #     command_caller_id=text_data_json["command_caller_id"]
+        #     if type=="to_admin":
+
 
 
 
@@ -94,7 +102,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
         group:Group=Group.objects.filter(participants=user,name=chat_name).first()
         print(group)
 
-        message:Message=Message.objects.create(sender=user,chat=group,body=body,reply_to=replied_message)
+        message:Message=Message.objects.create(sender=user,chat=group,body=body,reply_to=replied_message,timestamp=datetime.datetime.now())
 
         
         serialized=MessageSerializer(message,many=False)
@@ -104,12 +112,16 @@ class GroupConsumer(AsyncWebsocketConsumer):
     
 
     @database_sync_to_async
-    def fetch_messages(self):
-        messages=Message.message_order(self,self.room_name)
+    def fetch_messages(self,text_data):
+        user:User=User.objects.get(pk=text_data['sender_id'])
+        self.room_object=Group.objects.get(name=self.room_name,participants=user)
+        messages=Message.message_order(self,user,self.room_name)
         dict_messages=MessageSerializer(messages,many=True).data
+        group_serialized=GroupSerializer(self.room_object,many=False).data
         return {
             "command":"fetch_messages",
-            "messages":dict_messages
+            "messages":dict_messages,
+            "chat_info":group_serialized
         }
         
 

@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 
 
 class GroupApiView(APIView):
+    permission_classes=[permissions.IsAuthenticated]
     def get(self,request:Request):
         groups=Group.objects.filter(participants=request.user)
         serialized=GroupSerializer(groups,many=True)

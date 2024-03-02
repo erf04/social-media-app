@@ -10,7 +10,7 @@ class GroupSerializer(serializers.ModelSerializer):
     
     class Meta:
         model=Group
-        fields=('id','name','creator','creation_date','participants')
+        fields=('id','name','creator','creation_date','participants','image')
 
 
 class CommentContainerSerializer(serializers.ModelSerializer):
