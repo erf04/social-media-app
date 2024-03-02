@@ -109,6 +109,9 @@
 <script>
 
 import ReconnectingWebSocket from "../lib/reconnecting-websocket.min.js";
+import {JWTAuth} from "../../services/jwt";
+
+const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 
 export default {
   data() {
@@ -122,13 +125,15 @@ export default {
     }
   },
   methods: {
-    sendMessage() {
+    async sendMessage() {
         console.log("open");
+      console.log(await jwtAuth.getCurrentUser().id);
         this.websocket.send(JSON.stringify({
           "command":"new_message",
           "message":{
             "body":'Hello server!',
-            "reply_to_id":null
+            "reply_to_id":null,
+            "sender_id":null ,
           }
         }))
     },
@@ -158,8 +163,8 @@ export default {
       if (data["command"] === "fetch_messages")
         this.messages = data["messages"];
       else if (data["command"] === "new_message")
-        console.log(data)
-      this.new_message = data;
+        // console.log(data)
+        this.new_message = data;
 
       // console.log(this.messages.length);
       // this.$refs.text.innerHTML = this.messages[0].body;

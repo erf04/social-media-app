@@ -76,7 +76,9 @@ class GroupConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def create_new_message(self,text_data):
         #reply_to,chat,body
-        user:User=self.scope['user']
+#         user:User=self.scope['user']
+        sender_id=text_data["sender_id"]
+        print(sender_id)
         if not user.is_authenticated:
             return {'error':'Must be logged in'}
             
