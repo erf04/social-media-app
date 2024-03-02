@@ -40,7 +40,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
 
         elif command=="fetch_messages":
             result=await self.fetch_messages() 
-            print(result)
+       
             await self.chat_message(result)  
 
 
@@ -83,13 +83,13 @@ class GroupConsumer(AsyncWebsocketConsumer):
             return {"error":f"there is no message with id:{reply_to_id} to be a replied message"}
         
         group:Group=Group.objects.filter(participants=user,name=chat_name).first()
-        print(group)
-        # try:
-        message:Message=Message.objects.create(sender=user,chat=group,body=body,reply_to=replied_message)
-        # except:
-        #     return {
-        #         "error":"something wrong in creating message"
-        #     }
+        # print(group)
+        try:
+            message:Message=Message.objects.create(sender=user,chat=group,body=body,reply_to=replied_message)
+        except:
+            return {
+                "error":"something wrong in creating message"
+            }
         
         serialized=MessageSerializer(message,many=False)
         print(serialized.data)

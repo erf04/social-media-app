@@ -33,7 +33,7 @@ class CommentContainerSerializer(serializers.ModelSerializer):
 
 class MessageSerializer(serializers.ModelSerializer):
     sender=UserSerializer(many=False,required=False)
-    timestamp=serializers.DateTimeField(format='%Y-%m-%d',read_only=True)
+    timestamp=serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S",read_only=True)
     liked_by=UserSerializer(many=True, required=False)
     saved_by=UserSerializer(many=True,required=False)
     class Meta:
