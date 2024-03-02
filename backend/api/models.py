@@ -96,7 +96,8 @@ class Message(AbstractMessage):
     saved_by=models.ManyToManyField(User,related_name='message_saves',blank=True)
 
     def message_order(self,roomname):
-        return Message.objects.filter(chat__name=roomname).order_by('timestamp')
+        chat_id=Group.objects.get(name=roomname).id
+        return Message.objects.filter(content_type__model="group",object_id=chat_id).order_by('timestamp')
 
     
 

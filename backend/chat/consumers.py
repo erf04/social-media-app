@@ -31,10 +31,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         print(text_data_json)
         
-        commands={
-        "new_message":self.create_new_message,
-        "fetch_messages":self.fetch_messages
-        }
+        
         command = text_data_json["command"]
         # self.send_to_chat_message(text_data)
         if command=="new_message":
@@ -43,6 +40,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
 
         elif command=="fetch_messages":
             result=await self.fetch_messages() 
+            print(result)
             await self.chat_message(result)  
 
 
