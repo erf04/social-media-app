@@ -126,14 +126,15 @@ export default {
   },
   methods: {
     async sendMessage() {
-        console.log("open");
-      console.log(await jwtAuth.getCurrentUser().id);
+      console.log("open");
+      let user=await jwtAuth.getCurrentUser();
+      // console.log(user.id);
         this.websocket.send(JSON.stringify({
           "command":"new_message",
           "message":{
             "body":'Hello server!',
             "reply_to_id":null,
-            "sender_id":null ,
+            "sender_id":user.id ,
           }
         }))
     },
@@ -163,8 +164,8 @@ export default {
       if (data["command"] === "fetch_messages")
         this.messages = data["messages"];
       else if (data["command"] === "new_message")
-        // console.log(data)
-        this.new_message = data;
+        console.log(data)
+        this.new_message = data['data'];
 
       // console.log(this.messages.length);
       // this.$refs.text.innerHTML = this.messages[0].body;
