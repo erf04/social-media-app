@@ -1,32 +1,48 @@
 <template>
-  <div class="container mt-5">
-    <div class="row clearfix">
-      <div class="col-lg-12">
-        <div class="card chat-app">
-          <div id="plist" class="people-list">
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fa fa-search"></i></span>
-              </div>
-              <input type="text" class="form-control" placeholder="Search...">
-            </div>
-            <ul class="list-unstyled chat-list mt-2 mb-0">
-              <li class="clearfix" v-for="group in groups" :key="group.id">
-                <button @click="GoToSelectedChat(group.id)">
-                  <img :src="getAbsoluteUrl(group.image)" alt="avatar"/>
-                  <div class="about">
-                    <div class="name">{{ group.name }}</div>
-                    <div class="status"><i class="fa fa-circle offline"></i> {{ group.participants.length }} <span
-                        v-if="group.participants.length>1"> members</span><span
-                        v-else-if="group.participants.length<=1">member</span>
-                    </div>
-                  </div>
-                </button>
-              </li>
-            </ul>
+  <ChatView />
+  <div class="chat">
+    <div class="chat-header clearfix">
+      <div class="row">
+        <div class="col-lg-6">
+          <a href="javascript:void(0);" data-toggle="modal" data-target="#view_info">
+            <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">
+          </a>
+          <div class="chat-about">
+            <h6 class="m-b-0">Aiden Chavez</h6>
+            <small>Last seen: 2 hours ago</small>
           </div>
-          <chat-view></chat-view>
         </div>
+        <div class="col-lg-6 hidden-sm text-right">
+          <a href="javascript:void(0);" class="btn btn-outline-secondary"><i class="fa fa-camera"></i></a>
+          <a href="javascript:void(0);" class="btn btn-outline-primary"><i class="fa fa-image"></i></a>
+          <a href="javascript:void(0);" class="btn btn-outline-info"><i class="fa fa-cogs"></i></a>
+          <a href="javascript:void(0);" class="btn btn-outline-warning"><i class="fa fa-question"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="chat-history">
+      <ul class="m-b-0">
+        <li v-for="message in messages" :key="message.id" class="clearfix">
+          <div class="message-data text-right">
+                    <span class="message-data-time">
+                      <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>
+                      <span v-else-if="getFormattedDate(message.timestamp) === yesterdayTime"> Yesterday </span>
+                      <span v-else> {{ message.timestamp }} </span>
+                    </span>
+            <img :src="getAbsoluteUrl(message.sender.image)" alt="user profile picture"/>
+          </div>
+          <div class="message other-message float-right">{{ message.body }}</div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="chat-message clearfix">
+      <div class="input-group mb-0">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><i class="fa fa-send"></i></span>
+        </div>
+        <input @keyup.enter="sendMessage" v-model="new_message_body" type="text" class="form-control"
+               placeholder="Enter text here...">
       </div>
     </div>
   </div>
@@ -37,15 +53,14 @@
 import ReconnectingWebSocket from "../lib/reconnecting-websocket.min.js";
 import {JWTAuth} from "../../services/jwt";
 import axios from "axios";
-import router from "@/router";
-import chatView from '../components/ChatHistory.vue'
+import ChatView from "@/components/ChatView.vue";
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 const user = await jwtAuth.getCurrentUser();
 
 export default {
   components: {
-    chatView,
+    ChatView,
   },
   data() {
     return {
@@ -67,10 +82,6 @@ export default {
   },
   computed: {},
   methods: {
-    GoToSelectedChat(n) {
-      router.push(`chat/${n}`);
-    },
-
     async sendMessage() {
       console.log("open");
       this.websocket.send(JSON.stringify({
@@ -254,7 +265,7 @@ body {
 }
 
 .chat .chat-history ul li:last-child {
-  margin-bottom: 0
+  margin-bottom: 0px
 }
 
 .chat .chat-history .message-data {
