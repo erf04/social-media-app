@@ -2,7 +2,6 @@ import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .serializers import MessageSerializer,GroupSerializer
-import datetime
 from .utils import create_new_message,fetch_messages
 class GroupConsumer(AsyncWebsocketConsumer):
 
