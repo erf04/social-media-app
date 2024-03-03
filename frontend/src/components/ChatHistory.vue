@@ -1,16 +1,41 @@
 <template>
-  <ChatView />
+  <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
+       aria-labelledby="offcanvasWithBothOptionsLabel">
+    <div class="offcanvas-header p-0">
+      <img :src="getAbsoluteUrl(groupInfo.image)" style="max-height: 200px; width: 100%"/>
+      <button style="position: absolute; top: 10px; right: 10px; background-color: red;" type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      <!--      <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Backdrop with scrolling</h5>-->
+    </div>
+    <div class="offcanvas-body">
+      <h6>This group created in {{ groupInfo.creation_date }}.</h6>
+      <h2>Members</h2>
+      <div v-for="member in groupInfo.participants" :key="member.id" class="d-flex" style="gap: 10px; padding-left: 20px">
+        <img :src="getAbsoluteUrl(member.image)" style="width: 30px; height: 30px; border-radius: 50%"/>
+        <div>
+          <h3>{{ member.username }}</h3>
+          <p>last seen</p>
+        </div>
+        <hr />
+      </div>
+    </div>
+  </div>
   <div class="chat">
     <div class="chat-header clearfix">
       <div class="row">
         <div class="col-lg-6">
-          <a href="javascript:void(0);" data-toggle="modal" data-target="#view_info">
-            <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">
-          </a>
-          <div class="chat-about">
-            <h6 class="m-b-0">Aiden Chavez</h6>
-            <small>Last seen: 2 hours ago</small>
-          </div>
+          <button style="text-align: start" type="button" data-bs-toggle="offcanvas"
+                  data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
+            <a href="javascript:void(0);" data-toggle="modal" data-target="#view_info">
+              <img :src="getAbsoluteUrl(groupInfo.image)" alt="avatar">
+            </a>
+            <div class="chat-about">
+              <div class="d-flex align-items-center small" style="gap: 10px">
+                <h6 class="mb-0">{{ groupInfo.name }} </h6>
+                <span> Created By {{ groupInfo.creator.username }}</span>
+              </div>
+              <small>{{ groupInfo.participants.length }} Members</small>
+            </div>
+          </button>
         </div>
         <div class="col-lg-6 hidden-sm text-right">
           <a href="javascript:void(0);" class="btn btn-outline-secondary"><i class="fa fa-camera"></i></a>
@@ -53,15 +78,13 @@
 import ReconnectingWebSocket from "../lib/reconnecting-websocket.min.js";
 import {JWTAuth} from "../../services/jwt";
 import axios from "axios";
-import ChatView from "@/components/ChatView.vue";
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 const user = await jwtAuth.getCurrentUser();
 
 export default {
-  components: {
-    ChatView,
-  },
+  components: {},
+  props: ['groupInfo'],
   data() {
     return {
       messages: [],
@@ -116,9 +139,7 @@ export default {
     }
   },
   async mounted() {
-    this.today = this.formatDate(new Date()).trim();
-    this.yesterday = this.formatDate(this.getYesterday()).trim();
-    console.log(`today:${this.today}  yesterday:${this.yesterday}`);
+    // console.log(`today:${this.today}  yesterday:${this.yesterday}`);
     this.websocket = new ReconnectingWebSocket('ws://localhost:8000/ws/group/group1/');
     this.websocket.onopen = () => {
       this.websocket.send(JSON.stringify({
@@ -126,17 +147,17 @@ export default {
         "sender_id": user.id
       }))
     }
-    this.websocket.onclose = (event) => {
-      console.log("close");
-      console.log(event.data);
+    this.websocket.onclose = () => {
+      // console.log("close");
+      // console.log(event.data);
     }
     this.websocket.onmessage = (event) => {
       let data = JSON.parse(event.data);
       if (data["command"] === "fetch_messages") {
-        console.log(data);
+        // console.log(data);
         this.messages = data["messages"];
       } else if (data["command"] === "new_message") {
-        console.log(data);
+        // console.log(data);
         this.new_message = data['data'];
       }
     }
@@ -148,12 +169,15 @@ export default {
     })
         .then(result => {
           this.groups = result.data;
-          console.log(this.groups);
+          // console.log(this.groups);
         })
         .catch(error => {
           console.log(error);
         })
   },
+  updated() {
+    console.log("this.groupInfo", this.groupInfo);
+  }
 }
 </script>
 

@@ -25,7 +25,7 @@
               </li>
             </ul>
           </div>
-          <chat-view></chat-view>
+          <chat-view :groupInfo="groups[groupNumber]" />
         </div>
       </div>
     </div>
@@ -37,7 +37,7 @@
 import ReconnectingWebSocket from "../lib/reconnecting-websocket.min.js";
 import {JWTAuth} from "../../services/jwt";
 import axios from "axios";
-import router from "@/router";
+// import router from "@/router";
 import chatView from '../components/ChatHistory.vue'
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
@@ -62,15 +62,16 @@ export default {
           creator: {},
           participants: [{}]
         }
-      ]
+      ],
+      groupNumber: 0,
     }
   },
   computed: {},
   methods: {
     GoToSelectedChat(n) {
-      router.push(`chat/${n}`);
+      // console.log("this.groups[n]", this.groups[n-1]);
+      this.groupNumber = n-1;
     },
-
     async sendMessage() {
       console.log("open");
       this.websocket.send(JSON.stringify({
@@ -105,11 +106,6 @@ export default {
     }
   },
   async mounted() {
-    this.today = this.formatDate(new Date()).trim();
-    this.yesterday = this.formatDate(this.getYesterday()).trim();
-    console.log(`today:${this.today}  yesterday:${this.yesterday}`);
-
-    
     this.websocket = new ReconnectingWebSocket('ws://localhost:8000/ws/group/group1/');
     this.websocket.onopen = () => {
       this.websocket.send(JSON.stringify({
@@ -117,17 +113,17 @@ export default {
         "sender_id": user.id
       }))
     }
-    this.websocket.onclose = (event) => {
-      console.log("close");
-      console.log(event.data);
+    this.websocket.onclose = () => {
+      // console.log("close");
+      // console.log(event.data);
     }
     this.websocket.onmessage = (event) => {
       let data = JSON.parse(event.data);
       if (data["command"] === "fetch_messages") {
-        console.log(data);
+        // console.log(data);
         this.messages = data["messages"];
       } else if (data["command"] === "new_message") {
-        console.log(data);
+        // console.log(data);
         this.new_message = data['data'];
       }
     }
@@ -139,7 +135,6 @@ export default {
     })
         .then(result => {
           this.groups = result.data;
-          console.log(this.groups);
         })
         .catch(error => {
           console.log(error);
