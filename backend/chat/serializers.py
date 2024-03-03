@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import Group,User,Message,CommentContainer
+from api.models import Group,User,Message,CommentContainer,PrivateChat
 from api.serializers import UserSerializer,PostSerializer
 
 
@@ -39,3 +39,11 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model=Message
         fields=('id','sender','reply_to','liked_by','saved_by','body','timestamp')
+
+
+class PrivateChatSerializer(serializers.ModelSerializer):
+    creator=UserSerializer(many=False)
+    the_other=UserSerializer(many=False)
+    class Meta:
+        model=PrivateChat
+        fields=('id','creator','the_other')

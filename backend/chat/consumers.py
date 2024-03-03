@@ -80,8 +80,9 @@ class GroupConsumer(AsyncWebsocketConsumer):
 
 class PrivateChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        
-        
+        chat_id=self.scope["url_route"]["kwargs"]["chat_id"]
+        # get chat object from id
+        # check if the user is creator or the_other user
         await self.accept()
 
     # @database_sync_to_async
