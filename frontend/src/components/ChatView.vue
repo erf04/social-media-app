@@ -12,7 +12,7 @@
             </div>
             <ul class="list-unstyled chat-list mt-2 mb-0">
               <li class="clearfix" v-for="group in groups" :key="group.id">
-                <button @click="GoToSelectedChat(group.id)">
+                <button @click="GoToSelectedChat(group.id, group.name)">
                   <img :src="getAbsoluteUrl(group.image)" alt="avatar"/>
                   <div class="about">
                     <div class="name">{{ group.name }}</div>
@@ -25,7 +25,7 @@
               </li>
             </ul>
           </div>
-          <chat-view :groupInfo="groups[groupNumber]" />
+          <chat-history :groupInfo="groups[groupNumber]" />
         </div>
       </div>
     </div>
@@ -38,14 +38,14 @@ import ReconnectingWebSocket from "../lib/reconnecting-websocket.min.js";
 import {JWTAuth} from "../../services/jwt";
 import axios from "axios";
 // import router from "@/router";
-import chatView from '../components/ChatHistory.vue'
+import chatHistory from '../components/ChatHistory.vue'
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 const user = await jwtAuth.getCurrentUser();
 
 export default {
   components: {
-    chatView,
+    chatHistory,
   },
   data() {
     return {
@@ -64,13 +64,14 @@ export default {
         }
       ],
       groupNumber: 0,
+      groupName: 0,
     }
   },
   computed: {},
   methods: {
-    GoToSelectedChat(n) {
-      // console.log("this.groups[n]", this.groups[n-1]);
+    GoToSelectedChat(n, name) {
       this.groupNumber = n-1;
+      this.groupName = name;
     },
     async sendMessage() {
       console.log("open");
@@ -82,7 +83,7 @@ export default {
           "sender_id": user.id,
         }
       }))
-      location.reload();
+      // location.reload();
     },
 
     getAbsoluteUrl(relativeUrl) {
@@ -106,11 +107,11 @@ export default {
     }
   },
   async mounted() {
-    this.websocket = new ReconnectingWebSocket('ws://localhost:8000/ws/group/group1/');
+    this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/group/${this.groupName}/`);
     this.websocket.onopen = () => {
       this.websocket.send(JSON.stringify({
         "command": "fetch_messages",
-        "sender_id": user.id
+        "sender_id": user.id,
       }))
     }
     this.websocket.onclose = () => {
@@ -119,11 +120,12 @@ export default {
     }
     this.websocket.onmessage = (event) => {
       let data = JSON.parse(event.data);
+      console.log(data)
       if (data["command"] === "fetch_messages") {
         // console.log(data);
         this.messages = data["messages"];
       } else if (data["command"] === "new_message") {
-        // console.log(data);
+        console.log(data);
         this.new_message = data['data'];
       }
     }

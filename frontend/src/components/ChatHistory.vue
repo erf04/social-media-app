@@ -115,7 +115,7 @@ export default {
           "sender_id": user.id,
         }
       }))
-      location.reload();
+      // location.reload();
     },
 
     getAbsoluteUrl(relativeUrl) {
@@ -157,7 +157,7 @@ export default {
         // console.log(data);
         this.messages = data["messages"];
       } else if (data["command"] === "new_message") {
-        // console.log(data);
+        console.log(data);
         this.new_message = data['data'];
       }
     }
@@ -176,7 +176,7 @@ export default {
         })
   },
   updated() {
-    console.log("this.groupInfo", this.groupInfo);
+    // console.log("this.groupInfo", this.groupInfo);
   }
 }
 </script>
