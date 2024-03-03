@@ -108,6 +108,8 @@ export default {
     this.today = this.formatDate(new Date()).trim();
     this.yesterday = this.formatDate(this.getYesterday()).trim();
     console.log(`today:${this.today}  yesterday:${this.yesterday}`);
+
+    
     this.websocket = new ReconnectingWebSocket('ws://localhost:8000/ws/group/group1/');
     this.websocket.onopen = () => {
       this.websocket.send(JSON.stringify({
