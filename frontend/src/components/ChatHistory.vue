@@ -154,12 +154,19 @@ export default {
     }
     this.websocket.onmessage = (event) => {
       let data = JSON.parse(event.data);
-      if (data["command"] === "fetch_messages") {
-        console.log(data);
-        this.messages = data["messages"];
-      } else if (data["command"] === "new_message") {
-        console.log(data);
-        this.new_message = data['data'];
+      if (!('command' in data)) {
+        // message received from server
+        console.log(data.error);
+      }
+      else {
+        let command=data["command"]
+        if (command === "fetch_messages") {
+          console.log(data);
+          this.messages = data["messages"];
+        } else if (command === "new_message") {
+          console.log(data);
+          this.new_message = data['data'];
+        }
       }
     }
 

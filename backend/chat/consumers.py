@@ -9,14 +9,22 @@ from channels.db import database_sync_to_async
 from api.models import  User,PrivateChat,Message,Group
 from .serializers import MessageSerializer,GroupSerializer
 import datetime
+import copy
 
 class GroupConsumer(AsyncWebsocketConsumer):
 
-    
+        
     async def connect(self):
-        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+        room_id = self.scope["url_route"]["kwargs"]["room_id"]
+        room=await self.get_room(room_id)
+        self.room_name=room.name
         self.room_group_name = f"chat_{self.room_name}"
         print(f"user: {self.scope['user']}")
+
+    
+        self.user=copy.deepcopy(self.scope['user'])
+        print(f"user: {self.user}")
+
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name, self.channel_name
@@ -28,6 +36,11 @@ class GroupConsumer(AsyncWebsocketConsumer):
 #      @database_sync_to_async
 #      def add_to_group(self):
 #         self.scope['user']
+        
+
+    @database_sync_to_async
+    def get_room(self,id):
+        return Group.objects.get(pk=id)
 
 
     async def disconnect(self, close_code):
@@ -141,7 +154,8 @@ class GroupConsumer(AsyncWebsocketConsumer):
         #reply_to,chat,body
     #         user:User=self.scope['user']
         
-        user=self.scope['user']
+        user=self.user
+        print(self.room_name,user)
         if not user.is_authenticated:
             return {'error':'Must be logged in'}
             
@@ -167,8 +181,10 @@ class GroupConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def fetch_messages(self):
-        user:User=self.scope['user']
-        self.room_object=Group.objects.get(name=self.room_name,participants=user)
+        user=self.user
+        print(self.room_name,user)
+        # user=User.objects.get(pk=user.id)
+        self.room_object=Group.objects.get(name=self.room_name,participants__id=user.id)
         messages=Message.message_order(self,user,self.room_name)
         dict_messages=MessageSerializer(messages,many=True).data
         group_serialized=GroupSerializer(self.room_object,many=False).data
@@ -198,6 +214,15 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
                 await self.close()
 
 
+            else:
+                self.room_group_name=f"user_{chat.creator}_{chat.the_other}" 
+                await self.channel_layer.group_add(
+                 self.room_group_name, self.channel_name
+                )
+
+                await self.accept()
+
+
 
         except:
             self.send(json.dumps({
@@ -205,7 +230,7 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
             }))
             await self.close()
         
-        await self.accept()
+        
 
     # @database_sync_to_async
     # def set_channel_name(self,user:User):
@@ -220,16 +245,38 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
     #     private_chat.save()
 
 
-    async def disconnect(self, code):
-        return await super().disconnect(code)
+    async def disconnect(self, close_code):
+        # Leave room group
+        await self.channel_layer.group_discard(
+            self.room_group_name, self.channel_name
+        )
+
     
 
+    # Receive message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
+        print(text_data_json)
+        
+        
+        command = text_data_json["command"]
+        # self.send_to_chat_message(text_data)
+        if command=="new_message":
+            result=await self.create_new_message(text_data_json)
+            await self.send_to_chat_message(result)
 
-        # await self.send(text_data=json.dumps({"message": message}))
-        await self.chat_message(text_data_json)
+        elif command=="fetch_messages":
+            result=await self.fetch_messages() 
+       
+            await self.chat_message(result)
+
+        # elif command=="change_permission":
+        #     type=text_data_json["command_type"]
+        #     selected_user_id=text_data_json["selected_user_id"]
+        #     command_caller_id=text_data_json["command_caller_id"]
+        #     if type=="to_admin":
+
+
 
     # async def send_message(self,channel_name, message):
     #     # channel_layer = get_channel_layer()
