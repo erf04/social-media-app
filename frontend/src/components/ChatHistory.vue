@@ -142,19 +142,20 @@ export default {
     // console.log(`today:${this.today}  yesterday:${this.yesterday}`);
     this.websocket = new ReconnectingWebSocket('ws://localhost:8000/ws/group/group1/');
     this.websocket.onopen = () => {
+      console.log("open");
       this.websocket.send(JSON.stringify({
         "command": "fetch_messages",
         "sender_id": user.id
       }))
     }
     this.websocket.onclose = () => {
-      // console.log("close");
+      console.log("close");
       // console.log(event.data);
     }
     this.websocket.onmessage = (event) => {
       let data = JSON.parse(event.data);
       if (data["command"] === "fetch_messages") {
-        // console.log(data);
+        console.log(data);
         this.messages = data["messages"];
       } else if (data["command"] === "new_message") {
         console.log(data);
@@ -175,9 +176,6 @@ export default {
           console.log(error);
         })
   },
-  updated() {
-    // console.log("this.groupInfo", this.groupInfo);
-  }
 }
 </script>
 
