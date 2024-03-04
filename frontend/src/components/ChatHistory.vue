@@ -137,11 +137,11 @@ export default {
       return date.split(" ")[0].trim();
     }
   },
-  async mounted() {
+  async updated() {
     // console.log(`today:${this.today}  yesterday:${this.yesterday}`);
     this.currentUser = await jwtAuth.getCurrentUser();
-
-    this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/group/group1/?token=${await jwtAuth.getAccessToken()}`);
+    // console.log("this.groupInfo", this.groupInfo);
+    this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/group/${this.groupInfo.id}/?token=${await jwtAuth.getAccessToken()}`);
     this.websocket.onopen = () => {
       console.log("open");
       this.websocket.send(JSON.stringify({
@@ -176,6 +176,9 @@ export default {
           console.log(error);
         })
   },
+  // updated() {
+  //   console.log("this.groupInfo // updated", this.groupInfo)
+  // }
 }
 </script>
 
