@@ -12,7 +12,7 @@
             </div>
             <ul class="list-unstyled chat-list mt-2 mb-0">
               <li class="clearfix" v-for="group in groups" :key="group.id">
-                <button @click="GoToSelectedChat(group.id)">
+                <button @click="GoToSelectedChat(group.id, group.name)">
                   <img :src="getAbsoluteUrl(group.image)" alt="avatar"/>
                   <div class="about">
                     <div class="name">{{ group.name }}</div>
@@ -25,7 +25,7 @@
               </li>
             </ul>
           </div>
-          <chat-view :groupInfo="groups[groupNumber]" />
+          <chat-history :groupInfo="groups[groupNumber]" />
         </div>
       </div>
     </div>
@@ -38,14 +38,14 @@
 import {JWTAuth} from "../../services/jwt";
 import axios from "axios";
 // import router from "@/router";
-import chatView from '../components/ChatHistory.vue'
+import chatHistory from '../components/ChatHistory.vue'
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 // const user = await jwtAuth.getCurrentUser();
 
 export default {
   components: {
-    chatView,
+    chatHistory,
   },
   data() {
     return {
@@ -64,70 +64,21 @@ export default {
         }
       ],
       groupNumber: 0,
+      groupName: 0,
     }
   },
   computed: {},
   methods: {
-    GoToSelectedChat(n) {
-      // console.log("this.groups[n]", this.groups[n-1]);
+    GoToSelectedChat(n, name) {
       this.groupNumber = n-1;
+      this.groupName = name;
     },
-    // async sendMessage() {
-    //   console.log("open");
-    //   this.websocket.send(JSON.stringify({
-    //     "command": "new_message",
-    //     "message": {
-    //       "body": this.new_message_body,
-    //       "reply_to_id": null,
-    //       "sender_id": user.id,
-    //     }
-    //   }))
-
-    // },
 
     getAbsoluteUrl(relativeUrl) {
       return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
     },
-
-    // formatDate(date) {
-    //   const year = date.getFullYear();
-    //   const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    //   const day = String(date.getDate()).padStart(2, '0');
-    //   return `${year}-${month}-${day}`
-    // },
-    // getYesterday() {
-    //   const today = new Date();
-    //   const yesterday = new Date(today);
-    //   yesterday.setDate(today.getDate() - 1);
-    //   return yesterday;
-    // },
-    // getFormattedDate(date) {
-    //   return date.split(" ")[0].trim();
-    // }
   },
   async mounted() {
-    // this.websocket = new ReconnectingWebSocket('ws://localhost:8000/ws/group/group1/');
-    // this.websocket.onopen = () => {
-    //   this.websocket.send(JSON.stringify({
-    //     "command": "fetch_messages",
-    //     "sender_id": user.id
-    //   }))
-    // }
-    // this.websocket.onclose = () => {
-    //   console.log("close");
-    //   // console.log(event.data);
-    // }
-    // this.websocket.onmessage = (event) => {
-    //   let data = JSON.parse(event.data);
-    //   if (data["command"] === "fetch_messages") {
-    //     // console.log(data);
-    //     this.messages = data["messages"];
-    //   } else if (data["command"] === "new_message") {
-    //     console.log(data);
-    //     this.new_message = data['data'];
-    //   }
-    // }
-
     axios.get('http://localhost:8000/chat/groups/', {
       headers: {
         Authorization: `JWT ${await jwtAuth.getAccessToken()}`
