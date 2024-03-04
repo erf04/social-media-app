@@ -17,13 +17,13 @@ class GroupConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
-        print(self.groups)
+        print(f"user: {self.scope['user']}")
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name, self.channel_name
         )
 
-        print('to accept')
+        
         await self.accept()
 
 #      @database_sync_to_async
@@ -50,7 +50,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
             await self.send_to_chat_message(result)
 
         elif command=="fetch_messages":
-            result=await self.fetch_messages(text_data_json) 
+            result=await self.fetch_messages() 
        
             await self.chat_message(result)
 
@@ -91,9 +91,8 @@ class GroupConsumer(AsyncWebsocketConsumer):
     def create_new_message(self,text_data):
         #reply_to,chat,body
     #         user:User=self.scope['user']
-        sender_id=text_data["message"]["sender_id"]
-        user=User.objects.get(pk=sender_id)
-        print(sender_id)
+        
+        user=self.scope['user']
         if not user.is_authenticated:
             return {'error':'Must be logged in'}
             
@@ -118,8 +117,8 @@ class GroupConsumer(AsyncWebsocketConsumer):
 
 
     @database_sync_to_async
-    def fetch_messages(self,text_data):
-        user:User=User.objects.get(pk=text_data['sender_id'])
+    def fetch_messages(self):
+        user:User=self.scope['user']
         self.room_object=Group.objects.get(name=self.room_name,participants=user)
         messages=Message.message_order(self,user,self.room_name)
         dict_messages=MessageSerializer(messages,many=True).data
@@ -139,7 +138,24 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         chat_id=self.scope["url_route"]["kwargs"]["chat_id"]
         # get chat object from id
-        # check if the user is creator or the_other user
+        try:
+            chat=PrivateChat.objects.get(pk=chat_id)
+            # check if the user is creator or the_other user
+            current_user=self.scope['user']
+            if not (current_user==chat.creator or current_user==chat.the_other):
+                self.send(json.dumps({
+                    "error":f"user {current_user} dont have access to this room"
+                }))
+                await self.close()
+
+
+
+        except:
+            self.send(json.dumps({
+                "error":f"no such private chat with id : {chat_id}"
+            }))
+            await self.close()
+        
         await self.accept()
 
     # @database_sync_to_async
@@ -186,37 +202,3 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({"message": message}))
 
     
-
-
-
-
-class testConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
-        self.room_group_name = f"chat_{self.room_name}"
-
-        # Join room group
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-
-        await self.accept()
-
-    async def disconnect(self, close_code):
-        # Leave room group
-        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-
-    # Receive message from WebSocket
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
-
-        # Send message to room group
-        await self.channel_layer.group_send(
-            self.room_group_name, {"type": "chat.message", "message": message}
-        )
-
-    # Receive message from room group
-    async def chat_message(self, event):
-        message = event["message"]
-
-        # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message}))

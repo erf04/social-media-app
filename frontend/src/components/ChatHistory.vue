@@ -80,7 +80,6 @@ import {JWTAuth} from "../../services/jwt";
 import axios from "axios";
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
-const user = await jwtAuth.getCurrentUser();
 
 export default {
   components: {},
@@ -100,7 +99,8 @@ export default {
           creator: {},
           participants: [{}]
         }
-      ]
+      ],
+      currentUser:Object,
     }
   },
   computed: {},
@@ -112,7 +112,6 @@ export default {
         "message": {
           "body": this.new_message_body,
           "reply_to_id": null,
-          "sender_id": user.id,
         }
       }))
       // location.reload();
@@ -140,12 +139,13 @@ export default {
   },
   async mounted() {
     // console.log(`today:${this.today}  yesterday:${this.yesterday}`);
-    this.websocket = new ReconnectingWebSocket('ws://localhost:8000/ws/group/group1/');
+    this.currentUser = await jwtAuth.getCurrentUser();
+
+    this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/group/group1/?token=${await jwtAuth.getAccessToken()}`);
     this.websocket.onopen = () => {
       console.log("open");
       this.websocket.send(JSON.stringify({
         "command": "fetch_messages",
-        "sender_id": user.id
       }))
     }
     this.websocket.onclose = () => {
