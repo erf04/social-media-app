@@ -141,7 +141,7 @@ export default {
     // console.log(`today:${this.today}  yesterday:${this.yesterday}`);
     this.currentUser = await jwtAuth.getCurrentUser();
 
-    this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/group/group1/?token=${await jwtAuth.getAccessToken()}`);
+    this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/group/1/?token=${await jwtAuth.getAccessToken()}`);
     this.websocket.onopen = () => {
       console.log("open");
       this.websocket.send(JSON.stringify({
@@ -154,12 +154,19 @@ export default {
     }
     this.websocket.onmessage = (event) => {
       let data = JSON.parse(event.data);
-      if (data["command"] === "fetch_messages") {
-        console.log(data);
-        this.messages = data["messages"];
-      } else if (data["command"] === "new_message") {
-        console.log(data);
-        this.new_message = data['data'];
+      if (!('command' in data)) {
+        // message received from server
+        console.log(data.error);
+      }
+      else {
+        let command=data["command"]
+        if (command === "fetch_messages") {
+          console.log(data);
+          this.messages = data["messages"];
+        } else if (command === "new_message") {
+          console.log(data);
+          this.new_message = data['data'];
+        }
       }
     }
 
