@@ -25,28 +25,29 @@
               </li>
             </ul>
           </div>
-<!--          <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"-->
-<!--               aria-labelledby="offcanvasWithBothOptionsLabel">-->
-<!--            <div class="offcanvas-header p-0">-->
-<!--              <img :src="getAbsoluteUrl(groups[groupNumber].image)" style="max-height: 200px; width: 100%"/>-->
-<!--              <button style="position: absolute; top: 10px; right: 10px; background-color: red;" type="button"-->
-<!--                      class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>-->
-<!--              <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Backdrop with scrolling</h5>-->
-<!--            </div>-->
-<!--            <div class="offcanvas-body">-->
-<!--              <h6>This group created in {{ groups[groupNumber].creation_date }}.</h6>-->
-<!--              <h2>Members</h2>-->
-<!--              <div v-for="member in groups[groupNumber].participants" :key="member.id" class="d-flex"-->
-<!--                   style="gap: 10px; padding-left: 20px">-->
-<!--                <img :src="getAbsoluteUrl(member.image)" style="width: 30px; height: 30px; border-radius: 50%"/>-->
-<!--                <div>-->
-<!--                  <h3>{{ member.username }}</h3>-->
-<!--                  <p>last seen</p>-->
-<!--                </div>-->
-<!--                <hr/>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
+          <div v-if="groupNumber !== -1" class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1"
+               id="offcanvasWithBothOptions"
+               aria-labelledby="offcanvasWithBothOptionsLabel">
+            <div class="offcanvas-header p-0">
+              <img :src="getAbsoluteUrl(groups[groupNumber].image)" style="max-height: 200px; width: 100%"/>
+              <button style="position: absolute; top: 10px; right: 10px; background-color: red;" type="button"
+                      class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+              <!--              <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Backdrop with scrolling</h5>-->
+            </div>
+            <div class="offcanvas-body">
+              <h6>This group created in {{ groups[groupNumber].creation_date }}.</h6>
+              <h2>Members</h2>
+              <div v-for="member in groups[groupNumber].participants" :key="member.id" class="d-flex"
+                   style="gap: 10px; padding-left: 20px">
+                <img :src="getAbsoluteUrl(member.image)" style="width: 30px; height: 30px; border-radius: 50%"/>
+                <div>
+                  <h3>{{ member.username }}</h3>
+                  <p>last seen</p>
+                </div>
+                <hr/>
+              </div>
+            </div>
+          </div>
           <div class="chat" v-if="groupNumber !== -1">
             <div class="chat-header clearfix">
               <div class="row">
@@ -73,14 +74,15 @@
                 </div>
               </div>
             </div>
-            <div class="chat-history">
-              <ul class="m-b-0">
-                <li v-for="message in messages" :key="message.id" class="clearfix">
-                  <div class="message-data text-right" @keyup.right="showOptions($event)">
-                    <div class="options">
+            <div class="chat-history" id="chat-history" ref="chatHistory">
+              <ul class="m-b-0" id="chatList">
+                <li v-for="(message, index) in messages" :key="message.id" class="clearfix"
+                    @contextmenu.prevent="showOptions(index)">
+                  <div class="message-data text-right">
+                    <div class="options" ref="optionsMenu">
                       <ul>
                         <li>
-                          <button @click="showRepliedMessage">
+                          <button @click="showRepliedMessage(message)">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                  stroke="currentColor" class="w-6 h-6 me-2">
                               <path stroke-linecap="round" stroke-linejoin="round"
@@ -101,31 +103,31 @@
                   <div class="message other-message float-right">{{ message.body }}</div>
                 </li>
                 <!-- New Message(s) #### Totally Writing Correctly After Backend Issue is Fixed -->
-<!--                <li v-for="(message, index) in new_message" :key="index" class="clearfix">-->
-<!--                  <div class="message-data text-right" @keyup.right="showOptions($event)">-->
-<!--                    <div class="options">-->
-<!--                      <ul>-->
-<!--                        <li>-->
-<!--                          <button @click="showRepliedMessage(message.body)">-->
-<!--                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"-->
-<!--                                 stroke="currentColor" class="w-6 h-6 me-2">-->
-<!--                              <path stroke-linecap="round" stroke-linejoin="round"-->
-<!--                                    d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" style="width: 20px; height: 20px"/>-->
-<!--                            </svg>-->
-<!--                            Reply-->
-<!--                          </button>-->
-<!--                        </li>-->
-<!--                      </ul>-->
-<!--                    </div>-->
-<!--                    <span class="message-data-time">-->
-<!--                      <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>-->
-<!--                      <span v-else-if="getFormattedDate(message.timestamp) === yesterdayTime"> Yesterday </span>-->
-<!--                      <span v-else> {{ message.timestamp }} </span>-->
-<!--                    </span>-->
-<!--                    <img :src="getAbsoluteUrl(message.sender.image)" alt="user profile picture"/>-->
-<!--                  </div>-->
-<!--                  <div class="message other-message float-right">{{ message.body }}</div>-->
-<!--                </li>-->
+                <!--                <li class="clearfix">-->
+                <!--                  <div class="message-data text-right" @contextmenu.prevent="showOptions($event)">-->
+                <!--                    <div class="options">-->
+                <!--                      <ul>-->
+                <!--                        <li>-->
+                <!--                          <button @click="showRepliedMessage(new_message.body)">-->
+                <!--                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"-->
+                <!--                                 stroke="currentColor" class="w-6 h-6 me-2">-->
+                <!--                              <path stroke-linecap="round" stroke-linejoin="round"-->
+                <!--                                    d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" style="width: 20px; height: 20px"/>-->
+                <!--                            </svg>-->
+                <!--                            Reply-->
+                <!--                          </button>-->
+                <!--                        </li>-->
+                <!--                      </ul>-->
+                <!--                    </div>-->
+                <!--                    <span class="message-data-time">-->
+                <!--                      <span v-if="getFormattedDate(new_message.timestamp) === todayTime"> Today </span>-->
+                <!--                      <span v-else-if="getFormattedDate(new_message.timestamp) === yesterdayTime"> Yesterday </span>-->
+                <!--                      <span v-else> {{ new_message.timestamp }} </span>-->
+                <!--                    </span>-->
+                <!--                    <img :src="getAbsoluteUrl(new_message.sender.image)" alt="user profile picture"/>-->
+                <!--                  </div>-->
+                <!--                  <div class="message other-message float-right">{{ new_message.body }}</div>-->
+                <!--                </li>-->
                 <!-- ############################################################################ -->
               </ul>
             </div>
@@ -154,8 +156,8 @@
 import {JWTAuth} from "../../services/jwt";
 import axios from "axios";
 import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
-// import router from "@/router";
-// import chatHistory from '../components/ChatHistory.vue'
+import router from "@/router";
+// import "https://code.jquery.com/jquery-3.7.1.min.js";
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 // const user = await jwtAuth.getCurrentUser();
@@ -188,12 +190,21 @@ export default {
   },
   computed: {},
   methods: {
-    showRepliedMessage(message) {
-      this.$refs.repliedMessage.style.display = 'block';
-      this.$refs.repliedMessage.innerText = message;
+    scroll(speed, num) {
+      /* eslint-disable */
+      let ht = 0;
+      for (let i = 0; i !== num; i++) ht += $(".clearfix")[i].clientHeight;
+      ht += 30;
+      // let content_menu = document.getElementById('chat-history');
+      $("#chat-history").animate({scrollTop: ht}, speed);
     },
-    showOptions(element) {
-      element.style.display = "block";
+    showRepliedMessage(message) {
+      console.log("message showRepliedMessage", message);
+      this.$refs.repliedMessage.style.display = 'block';
+      this.$refs.repliedMessage.innerText = message.body;
+    },
+    showOptions(n) {
+      this.$refs.optionsMenu[n].style.display = "block";
     },
     getFormattedDate(date) {
       return date.split(" ")[0].trim();
@@ -207,21 +218,23 @@ export default {
           "reply_to_id": null,
         }
       }))
+
     },
     GoToSelectedChat(n, name) {
       this.groupNumber = n - 1;
       this.groupName = name;
-      this.kirKhar();
+      router.push({name: 'chat', params: {name}});
+      this.kirKhar(n);
     },
 
     getAbsoluteUrl(relativeUrl) {
       return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
     },
 
-    async kirKhar() {
+    async kirKhar(id) {
       this.currentUser = await jwtAuth.getCurrentUser();
       console.log("this.groupNumber", this.groupNumber);
-      this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/group/${this.groupNumber + 1}/?token=${await jwtAuth.getAccessToken()}`);
+      this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/group/${id}/?token=${await jwtAuth.getAccessToken()}`);
       this.websocket.onopen = () => {
         // console.log("new group id", this.groupInfo.id);
         this.websocket.send(JSON.stringify({
@@ -245,8 +258,14 @@ export default {
           } else if (command === "new_message") {
             console.log(data['data']);
             this.new_message = data['data'];
+            this.messages.push(this.new_message);
+            this.new_message_body = '';
           }
         }
+        // this.$refs.chatHistory.scrollTop = 99999999;
+        this.scroll(9999999, 9999999);
+        // let content_menu = document.getElementById('chat-history');
+        // content_menu.scrollIntoView({behavior: 'smooth', block: 'end'});
       }
     },
   },
@@ -262,6 +281,7 @@ export default {
     }
   },
   async mounted() {
+
     axios.get('http://localhost:8000/chat/groups/', {
       headers: {
         Authorization: `JWT ${await jwtAuth.getAccessToken()}`
@@ -556,10 +576,9 @@ ul {
   background-color: #525252;
   border: 1px solid gray;
   border-radius: 5px;
-  position: relative;
+//position: absolute; display: none;
   z-index: 9;
-  top: 0;
-  left: 0;
+//top: 0; //left: 0;
 }
 
 </style>
