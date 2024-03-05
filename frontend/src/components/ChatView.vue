@@ -576,9 +576,9 @@ ul {
   background-color: #525252;
   border: 1px solid gray;
   border-radius: 5px;
-//position: absolute; display: none;
+  display: none;
   z-index: 9;
-//top: 0; //left: 0;
+  
 }
 
 </style>
