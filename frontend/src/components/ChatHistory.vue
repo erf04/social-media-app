@@ -101,6 +101,7 @@ export default {
         }
       ],
       currentUser:Object,
+      newGroupId: 1,
     }
   },
   computed: {},
@@ -121,29 +122,25 @@ export default {
       return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
     },
 
-    formatDate(date) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`
-    },
-    getYesterday() {
-      const today = new Date();
-      const yesterday = new Date(today);
-      yesterday.setDate(today.getDate() - 1);
-      return yesterday;
-    },
     getFormattedDate(date) {
       return date.split(" ")[0].trim();
     }
   },
-  async updated() {
+  watch: {
+    groupInfo(n) {
+      // console.log("vfdhgiukfdynguyfdhgfjdyghfgdfhgkhdfkjhdfbgjkdf");
+      console.log("new", n.id);
+      this.newGroupId = n.id;
+    }
+  },
+  async mounted() {
     // console.log(`today:${this.today}  yesterday:${this.yesterday}`);
+    // await nextTick();
     this.currentUser = await jwtAuth.getCurrentUser();
     // console.log("this.groupInfo", this.groupInfo);
-    this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/group/${this.groupInfo.id}/?token=${await jwtAuth.getAccessToken()}`);
+    this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/group/${this.newGroupId}/?token=${await jwtAuth.getAccessToken()}`);
     this.websocket.onopen = () => {
-      console.log("open");
+      console.log("new group id", this.groupInfo.id);
       this.websocket.send(JSON.stringify({
         "command": "fetch_messages",
       }))
@@ -183,9 +180,6 @@ export default {
           console.log(error);
         })
   },
-  // updated() {
-  //   console.log("this.groupInfo // updated", this.groupInfo)
-  // }
 }
 </script>
 
