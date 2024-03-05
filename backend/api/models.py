@@ -95,9 +95,9 @@ class Message(AbstractMessage):
     liked_by=models.ManyToManyField(User,related_name='message_likes',blank=True)
     saved_by=models.ManyToManyField(User,related_name='message_saves',blank=True)
 
-    def message_order(self,user,roomname):
-        chat_id=Group.objects.get(name=roomname,participants=user).id
-        return Message.objects.filter(content_type__model="group",object_id=chat_id).order_by('timestamp')
+    def message_order(self,room,type):
+        # chat_id=Group.objects.get(name=roomname,participants=user).id
+        return Message.objects.filter(content_type__model=type,object_id=room.id).order_by('timestamp')
 
     
 
