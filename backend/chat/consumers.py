@@ -17,7 +17,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         room_id = self.scope["url_route"]["kwargs"]["room_id"]
         print(room_id)
-        self.room=await self.get_room(room_id)
+        self.room:Group=await self.get_room(room_id)
         self.room_name=self.room.name
         self.room_group_name = f"chat_{self.room_name}"
         print(f"user: {self.scope['user']}")
@@ -77,7 +77,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def fetch_messages(self,text_data):
         user:User=User.objects.get(pk=text_data['sender_id'])
-        messages=Message.message_order(self,user,self.room_name)
+        messages=Message.message_order(self,self.room,"group")
         dict_messages=MessageSerializer(messages,many=True).data
         group_serialized=GroupSerializer(self.room,many=False).data
         return {
@@ -88,7 +88,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
 
 
     @database_sync_to_async
-    def create_new_message(text_data):
+    def create_new_message(self,text_data):
         #reply_to,chat,body
     #         user:User=self.scope['user']
         sender_id=text_data["message"]["sender_id"]
@@ -115,15 +115,6 @@ class GroupConsumer(AsyncWebsocketConsumer):
         print(serialized.data)
         # self.send_to_chat_message(serialized.data)
         return serialized.data
-
-
-
-
-
-
-
-
-
 
 
     async def send_to_chat_message(self,text_data):
@@ -202,9 +193,11 @@ class GroupConsumer(AsyncWebsocketConsumer):
 class PrivateChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         chat_id=self.scope["url_route"]["kwargs"]["chat_id"]
+        self.user=self.scope["user"]
         # get chat object from id
         try:
             chat=PrivateChat.objects.get(pk=chat_id)
+            self.chat=chat
             # check if the user is creator or the_other user
             current_user=self.scope['user']
             if not (current_user==chat.creator or current_user==chat.the_other):
@@ -296,5 +289,51 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({"message": message}))
+
+
+    @database_sync_to_async
+    def create_new_message(self,text_data):
+        #reply_to,chat,body
+    #         user:User=self.scope['user']
+        
+        user:User=self.user
+        # print(self.room_name,user)
+        if not user.is_authenticated:
+            return {'error':'Must be logged in'}
+            
+        reply_to_id=text_data["message"]["reply_to_id"]
+        body=text_data["message"]["body"]
+        try:
+            replied_message=Message.objects.get(pk=reply_to_id) if reply_to_id!=None else None
+        except:
+            return {"error":f"there is no message with id:{reply_to_id} to be a replied message"}
+        print(user)
+        
+
+
+        message:Message=Message.objects.create(sender=user,chat=self.chat,body=body,reply_to=replied_message,timestamp=datetime.datetime.now())
+
+        
+        serialized=MessageSerializer(message,many=False)
+        print(serialized.data)
+        # self.send_to_chat_message(serialized.data)
+        return serialized.data
+
+
+    @database_sync_to_async
+    def fetch_messages(self):
+        user=self.user
+        print(self.room_group_name,user)
+        # user=User.objects.get(pk=user.id)
+        
+        messages=Message.message_order(self,user,self.room_name)
+        dict_messages=MessageSerializer(messages,many=True).data
+        group_serialized=GroupSerializer(self.room_object,many=False).data
+        return {
+            "command":"fetch_messages",
+            "messages":dict_messages,
+            "chat_info":group_serialized
+        }
+        
 
     
