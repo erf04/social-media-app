@@ -25,41 +25,43 @@
               </li>
             </ul>
           </div>
-          <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
-               aria-labelledby="offcanvasWithBothOptionsLabel">
-            <div class="offcanvas-header p-0">
-              <img :src="getAbsoluteUrl(groups[groupName].image)" style="max-height: 200px; width: 100%"/>
-              <button style="position: absolute; top: 10px; right: 10px; background-color: red;" type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                    <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Backdrop with scrolling</h5>
-            </div>
-            <div class="offcanvas-body">
-              <h6>This group created in {{ groups[groupName].creation_date }}.</h6>
-              <h2>Members</h2>
-              <div v-for="member in groups[groupName].participants" :key="member.id" class="d-flex" style="gap: 10px; padding-left: 20px">
-                <img :src="getAbsoluteUrl(member.image)" style="width: 30px; height: 30px; border-radius: 50%"/>
-                <div>
-                  <h3>{{ member.username }}</h3>
-                  <p>last seen</p>
-                </div>
-                <hr />
-              </div>
-            </div>
-          </div>
-          <div class="chat">
+<!--          <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"-->
+<!--               aria-labelledby="offcanvasWithBothOptionsLabel">-->
+<!--            <div class="offcanvas-header p-0">-->
+<!--              <img :src="getAbsoluteUrl(groups[groupNumber].image)" style="max-height: 200px; width: 100%"/>-->
+<!--              <button style="position: absolute; top: 10px; right: 10px; background-color: red;" type="button"-->
+<!--                      class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>-->
+<!--              <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Backdrop with scrolling</h5>-->
+<!--            </div>-->
+<!--            <div class="offcanvas-body">-->
+<!--              <h6>This group created in {{ groups[groupNumber].creation_date }}.</h6>-->
+<!--              <h2>Members</h2>-->
+<!--              <div v-for="member in groups[groupNumber].participants" :key="member.id" class="d-flex"-->
+<!--                   style="gap: 10px; padding-left: 20px">-->
+<!--                <img :src="getAbsoluteUrl(member.image)" style="width: 30px; height: 30px; border-radius: 50%"/>-->
+<!--                <div>-->
+<!--                  <h3>{{ member.username }}</h3>-->
+<!--                  <p>last seen</p>-->
+<!--                </div>-->
+<!--                <hr/>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+          <div class="chat" v-if="groupNumber !== -1">
             <div class="chat-header clearfix">
               <div class="row">
                 <div class="col-lg-6">
                   <button style="text-align: start" type="button" data-bs-toggle="offcanvas"
                           data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
                     <a href="javascript:void(0);" data-toggle="modal" data-target="#view_info">
-                      <img :src="getAbsoluteUrl(groups[groupName].image)" alt="avatar">
+                      <img :src="getAbsoluteUrl(groups[groupNumber].image)" alt="avatar">
                     </a>
                     <div class="chat-about">
                       <div class="d-flex align-items-center small" style="gap: 10px">
-                        <h6 class="mb-0">{{ groups[groupName].name }} </h6>
-                        <span> Created By {{ groups[groupName].creator.username }}</span>
+                        <h6 class="mb-0">{{ groups[groupNumber].name }} </h6>
+                        <span> Created By {{ groups[groupNumber].creator.username }}</span>
                       </div>
-                      <small>{{ groups[groupName].participants.length }} Members</small>
+                      <small>{{ groups[groupNumber].participants.length }} Members</small>
                     </div>
                   </button>
                 </div>
@@ -74,7 +76,21 @@
             <div class="chat-history">
               <ul class="m-b-0">
                 <li v-for="message in messages" :key="message.id" class="clearfix">
-                  <div class="message-data text-right">
+                  <div class="message-data text-right" @keyup.right="showOptions($event)">
+                    <div class="options">
+                      <ul>
+                        <li>
+                          <button @click="showRepliedMessage">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                 stroke="currentColor" class="w-6 h-6 me-2">
+                              <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" style="width: 20px; height: 20px"/>
+                            </svg>
+                            Reply
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
                     <span class="message-data-time">
                       <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>
                       <span v-else-if="getFormattedDate(message.timestamp) === yesterdayTime"> Yesterday </span>
@@ -84,6 +100,33 @@
                   </div>
                   <div class="message other-message float-right">{{ message.body }}</div>
                 </li>
+                <!-- New Message(s) #### Totally Writing Correctly After Backend Issue is Fixed -->
+<!--                <li v-for="(message, index) in new_message" :key="index" class="clearfix">-->
+<!--                  <div class="message-data text-right" @keyup.right="showOptions($event)">-->
+<!--                    <div class="options">-->
+<!--                      <ul>-->
+<!--                        <li>-->
+<!--                          <button @click="showRepliedMessage(message.body)">-->
+<!--                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"-->
+<!--                                 stroke="currentColor" class="w-6 h-6 me-2">-->
+<!--                              <path stroke-linecap="round" stroke-linejoin="round"-->
+<!--                                    d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" style="width: 20px; height: 20px"/>-->
+<!--                            </svg>-->
+<!--                            Reply-->
+<!--                          </button>-->
+<!--                        </li>-->
+<!--                      </ul>-->
+<!--                    </div>-->
+<!--                    <span class="message-data-time">-->
+<!--                      <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>-->
+<!--                      <span v-else-if="getFormattedDate(message.timestamp) === yesterdayTime"> Yesterday </span>-->
+<!--                      <span v-else> {{ message.timestamp }} </span>-->
+<!--                    </span>-->
+<!--                    <img :src="getAbsoluteUrl(message.sender.image)" alt="user profile picture"/>-->
+<!--                  </div>-->
+<!--                  <div class="message other-message float-right">{{ message.body }}</div>-->
+<!--                </li>-->
+                <!-- ############################################################################ -->
               </ul>
             </div>
 
@@ -92,12 +135,13 @@
                 <div class="input-group-prepend">
                   <span class="input-group-text"><i class="fa fa-send"></i></span>
                 </div>
+                <div ref="repliedMessage" class="alert alert-success" role="alert"></div>
                 <input @keyup.enter="sendMessage" v-model="new_message_body" type="text" class="form-control"
                        placeholder="Enter text here...">
               </div>
             </div>
           </div>
-<!--          <chat-history :groupInfo="groups[groupNumber]" />-->
+          <!--          <chat-history :groupInfo="groups[groupNumber]" />-->
         </div>
       </div>
     </div>
@@ -136,14 +180,21 @@ export default {
           participants: [{}]
         }
       ],
-      groupNumber: 0,
+      groupNumber: -1,
       groupName: 0,
-      currentUser:Object,
-      newGroupId: 1,
+      currentUser: Object,
+      newGroupId: 0,
     }
   },
   computed: {},
   methods: {
+    showRepliedMessage(message) {
+      this.$refs.repliedMessage.style.display = 'block';
+      this.$refs.repliedMessage.innerText = message;
+    },
+    showOptions(element) {
+      element.style.display = "block";
+    },
     getFormattedDate(date) {
       return date.split(" ")[0].trim();
     },
@@ -156,59 +207,61 @@ export default {
           "reply_to_id": null,
         }
       }))
-      // location.reload();
     },
     GoToSelectedChat(n, name) {
-      this.groupNumber = n-1;
+      this.groupNumber = n - 1;
       this.groupName = name;
-      // console.log("this.groupNumber", this.groups[this.groupNumber].id);
+      this.kirKhar();
     },
 
     getAbsoluteUrl(relativeUrl) {
       return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
     },
+
+    async kirKhar() {
+      this.currentUser = await jwtAuth.getCurrentUser();
+      console.log("this.groupNumber", this.groupNumber);
+      this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/group/${this.groupNumber + 1}/?token=${await jwtAuth.getAccessToken()}`);
+      this.websocket.onopen = () => {
+        // console.log("new group id", this.groupInfo.id);
+        this.websocket.send(JSON.stringify({
+          "command": "fetch_messages",
+        }))
+      }
+      this.websocket.onclose = () => {
+        console.log("close");
+        // console.log(event.data);
+      }
+      this.websocket.onmessage = (event) => {
+        let data = JSON.parse(event.data);
+        if (!('command' in data)) {
+          // message received from server
+          console.log(data.error);
+        } else {
+          let command = data["command"]
+          if (command === "fetch_messages") {
+            console.log(data);
+            this.messages = data["messages"];
+          } else if (command === "new_message") {
+            console.log(data['data']);
+            this.new_message = data['data'];
+          }
+        }
+      }
+    },
   },
   watch: {
     groupInfo(n) {
-      // console.log("vfdhgiukfdynguyfdhgfjdyghfgdfhgkhdfkjhdfbgjkdf");
       console.log("new", n.id);
       this.newGroupId = n.id;
+    },
+    groupNumber(n) {
+      this.groupNumber = n;
+      console.log("groupNumber", this.groupNumber);
+      // this.kirKhar();
     }
   },
   async mounted() {
-    // console.log(`today:${this.today}  yesterday:${this.yesterday}`);
-    // await nextTick();
-    this.currentUser = await jwtAuth.getCurrentUser();
-    // console.log("this.groupInfo", this.groupInfo);
-    this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/group/${this.newGroupId}/?token=${await jwtAuth.getAccessToken()}`);
-    this.websocket.onopen = () => {
-      console.log("new group id", this.groupInfo.id);
-      this.websocket.send(JSON.stringify({
-        "command": "fetch_messages",
-      }))
-    }
-    this.websocket.onclose = () => {
-      console.log("close");
-      // console.log(event.data);
-    }
-    this.websocket.onmessage = (event) => {
-      let data = JSON.parse(event.data);
-      if (!('command' in data)) {
-        // message received from server
-        console.log(data.error);
-      }
-      else {
-        let command=data["command"]
-        if (command === "fetch_messages") {
-          console.log(data);
-          this.messages = data["messages"];
-        } else if (command === "new_message") {
-          console.log(data);
-          this.new_message = data['data'];
-        }
-      }
-    }
-
     axios.get('http://localhost:8000/chat/groups/', {
       headers: {
         Authorization: `JWT ${await jwtAuth.getAccessToken()}`
@@ -216,20 +269,25 @@ export default {
     })
         .then(result => {
           this.groups = result.data;
-          // console.log(this.groups);
         })
         .catch(error => {
           console.log(error);
         })
   },
-
 }
 </script>
 
 <style scoped>
-body {
-  background-color: #f4f7f6;
-  margin-top: 20px;
+
+button {
+  border: none;
+  background-color: inherit;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
 }
 
 .card {
@@ -491,4 +549,17 @@ body {
     overflow-x: auto
   }
 }
+
+.options {
+  width: 80px;
+  height: 100px;
+  background-color: #525252;
+  border: 1px solid gray;
+  border-radius: 5px;
+  position: relative;
+  z-index: 9;
+  top: 0;
+  left: 0;
+}
+
 </style>
