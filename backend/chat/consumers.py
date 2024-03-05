@@ -16,8 +16,9 @@ class GroupConsumer(AsyncWebsocketConsumer):
         
     async def connect(self):
         room_id = self.scope["url_route"]["kwargs"]["room_id"]
-        room=await self.get_room(room_id)
-        self.room_name=room.name
+        print(room_id)
+        self.room=await self.get_room(room_id)
+        self.room_name=self.room.name
         self.room_group_name = f"chat_{self.room_name}"
         print(f"user: {self.scope['user']}")
 
@@ -76,10 +77,9 @@ class GroupConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def fetch_messages(self,text_data):
         user:User=User.objects.get(pk=text_data['sender_id'])
-        self.room_object=Group.objects.get(name=self.room_name,participants=user)
         messages=Message.message_order(self,user,self.room_name)
         dict_messages=MessageSerializer(messages,many=True).data
-        group_serialized=GroupSerializer(self.room_object,many=False).data
+        group_serialized=GroupSerializer(self.room,many=False).data
         return {
             "command":"fetch_messages",
             "messages":dict_messages,
