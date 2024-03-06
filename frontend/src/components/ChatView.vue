@@ -157,10 +157,16 @@ import {JWTAuth} from "../../services/jwt";
 import axios from "axios";
 import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
 import router from "@/router";
+// import $ from "jquery"
+// import jquery from "jquery";
 // import "https://code.jquery.com/jquery-3.7.1.min.js";
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 // const user = await jwtAuth.getCurrentUser();
+const chatType=Object.freeze({
+  PRIVATE:"pv",
+  GROUP:"group"
+})
 
 export default {
   components: {
@@ -190,14 +196,12 @@ export default {
   },
   computed: {},
   methods: {
-    scroll(speed, num) {
-      /* eslint-disable */
-      let ht = 0;
-      for (let i = 0; i !== num; i++) ht += $(".clearfix")[i].clientHeight;
-      ht += 30;
-      // let content_menu = document.getElementById('chat-history');
-      $("#chat-history").animate({scrollTop: ht}, speed);
-    },
+    // scroll(speed, num) {
+    //     var ht = 0;
+    //     for (let i = 0; i != num; i++) console.log( this.messages[i]);
+    //     ht += 30;
+    //     $("#chat-log").animate({scrollTop: ht}, speed);
+    //   },
     showRepliedMessage(message) {
       console.log("message showRepliedMessage", message);
       this.$refs.repliedMessage.style.display = 'block';
@@ -224,17 +228,17 @@ export default {
       this.groupNumber = n - 1;
       this.groupName = name;
       router.push({name: 'chat', params: {name}});
-      this.kirKhar(n);
+      this.kirKhar(n,chatType.GROUP);
     },
 
     getAbsoluteUrl(relativeUrl) {
       return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
     },
-
-    async kirKhar(id) {
+// eslint-disable-next-line
+    async kirKhar(id,type) {
       this.currentUser = await jwtAuth.getCurrentUser();
       console.log("this.groupNumber", this.groupNumber);
-      this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/group/${id}/?token=${await jwtAuth.getAccessToken()}`);
+      this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/${type}/${id}/?token=${await jwtAuth.getAccessToken()}`);
       this.websocket.onopen = () => {
         // console.log("new group id", this.groupInfo.id);
         this.websocket.send(JSON.stringify({
@@ -263,7 +267,7 @@ export default {
           }
         }
         // this.$refs.chatHistory.scrollTop = 99999999;
-        this.scroll(9999999, 9999999);
+        // this.scroll(9999999, 9999999);
         // let content_menu = document.getElementById('chat-history');
         // content_menu.scrollIntoView({behavior: 'smooth', block: 'end'});
       }

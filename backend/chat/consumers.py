@@ -7,7 +7,7 @@ from channels.db import database_sync_to_async
 from channels.layers import get_channel_layer
 from channels.db import database_sync_to_async
 from api.models import  User,PrivateChat,Message,Group
-from .serializers import MessageSerializer,GroupSerializer
+from .serializers import MessageSerializer,GroupSerializer,PrivateChatSerializer
 import datetime
 import copy
 
@@ -176,7 +176,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
         print(self.room_name,user)
         # user=User.objects.get(pk=user.id)
         self.room_object=Group.objects.get(name=self.room_name,participants__id=user.id)
-        messages=Message.message_order(self,user,self.room_name)
+        messages=Message.message_order(self,self.room_object,"group")
         dict_messages=MessageSerializer(messages,many=True).data
         group_serialized=GroupSerializer(self.room_object,many=False).data
         return {
@@ -196,47 +196,53 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         self.user=self.scope["user"]
         # get chat object from id
         try:
-            chat=PrivateChat.objects.get(pk=chat_id)
+            chat:PrivateChat=await self.get_private_chat(chat_id)
             self.chat=chat
             # check if the user is creator or the_other user
             current_user=self.scope['user']
-            if not (current_user==chat.creator or current_user==chat.the_other):
-                self.send(json.dumps({
+            if not await self.check_permission(current_user):
+                print("in if")
+                await self.send(json.dumps({
                     "error":f"user {current_user} dont have access to this room"
                 }))
                 await self.close()
 
 
             else:
-                self.room_group_name=f"user_{chat.creator}_{chat.the_other}" 
+                print("in else")
+                # self.room_group_name=f"user_{chat.creator}_{chat.the_other}" 
+                await self.set_group_name()
                 await self.channel_layer.group_add(
-                 self.room_group_name, self.channel_name
+                    self.room_group_name, self.channel_name
                 )
 
                 await self.accept()
 
 
 
-        except:
-            self.send(json.dumps({
+        except Exception as e:
+        # print(e)
+            await self.send(json.dumps({
                 "error":f"no such private chat with id : {chat_id}"
             }))
             await self.close()
+
+    
+    @database_sync_to_async
+    def get_private_chat(self,id):
+        return PrivateChat.objects.get(pk=id)
+    
+    @database_sync_to_async
+    def check_permission(self,user):
+        if (self.chat.creator==user or self.chat.the_other==user):
+            return True
+        return False
+    
+    @database_sync_to_async
+    def set_group_name(self):
+        self.room_group_name=f"pv_{self.chat.creator}_{self.chat.the_other}" 
         
         
-
-    # @database_sync_to_async
-    # def set_channel_name(self,user:User):
-    #     # This is a synchronous function that returns a result
-    #     user.channel_name=self.channel_name
-    #     user.save()
-
-    # @database_sync_to_async
-    # def get_private_chat(creator,the_other):
-    #     # Create or retrieve a PrivateChat instance
-    #     private_chat, created = PrivateChat.objects.get_or_create(creator=creator,the_other=the_other)
-    #     private_chat.save()
-
 
     async def disconnect(self, close_code):
         # Leave room group
@@ -271,24 +277,29 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
 
 
 
-    # async def send_message(self,channel_name, message):
-    #     # channel_layer = get_channel_layer()
-    #     await channel_layer.send(channel_name, {
-    #         'type': 'chat.message',
-    #         'message': message
-    #     })
-
-    # async def send_message_to_user(self,user_id, message):
-    #     # Assuming you have a unique channel name for each user, for example, "user_{user_id}"
-    #     channel_name = f"user_{user_id}"
-    #     self.send_messasge(channel_name, message)
-
      # Receive message from room group
+    
+
+    async def send_to_chat_message(self,text_data):
+        
+     
+        # Send message to room group
+        await self.channel_layer.group_send(
+            self.room_group_name, {
+                "type": "chat.message",
+                "data":text_data,
+                "command":"new_message"
+
+            }
+        )
+
+
+    # Receive message from room group
     async def chat_message(self, event):
-        message = event["message"]
+        # message = event["message"]
 
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message}))
+        await self.send(text_data=json.dumps(event))
 
 
     @database_sync_to_async
@@ -322,13 +333,15 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def fetch_messages(self):
-        user=self.user
-        print(self.room_group_name,user)
+        
+        print(self.room_group_name,self.user)
         # user=User.objects.get(pk=user.id)
         
-        messages=Message.message_order(self,user,self.room_name)
+        messages=Message.message_order(self,self.chat,"privatechat")
+        
         dict_messages=MessageSerializer(messages,many=True).data
-        group_serialized=GroupSerializer(self.room_object,many=False).data
+        print(messages)
+        group_serialized=PrivateChatSerializer(self.chat,many=False).data
         return {
             "command":"fetch_messages",
             "messages":dict_messages,

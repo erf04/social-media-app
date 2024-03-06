@@ -2,10 +2,9 @@ import { createApp } from 'vue'
 import mitt from "mitt";
 import App from './App.vue'
 import router from './router.js'
+import $ from 'jquery'
 
 
-global.jQuery = require('jquery');
-const $ = global.jQuery;
 window.$ = $;
 
 const emitter = mitt();
