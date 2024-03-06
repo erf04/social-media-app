@@ -152,11 +152,20 @@
 
 <script>
 
+//flexible the #chat-history
+//add user private chats to front
+//fix reply
+//add group and add private chat
+//able to add admin to a group --erfan
+//fix token expiration** --erfan
+//
+
 // import ReconnectingWebSocket from "../lib/reconnecting-websocket.min.js";
 import {JWTAuth} from "../../services/jwt";
 import axios from "axios";
 import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
 import router from "@/router";
+import { nextTick } from 'vue';
 // import $ from "jquery"
 // import jquery from "jquery";
 // import "https://code.jquery.com/jquery-3.7.1.min.js";
@@ -196,12 +205,15 @@ export default {
   },
   computed: {},
   methods: {
-    // scroll(speed, num) {
-    //     var ht = 0;
-    //     for (let i = 0; i != num; i++) console.log( this.messages[i]);
-    //     ht += 30;
-    //     $("#chat-log").animate({scrollTop: ht}, speed);
-    //   },
+    async scrollToEnd() {
+        // var ht = 0;
+        // for (let i = 0; i != num; i++) console.log( this.messages[i]);
+        // ht += 30;
+        // $("#chat-log").animate({scrollTop: ht}, speed);
+        await nextTick();
+        let container=document.getElementById("chat-history");
+        container.scrollTop=container.scrollHeight;
+    },
     showRepliedMessage(message) {
       console.log("message showRepliedMessage", message);
       this.$refs.repliedMessage.style.display = 'block';
@@ -234,7 +246,7 @@ export default {
     getAbsoluteUrl(relativeUrl) {
       return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
     },
-// eslint-disable-next-line
+
     async kirKhar(id,type) {
       this.currentUser = await jwtAuth.getCurrentUser();
       console.log("this.groupNumber", this.groupNumber);
@@ -259,12 +271,18 @@ export default {
           if (command === "fetch_messages") {
             console.log(data);
             this.messages = data["messages"];
-          } else if (command === "new_message") {
+            // this.scroll();
+
+          }
+           else if (command === "new_message") {
             console.log(data['data']);
             this.new_message = data['data'];
             this.messages.push(this.new_message);
             this.new_message_body = '';
+            // this.scroll();
           }
+          this.scrollToEnd();
+
         }
         // this.$refs.chatHistory.scrollTop = 99999999;
         // this.scroll(9999999, 9999999);
@@ -302,6 +320,12 @@ export default {
 </script>
 
 <style scoped>
+
+#chat-history {
+  max-height: 500px; /* Set a maximum height to enable scrolling */
+  overflow-y: auto; /* Enable vertical scrolling */
+  scroll-behavior: smooth; /* Enable smooth scroll behavior */
+}
 
 button {
   border: none;
