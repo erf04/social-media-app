@@ -12,6 +12,7 @@ from rest_framework import permissions,generics
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from django.db.models import Q
+from datetime import datetime
 
 
 class GroupApiView(APIView):
@@ -23,7 +24,8 @@ class GroupApiView(APIView):
 
     def post(self,request:Request): 
         group_name=request.data['group_name']
-        group=Group.objects.create(name=group_name,creator=request.user)
+        image=request.data['image']
+        group=Group.objects.create(name=group_name,creator=request.user,image=image,creation_date=datetime.now())
         group.participants.add(request.user)
         group.save()
         serialized=GroupSerializer(group, many=False)
@@ -46,5 +48,20 @@ class PrivateRoomView(APIView):
         if created:
             return Response(serialized.data,status=status.HTTP_201_CREATED)
         return Response(serialized.data,status=status.HTTP_200_OK)
+    
+
+@api_view(["POST"])
+@permission_classes([permissions.IsAuthenticated])
+def add_participants(request:Request):
+    participants_id_list=request.data["participants"]
+    chat_id=request.data["group_id"]
+    chat:Group=Group.objects.get(pk=chat_id)
+    for id in  participants_id_list:
+        user=User.objects.get(pk=id)
+        chat.participants.add(user)
+
+    serialized=GroupSerializer(chat,many=False)
+    return Response(serialized.data,status=status.HTTP_200_OK)
+
 
 

@@ -60,7 +60,7 @@ class Post(AbstractContent):
 
 
 class AbstractChat(models.Model):
-    creation_date=models.DateTimeField(auto_now_add=True)
+    creation_date=models.DateTimeField()
     creator=models.ForeignKey(User,on_delete=models.CASCADE)
 
 

@@ -1,9 +1,12 @@
 <template>
+  
+  <!-- <button>btn</button> -->
   <div class="container mt-5">
     <div class="row clearfix">
       <div class="col-lg-12">
         <div class="card chat-app">
           <div id="plist" class="people-list">
+            <button type="button" class="btn btn-success" style="background-color: blue;">add group</button>
             <div class="input-group">
               <div class="input-group-prepend">
                 <span class="input-group-text"><i class="fa fa-search"></i></span>
@@ -157,7 +160,7 @@
 //fix reply
 //add group and add private chat
 //able to add admin to a group --erfan
-//fix token expiration** --erfan
+//fix token expiration** --erfan          ok
 //
 
 // import ReconnectingWebSocket from "../lib/reconnecting-websocket.min.js";
@@ -166,9 +169,7 @@ import axios from "axios";
 import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
 // import router from "@/router";
 import { nextTick } from 'vue';
-// import $ from "jquery"
-// import jquery from "jquery";
-// import "https://code.jquery.com/jquery-3.7.1.min.js";
+import "../../node_modules/bootstrap/dist/css/bootstrap.css"; // or however you load your CSS
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 // const user = await jwtAuth.getCurrentUser();
@@ -327,10 +328,12 @@ export default {
           console.log(error);
         })
     // console.log("messages:"+this.messages);
-    if (this.currentChatRoom)
-      this.currentChatRoom=null;
+    this.currentChatRoom=null;
     
   },
+  created(){
+    this.currentChatRoom=null;
+  }
 }
 </script>
 

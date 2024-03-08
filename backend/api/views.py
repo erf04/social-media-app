@@ -90,17 +90,6 @@ def getUserByUsername(request:Request):
     return Response(serializer.data)
 
 
-@api_view(['GET'])
-def Test(request: Request):
-    group=Group.objects.get(pk=1)
-    sender=User.objects.get(pk=1)
-    message=Message.objects.create(chat=group,sender=sender,body="test")
-    return Response({
-        "messsage":"ok"
-    })
-
-
-
 
     
 

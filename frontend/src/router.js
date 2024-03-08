@@ -8,6 +8,7 @@ import userPage from '@/components/UserPage.vue'
 import profileInfo from "@/components/ProfileInfo.vue";
 import profilePostList from "@/components/ProfilePostList.vue";
 import chatView from "@/components/ChatView.vue";
+import createGroup  from "@/components/CreateGroup.vue";
 // import chatHistory from "@/components/ChatHistory.vue";
 
 const routes = [
@@ -21,6 +22,8 @@ const routes = [
     {path: '/profile/postsView', component: profilePostList},
     {path: '/chat', component: chatView},
     // {path: '/chat/:name', component: chatView, name: 'chat'},
+    {path: '/group/add', component:createGroup },
+    
 ]
 
 const router = createRouter({
