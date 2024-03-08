@@ -161,7 +161,7 @@
 //add group and add private chat
 //able to add admin to a group --erfan
 //fix token expiration** --erfan          ok
-//
+// add participants (not complete)
 
 // import ReconnectingWebSocket from "../lib/reconnecting-websocket.min.js";
 import {JWTAuth} from "../../services/jwt";
