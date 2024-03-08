@@ -12,7 +12,7 @@
             </div>
             <ul class="list-unstyled chat-list mt-2 mb-0">
               <li class="clearfix" v-for="group in groups" :key="group.id">
-                <button @click="GoToSelectedChat(group.id, group.name)">
+                <button @click="selectRoom(group)">
                   <img :src="getAbsoluteUrl(group.image)" alt="avatar"/>
                   <div class="about">
                     <div class="name">{{ group.name }}</div>
@@ -25,19 +25,19 @@
               </li>
             </ul>
           </div>
-          <div v-if="groupNumber !== -1" class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1"
+          <div v-if="this.currentChatRoom !== null" class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1"
                id="offcanvasWithBothOptions"
                aria-labelledby="offcanvasWithBothOptionsLabel">
             <div class="offcanvas-header p-0">
-              <img :src="getAbsoluteUrl(groups[groupNumber].image)" style="max-height: 200px; width: 100%"/>
+              <img :src="getAbsoluteUrl(currentChatRoom.image)" style="max-height: 200px; width: 100%"/>
               <button style="position: absolute; top: 10px; right: 10px; background-color: red;" type="button"
                       class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
               <!--              <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Backdrop with scrolling</h5>-->
             </div>
             <div class="offcanvas-body">
-              <h6>This group created in {{ groups[groupNumber].creation_date }}.</h6>
+              <h6>This group created in {{ currentChatRoom.creation_date }}.</h6>
               <h2>Members</h2>
-              <div v-for="member in groups[groupNumber].participants" :key="member.id" class="d-flex"
+              <div v-for="member in currentChatRoom.participants" :key="member.id" class="d-flex"
                    style="gap: 10px; padding-left: 20px">
                 <img :src="getAbsoluteUrl(member.image)" style="width: 30px; height: 30px; border-radius: 50%"/>
                 <div>
@@ -48,21 +48,21 @@
               </div>
             </div>
           </div>
-          <div class="chat" v-if="groupNumber !== -1">
+          <div class="chat" v-if="currentChatRoom !== null">
             <div class="chat-header clearfix">
               <div class="row">
                 <div class="col-lg-6">
                   <button style="text-align: start" type="button" data-bs-toggle="offcanvas"
                           data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
                     <a href="javascript:void(0);" data-toggle="modal" data-target="#view_info">
-                      <img :src="getAbsoluteUrl(groups[groupNumber].image)" alt="avatar">
+                      <img :src="getAbsoluteUrl(currentChatRoom.image)" alt="avatar">
                     </a>
                     <div class="chat-about">
                       <div class="d-flex align-items-center small" style="gap: 10px">
-                        <h6 class="mb-0">{{ groups[groupNumber].name }} </h6>
-                        <span> Created By {{ groups[groupNumber].creator.username }}</span>
+                        <h6 class="mb-0">{{ currentChatRoom.name }} </h6>
+                        <span> Created By {{ currentChatRoom.creator.username }}</span>
                       </div>
-                      <small>{{ groups[groupNumber].participants.length }} Members</small>
+                      <small>{{ currentChatRoom.participants.length }} Members</small>
                     </div>
                   </button>
                 </div>
@@ -164,7 +164,7 @@
 import {JWTAuth} from "../../services/jwt";
 import axios from "axios";
 import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
-import router from "@/router";
+// import router from "@/router";
 import { nextTick } from 'vue';
 // import $ from "jquery"
 // import jquery from "jquery";
@@ -172,6 +172,7 @@ import { nextTick } from 'vue';
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 // const user = await jwtAuth.getCurrentUser();
+// eslint-disable-next-line
 const chatType=Object.freeze({
   PRIVATE:"pv",
   GROUP:"group"
@@ -197,19 +198,18 @@ export default {
           participants: [{}]
         }
       ],
-      groupNumber: -1,
-      groupName: 0,
       currentUser: Object,
       newGroupId: 0,
+      currentChatRoom: this.loadSavedRoom() || {
+        creator:{},
+        participants:[{}]
+      },
     }
   },
   computed: {},
   methods: {
     async scrollToEnd() {
-        // var ht = 0;
-        // for (let i = 0; i != num; i++) console.log( this.messages[i]);
-        // ht += 30;
-        // $("#chat-log").animate({scrollTop: ht}, speed);
+
         await nextTick();
         let container=document.getElementById("chat-history");
         container.scrollTop=container.scrollHeight;
@@ -236,11 +236,29 @@ export default {
       }))
 
     },
-    GoToSelectedChat(n, name) {
-      this.groupNumber = n - 1;
-      this.groupName = name;
-      router.push({name: 'chat', params: {name}});
-      this.kirKhar(n,chatType.GROUP);
+    async selectRoom(room) {
+      // console.log(room);
+      
+        // this.kirKhar(room.id,chatType.GROUP);
+      this.currentChatRoom={...room};
+
+      // router.push({name: 'chat', params: {name}});
+      this.saveSelectedRoom();
+      // this.kirKhar(room.id,chatType.GROUP);
+      await this.kirKhar(room.id,chatType.GROUP);
+
+      setInterval(async()=>{
+        // await nextTick();
+        await this.kirKhar(room.id,chatType.GROUP);
+        // await nextTick();
+      },4.5*60*1000);
+    },
+    saveSelectedRoom() {
+      localStorage.setItem('selectedRoom', JSON.stringify(this.currentChatRoom));
+    },
+    loadSavedRoom() {
+      const savedRoom = localStorage.getItem('selectedRoom');
+      return savedRoom ? JSON.parse(savedRoom) : null;
     },
 
     getAbsoluteUrl(relativeUrl) {
@@ -248,11 +266,10 @@ export default {
     },
 
     async kirKhar(id,type) {
-      this.currentUser = await jwtAuth.getCurrentUser();
-      console.log("this.groupNumber", this.groupNumber);
+
       this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/${type}/${id}/?token=${await jwtAuth.getAccessToken()}`);
       this.websocket.onopen = () => {
-        // console.log("new group id", this.groupInfo.id);
+        
         this.websocket.send(JSON.stringify({
           "command": "fetch_messages",
         }))
@@ -284,10 +301,7 @@ export default {
           this.scrollToEnd();
 
         }
-        // this.$refs.chatHistory.scrollTop = 99999999;
-        // this.scroll(9999999, 9999999);
-        // let content_menu = document.getElementById('chat-history');
-        // content_menu.scrollIntoView({behavior: 'smooth', block: 'end'});
+
       }
     },
   },
@@ -296,11 +310,7 @@ export default {
       console.log("new", n.id);
       this.newGroupId = n.id;
     },
-    groupNumber(n) {
-      this.groupNumber = n;
-      console.log("groupNumber", this.groupNumber);
-      // this.kirKhar();
-    }
+
   },
   async mounted() {
 
@@ -311,10 +321,15 @@ export default {
     })
         .then(result => {
           this.groups = result.data;
+          console.log(this.groups);
         })
         .catch(error => {
           console.log(error);
         })
+    // console.log("messages:"+this.messages);
+    if (this.currentChatRoom)
+      this.currentChatRoom=null;
+    
   },
 }
 </script>

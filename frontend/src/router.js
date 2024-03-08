@@ -20,7 +20,7 @@ const routes = [
     {path: '/profile/info', component: profileInfo},
     {path: '/profile/postsView', component: profilePostList},
     {path: '/chat', component: chatView},
-    {path: '/chat/:name', component: chatView, name: 'chat'},
+    // {path: '/chat/:name', component: chatView, name: 'chat'},
 ]
 
 const router = createRouter({
