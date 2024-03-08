@@ -28,7 +28,7 @@
   import axios from 'axios';
   import { JWTAuth } from '../../services/jwt';
   import router from "@/router";
-  const baseURL="http://localhost:8000/api";
+  const baseURL="http://localhost:8000";
   const jwtAuth=new JWTAuth('http://localhost:8000/auth')
   export default {
     data() {
@@ -59,7 +59,6 @@
         })
           .then(response =>{
             console.log(response);
-            alert("Your group has been created");
             router.push('/chat');
           })
           .catch(error=>{

@@ -6,7 +6,7 @@
       <div class="col-lg-12">
         <div class="card chat-app">
           <div id="plist" class="people-list">
-            <button type="button" class="btn btn-success" style="background-color: blue;">add group</button>
+            <button type="button" class="btn btn-success" style="background-color: blue;" @click="goToGroupCreationForm()">add group</button>
             <div class="input-group">
               <div class="input-group-prepend">
                 <span class="input-group-text"><i class="fa fa-search"></i></span>
@@ -305,6 +305,10 @@ export default {
 
       }
     },
+
+    goToGroupCreationForm(){
+      this.$router.push('/group/create');
+    }
   },
   watch: {
     groupInfo(n) {

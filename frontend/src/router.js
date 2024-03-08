@@ -8,8 +8,9 @@ import userPage from '@/components/UserPage.vue'
 import profileInfo from "@/components/ProfileInfo.vue";
 import profilePostList from "@/components/ProfilePostList.vue";
 import chatView from "@/components/ChatView.vue";
-import createGroup  from "@/components/CreateGroup.vue";
+import CreateGroup  from "@/components/CreateGroup.vue";
 // import chatHistory from "@/components/ChatHistory.vue";
+import AddParticipants from  "@/components/AddParticipants.vue";
 
 const routes = [
     {path: '/', component: Home},
@@ -22,7 +23,8 @@ const routes = [
     {path: '/profile/postsView', component: profilePostList},
     {path: '/chat', component: chatView},
     // {path: '/chat/:name', component: chatView, name: 'chat'},
-    {path: '/group/add', component:createGroup },
+    {path: '/group/create', component:CreateGroup },
+    {path: '/group/add', component:AddParticipants },
     
 ]
 

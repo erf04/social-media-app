@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.request import Request
 from rest_framework.response import Response
-from api.models import Group,PrivateChat,User
+from api.models import Group,PrivateChat,User,Follower
 from rest_framework import status
 from rest_framework.decorators import api_view,permission_classes,parser_classes
 from .serializers import GroupSerializer,PrivateChatSerializer
@@ -13,6 +13,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from django.db.models import Q
 from datetime import datetime
+from .serializers import CompleteUserSerializer
 
 
 class GroupApiView(APIView):
@@ -62,6 +63,17 @@ def add_participants(request:Request):
 
     serialized=GroupSerializer(chat,many=False)
     return Response(serialized.data,status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([permissions.IsAuthenticated])
+def get_followers_and_followings(request:Request):
+    user:User=request.user
+    users=user.followers | user.followed
+    print(users)
+    serializer=CompleteUserSerializer(users,many=True)
+    print(serializer.data)
+    return Response(serializer.data,status=status.HTTP_200_OK)
 
 
 
