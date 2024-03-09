@@ -19,11 +19,11 @@ class User(AbstractUser):
     
     @property
     def followers(self):
-        return User.objects.filter(followings__followed=self)
+        return User.objects.filter(followers__followed__id=self.id)
 
     @property
     def followings(self):
-        return User.objects.filter(followers__follower=self)
+        return User.objects.filter(followings__follower__id=self.id)
 
 
     def __str__(self) -> str:
@@ -32,8 +32,8 @@ class User(AbstractUser):
 
 
 class Follower(models.Model):
-    follower=models.ForeignKey(User, on_delete=models.CASCADE, related_name="followers")
-    followed=models.ForeignKey(User, on_delete=models.CASCADE, related_name="followings")
+    follower=models.ForeignKey(User, on_delete=models.CASCADE, related_name="followings")
+    followed=models.ForeignKey(User, on_delete=models.CASCADE, related_name="followers")
     creation_date=models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -50,15 +50,17 @@ class PrivateChatSerializer(serializers.ModelSerializer):
 
 
 class CompleteUserSerializer(serializers.ModelSerializer):
-    followers=serializers.SerializerMethodField()
-    followings=serializers.SerializerMethodField()
+    followers_count=serializers.SerializerMethodField()
+    followings_count=serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields=("id","username","email","followers","followings")
+        fields=("id","username","email","followers_count","followings_count")
 
-    def get_followers(self,obj:User):
-        pass
+    def get_followers_count(self,obj:User):
+        return User.objects.filter(followings__followed=obj).count()
+
     
-    def get_followings(self,obj:User):
-        return obj.followings
+    def get_followings_count(self,obj:User):
+        return User.objects.filter(followers__follower=obj).count()
+        
 
