@@ -16,13 +16,24 @@ class Task(models.Model):
 
 class User(AbstractUser):
     image=models.ImageField(upload_to='profile/', blank=True, null=True,default='default/userProfile/user.png')
-    channel_name=models.CharField(max_length=1000,null=True,blank=True)
+    
+    @property
+    def followers(self):
+        return User.objects.filter(followings__followed=self)
+
+    @property
+    def followings(self):
+        return User.objects.filter(followers__follower=self)
+
+
+    def __str__(self) -> str:
+        return f"{self.pk}:{self.username}"
     
 
 
 class Follower(models.Model):
     follower=models.ForeignKey(User, on_delete=models.CASCADE, related_name="followers")
-    followed=models.ForeignKey(User, on_delete=models.CASCADE, related_name="followed")
+    followed=models.ForeignKey(User, on_delete=models.CASCADE, related_name="followings")
     creation_date=models.DateTimeField(auto_now_add=True)
 
     class Meta:

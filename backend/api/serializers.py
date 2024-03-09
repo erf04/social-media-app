@@ -14,12 +14,12 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id','username','email','image']
 
 
-class FollowerSerializer(serializers.ModelSerializer):
-    followers=UserSerializer(read_only=True,many=True)
-    following=UserSerializer(read_only=True,many=True)
-    class Meta:
-        model = Follower
-        fields= ['followers', 'following']
+# class FollowerSerializer(serializers.ModelSerializer):
+#     followers=UserSerializer(read_only=True,many=True)
+#     following=UserSerializer(read_only=True,many=True)
+#     class Meta:
+#         model = Follower
+#         fields= ['followers', 'following']
 
 
 class PostSerializer(serializers.ModelSerializer):

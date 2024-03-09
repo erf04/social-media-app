@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from api.models import Group,User,Message,CommentContainer,PrivateChat
-from api.serializers import UserSerializer,PostSerializer,FollowerSerializer
-from api.models import User,Follower
+from api.serializers import UserSerializer,PostSerializer
+from api.models import User
 
 class GroupSerializer(serializers.ModelSerializer):
     creator=UserSerializer(many=False,required=False)
@@ -50,8 +50,15 @@ class PrivateChatSerializer(serializers.ModelSerializer):
 
 
 class CompleteUserSerializer(serializers.ModelSerializer):
-    
+    followers=serializers.SerializerMethodField()
+    followings=serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields=("id","username","email")
+        fields=("id","username","email","followers","followings")
+
+    def get_followers(self,obj:User):
+        pass
+    
+    def get_followings(self,obj:User):
+        return obj.followings
 

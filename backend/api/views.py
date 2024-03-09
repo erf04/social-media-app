@@ -3,7 +3,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view,permission_classes,parser_classes
-from .serializers import TaskSerializer,UserSerializer,FollowerSerializer,PostSerializer
+from .serializers import TaskSerializer,UserSerializer,PostSerializer
 from .models import *
 from django.shortcuts import get_object_or_404
 from .permissions import IsOwnerOrReadOnly
