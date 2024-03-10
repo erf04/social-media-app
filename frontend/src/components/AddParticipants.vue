@@ -34,17 +34,18 @@
   <tbody>
     <tr v-for="(user,index) in users" :key="user.id">
         <td>{{ ++index }}</td>
-        <td>{{ user.username }}</td>
-        <td><i class="fa fa-check-circle-o green"></i><span class="ms-1">{{user.followe}}</span></td>
-        <td><img src="https://i.imgur.com/VKOeFyS.png" width="25"> Althan Travis</td>
-        <td>Wirecard for figma</td>
+        <td> <img :src="getAbsoluteUrl(user.image)" width="25" alt=""> </td>
+        <td><i class="fa fa-check-circle-o green"></i><span class="ms-1">{{user.username}}</span></td>
+        <td>{{user.followers_count}}</td>
+        <td>{{user.followings_count}}</td>
         <!-- <td class="text-end"><span class="fw-bolder">$0.99</span> <i class="fa fa-ellipsis-h  ms-2"></i></td> -->
-        <th scope="row"><input class="form-check-input" type="checkbox"></th>
+        <th scope="row"><input type="checkbox" @click="addParticipants(user.id)"></th>
     </tr>
     
    
   </tbody>
 </table>
+  <input type="submit" @click="save()" class="btn btn-success">
   
   </div>
     
@@ -57,8 +58,8 @@
   import { JWTAuth } from '../../services/jwt';
   import router from "@/router";
   const baseURL="http://localhost:8000";
-  const jwtAuth=new JWTAuth('http://localhost:8000/auth')
-  export default {
+  const jwtAuth=new JWTAuth('http://localhost:8000/auth');
+export default {
     data() {
       return {
         users:[{}],
@@ -86,6 +87,30 @@
             console.log(error);
           })
       },
+      getAbsoluteUrl(relativeUrl) {
+        return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
+      },
+      addParticipants(id){
+        this.participants.push(id);
+      },
+      async save(){
+        let body={
+          "participants":this.participants,
+        }
+        axios.post(`${baseURL}/chat/groups/add/`,body,{
+          headers:{
+            Authorization:`JWT ${await jwtAuth.getAccessToken()}`
+          }
+        })
+        .then(response=>{
+          console.log(response);
+          this.$router.push('/chat')
+        })
+        .catch(err=>{
+          console.log(err);
+        })
+      }
+
   
     },
     async mounted() {
@@ -109,29 +134,18 @@
 </script>
   
   <style>
-  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
+  /* @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap'); */
 
 /* body{
     font-family: 'Open Sans', sans-serif;
-     */
-/* } */
+    
+} */
 .search{
   
   top:6px;
   left:10px;
 }
 
-.form-control{
-    
-    border:none;
-    padding-left:32px;
-}
-
-.form-control:focus{
-    
-    border:none;
-    box-shadow:none;
-}
 
 .green{
     

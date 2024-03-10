@@ -54,7 +54,7 @@ class CompleteUserSerializer(serializers.ModelSerializer):
     followings_count=serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields=("id","username","email","followers_count","followings_count")
+        fields=("id","username","email","image","followers_count","followings_count")
 
     def get_followers_count(self,obj:User):
         return User.objects.filter(followings__followed=obj).count()

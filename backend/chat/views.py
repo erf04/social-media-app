@@ -53,15 +53,16 @@ class PrivateRoomView(APIView):
 
 @api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
-def add_participants(request:Request):
+def add_participants_to_last_group(request:Request):
     participants_id_list=request.data["participants"]
-    chat_id=request.data["group_id"]
-    chat:Group=Group.objects.get(pk=chat_id)
+    print(f"ids:{participants_id_list}")
+    myuser=request.user
+    last_group=Group.objects.filter(creator=myuser).last()
     for id in  participants_id_list:
         user=User.objects.get(pk=id)
-        chat.participants.add(user)
+        last_group.participants.add(user)
 
-    serialized=GroupSerializer(chat,many=False)
+    serialized=GroupSerializer(last_group,many=False)
     return Response(serialized.data,status=status.HTTP_200_OK)
 
 
@@ -73,8 +74,6 @@ def get_followers_and_followings(request:Request):
     followers=User.objects.filter(followings__followed=user)
     followings=User.objects.filter(followers__follower=user)
     users=followers | followings
-    
-    
     serializer=CompleteUserSerializer(users,many=True)
     return Response(serializer.data,status=status.HTTP_200_OK)
 

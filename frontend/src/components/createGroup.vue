@@ -59,12 +59,13 @@
         })
           .then(response =>{
             console.log(response);
-            router.push('/chat');
+            router.push('/group/add');
           })
           .catch(error=>{
             console.log(error);
           })
       },
+
   
     }
   
