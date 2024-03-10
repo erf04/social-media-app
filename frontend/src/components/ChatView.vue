@@ -238,9 +238,6 @@ export default {
 
     },
     async selectRoom(room) {
-      // console.log(room);
-      
-        // this.kirKhar(room.id,chatType.GROUP);
       this.currentChatRoom={...room};
 
       // router.push({name: 'chat', params: {name}});
@@ -249,8 +246,11 @@ export default {
       await this.kirKhar(room.id,chatType.GROUP);
 
       setInterval(async()=>{
+        if (!await jwtAuth.isAuthenticate())
+          this.$router.push('/login')
         // await nextTick();
-        await this.kirKhar(room.id,chatType.GROUP);
+        else
+          await this.kirKhar(room.id,chatType.GROUP);
         // await nextTick();
       },4.5*60*1000);
     },
