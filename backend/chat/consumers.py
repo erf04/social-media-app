@@ -203,9 +203,9 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
             current_user=self.scope['user']
             if not await self.check_permission(current_user):
                 print("in if")
-                await self.send(json.dumps({
-                    "error":f"user {current_user} dont have access to this room"
-                }))
+                # await self.send(json.dumps({
+                #     "error":f"user {current_user} dont have access to this room"
+                # }))
                 await self.close()
 
 
@@ -216,8 +216,8 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
                 await self.channel_layer.group_add(
                     self.room_group_name, self.channel_name
                 )
-
                 await self.accept()
+
 
 
 
@@ -241,7 +241,7 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
     
     @database_sync_to_async
     def set_group_name(self):
-        self.room_group_name=f"pv_{self.chat.creator}_{self.chat.the_other}" 
+        self.room_group_name=f"pv_{self.chat.creator.username}_{self.chat.the_other.username}" 
         
         
 
