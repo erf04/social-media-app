@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import *
-
+from datetime import datetime
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model=Task
@@ -33,7 +33,9 @@ class PostSerializer(serializers.ModelSerializer):
 
     def save(self,**kwargs):
         author=kwargs.get("author")
+        creation_date=datetime.now()
         self.validated_data['author']=author
+        self.validated_data['created_at']=creation_date
         return super().save()  # Call the parent's save() method
 
 

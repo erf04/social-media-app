@@ -59,7 +59,7 @@ class Post(AbstractContent):
     title = models.CharField(max_length=200)
     description = models.TextField()
     content=models.FileField(upload_to='posts/')
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField()
     updated_at = models.DateTimeField(auto_now=True)
     liked_by=models.ManyToManyField(User,related_name='post_likes',blank=True)
     saved_by=models.ManyToManyField(User,related_name='post_saves',blank=True)
@@ -129,7 +129,11 @@ class Group(AbstractChat):
     participants=models.ManyToManyField(User,blank=True)
     name=models.CharField(max_length=256)
     messages=GenericRelation(Message)
-    image=models.ImageField(upload_to='GroupProfile',default='default/groupProfile/group-profile.png', blank=True,null=True)
+    image=models.ImageField(upload_to='GroupProfile',default='default/groupProfile/group.png', blank=True,null=True)
+
+
+    def __str__(self) -> str:
+        return f"id:{self.id}_name:{self.name}"
 
 
 

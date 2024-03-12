@@ -26,11 +26,17 @@ class GroupApiView(APIView):
     def post(self,request:Request): 
         group_name=request.data['group_name']
         image=request.data['image']
-        group=Group.objects.create(name=group_name,creator=request.user,image=image,creation_date=datetime.now())
+        
+        if image!="null":
+            group=Group.objects.create(name=group_name,creator=request.user,image=image,creation_date=datetime.now())
+        else:
+            group=Group.objects.create(name=group_name,creator=request.user,creation_date=datetime.now())
+
         group.participants.add(request.user)
         group.save()
         serialized=GroupSerializer(group, many=False)
         return Response(serialized.data,status=status.HTTP_201_CREATED)
+
     
 
 
@@ -76,6 +82,27 @@ def get_followers_and_followings(request:Request):
     users=followers | followings
     serializer=CompleteUserSerializer(users,many=True)
     return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def filter_groups(request:Request):
+    key=request.data["key"]
+    groups=Group.objects.filter(participants=request.user).filter(name__contains=key.lower())
+    serialized=GroupSerializer(groups,many=True)
+    return Response(serialized.data,status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+@permission_classes([permissions.IsAuthenticated])
+def filter_pv(request:Request):
+    key=request.data["key"]
+    user=request.user
+    private_chats1=PrivateChat.objects.filter(creator=request.user).filter(the_other__username__contains=key.lower())
+    private_chats2=PrivateChat.objects.filter(the_other=request.user).filter(creator__username__contains=key.lower())
+    private_chats=private_chats1 | private_chats2
+    serialized=PrivateChatSerializer(private_chats,many=True)
+    return Response(serialized.data,status=status.HTTP_200_OK)
 
 
 

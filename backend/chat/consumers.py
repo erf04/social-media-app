@@ -153,13 +153,12 @@ class GroupConsumer(AsyncWebsocketConsumer):
             
         reply_to_id=text_data["message"]["reply_to_id"]
         body=text_data["message"]["body"]
-        chat_name=self.room_name
         try:
             replied_message=Message.objects.get(pk=reply_to_id) if reply_to_id!=None else None
         except:
             return {"error":f"there is no message with id:{reply_to_id} to be a replied message"}
         print(user)
-        group:Group=Group.objects.filter(participants=user,name=chat_name).first()
+        group:Group=self.room
         print(group)
 
         message:Message=Message.objects.create(sender=user,chat=group,body=body,reply_to=replied_message,timestamp=datetime.datetime.now())
@@ -173,13 +172,14 @@ class GroupConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def fetch_messages(self):
+        
         user=self.user
         print(self.room_name,user)
         # user=User.objects.get(pk=user.id)
-        self.room_object=Group.objects.get(name=self.room_name,participants__id=user.id)
-        messages=Message.message_order(self,self.room_object,"group")
+        
+        messages=Message.message_order(self,self.room,"group")
         dict_messages=MessageSerializer(messages,many=True).data
-        group_serialized=GroupSerializer(self.room_object,many=False).data
+        group_serialized=GroupSerializer(self.room,many=False).data
         return {
             "command":"fetch_messages",
             "messages":dict_messages,
