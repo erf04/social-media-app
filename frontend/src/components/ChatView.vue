@@ -423,6 +423,9 @@ export default {
       console.log("new", n.id);
       this.newGroupId = n.id;
     },
+    searchValue: function () { 
+        this.searchHandler();
+     }
 
   },
   async mounted() {
