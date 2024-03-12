@@ -26,11 +26,17 @@ class GroupApiView(APIView):
     def post(self,request:Request): 
         group_name=request.data['group_name']
         image=request.data['image']
-        group=Group.objects.create(name=group_name,creator=request.user,image=image,creation_date=datetime.now())
+        
+        if image!="null":
+            group=Group.objects.create(name=group_name,creator=request.user,image=image,creation_date=datetime.now())
+        else:
+            group=Group.objects.create(name=group_name,creator=request.user,creation_date=datetime.now())
+
         group.participants.add(request.user)
         group.save()
         serialized=GroupSerializer(group, many=False)
         return Response(serialized.data,status=status.HTTP_201_CREATED)
+
     
 
 
