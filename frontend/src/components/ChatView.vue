@@ -7,7 +7,8 @@
         <div class="card chat-app">
           <div id="plist" class="people-list">
             <button type="button" class="btn btn-success" style="background-color: blue;" @click="goToGroupCreationForm()">add group</button>
-            <button type="button" class="btn btn-success" style="background-color:green;" @click="fetchPrivateRooms()">fetch my pv</button>
+            <button type="button" class="btn btn-success" style="background-color:green;" @click="fetchPrivateRooms()">pv</button>
+            <button type="button" class="btn btn-success" style="background-color:green;" @click="fetchGroups()">groups</button>
             <div class="input-group">
               <div class="input-group-prepend">
                 <span class="input-group-text"><i class="fa fa-search"></i></span>
@@ -181,7 +182,7 @@
 //add group and add private chat
 //able to add admin to a group --erfan
 //fix token expiration** --erfan          ok
-// add participants (not complete)
+// add participants (not complete)        ok
 
 
 import {JWTAuth} from "../../services/jwt";
@@ -282,7 +283,7 @@ export default {
           this.$router.push('/login')
         // await nextTick();
         else
-          await this.kirKhar(room.id,chatType.GROUP);
+          await this.handleRoom(room.id,chatType.GROUP);
         // await nextTick();
       },4.5*60*1000);
     },
@@ -343,6 +344,7 @@ export default {
     },
     async fetchPrivateRooms(){
       this.isPrivate=true;
+      this.currentChatRoom=null;
       axios.get('http://localhost:8000/chat/pv/', {
       headers: {
         Authorization: `JWT ${await jwtAuth.getAccessToken()}`
@@ -358,6 +360,7 @@ export default {
     },
     async fetchGroups(){
       this.isPrivate=false;
+      this.currentPrivateRoom=null;
       axios.get('http://localhost:8000/chat/groups/', {
       headers: {
         Authorization: `JWT ${await jwtAuth.getAccessToken()}`
@@ -384,15 +387,17 @@ export default {
     this.user=await jwtAuth.getCurrentUser();
 
     // console.log("messages:"+this.messages);
-    // this.currentChatRoom=null;
+    this.currentChatRoom=null;
+    this.currentPrivateRoom=null;
+    this.groups=null;
     // this.isPrivate=false;
     console.log(this.isPrivate);
-    if (!this.isPrivate){
+    // if (!this.isPrivate){
 
-      await this.fetchGroups()
-    }
-    else
-      await this.fetchPrivateRooms()
+    //   await this.fetchGroups()
+    // }
+    // else
+    //   await this.fetchPrivateRooms()
   },
   created(){
     // this.currentChatRoom=null;
