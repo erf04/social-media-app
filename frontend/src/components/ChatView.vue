@@ -200,28 +200,27 @@
 
 <script>
 
-//flexible the #chat-history
-//add user private chats to front         ok
-//fix reply
-//add group and add private chat          ok
-//able to add admin to a group --erfan
-//fix token expiration** --erfan          ok
+// flexible the #chat-history
+// add user private chats to front         ok
+// fix reply
+// add group and add private chat          ok
+// able to add admin to a group --erfan
+// fix token expiration** --erfan          ok
 // add participants (not complete)        ok
 // last seen
 // static position for inputs
 // who send message
 // profile (posts), user profile (about & posts)
-//loading icon for fetch messages,main page and etc
+// loading icon for fetch messages,main page and etc
 // is typing 
-//add private chat creation
-
+// add private chat creation
+// enter in login page (or signup)
 
 import {JWTAuth} from "../../services/jwt";
 import axios from "axios";
 import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
 import {nextTick} from 'vue';
 import "../../node_modules/bootstrap/dist/css/bootstrap.css"; // or however you load your CSS
-// const baseURL="http://localhost:8000";
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 const baseURL = "http://localhost:8000/api";
 const BaseURL = "http://localhost:8000/api";
