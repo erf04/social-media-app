@@ -172,6 +172,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def fetch_messages(self):
+        
         user=self.user
         print(self.room_name,user)
         # user=User.objects.get(pk=user.id)
