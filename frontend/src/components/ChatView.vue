@@ -13,7 +13,7 @@
               <div class="input-group-prepend">
                 <span class="input-group-text"><i class="fa fa-search"></i></span>
               </div>
-              <input type="text" class="form-control" placeholder="Search...">
+              <input type="text" class="form-control" placeholder="Search..." v-model="searchValue" @change="searchHandler()">
             </div>
             <ul class="list-unstyled chat-list mt-2 mb-0" v-if="!this.isPrivate">
               <li class="clearfix"  v-for="group in groups" :key="group.id" >
@@ -177,12 +177,15 @@
 <script>
 
 //flexible the #chat-history
-//add user private chats to front
+//add user private chats to front         ok
 //fix reply
-//add group and add private chat
+//add group and add private chat          ok
 //able to add admin to a group --erfan
 //fix token expiration** --erfan          ok
 // add participants (not complete)        ok
+//loading icon for fetch messages,main page and etc
+// is typing 
+//add private chat creation
 
 
 import {JWTAuth} from "../../services/jwt";
@@ -191,7 +194,7 @@ import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
 // import router from "@/router";
 import { nextTick } from 'vue';
 import "../../node_modules/bootstrap/dist/css/bootstrap.css"; // or however you load your CSS
-
+const baseURL="http://localhost:8000";
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 // const user = await jwtAuth.getCurrentUser();
 // eslint-disable-next-line
@@ -236,7 +239,8 @@ export default {
       currentPrivateRoom:{
         creator:{},
         the_other:{}
-      }
+      },
+      searchValue:'',
     }
   },
   computed: {},
@@ -368,11 +372,50 @@ export default {
     })
         .then(result => {
           this.groups = result.data;
-          console.log(this.groups);
+          // console.log(this.groups);
         })
         .catch(error => {
           console.log(error);
         })
+    },
+    async searchHandler(){
+      // console.log(this.isPrivate);
+      if (!this.isPrivate){
+
+        let body={
+          "key":this.searchValue
+        }
+        axios.post(`${baseURL}/chat/groups/filter`,body,{
+          headers:{
+            Authorization:`JWT ${await jwtAuth.getAccessToken()}`
+          }
+        })
+        .then(response=>{
+          this.groups=response.data;
+        })
+        .catch(err=>{
+          console.log(err);
+        })
+
+      }
+      else{
+
+        let body={
+          "key":this.searchValue
+        }
+        axios.post(`${baseURL}/chat/pv/filter`,body,{
+          headers:{
+            Authorization:`JWT ${await jwtAuth.getAccessToken()}`
+          }
+        })
+        .then(response=>{
+          this.privateRooms=response.data;
+        })
+        .catch(err=>{
+          console.log(err);
+        })
+
+      }
     }
   },
   watch: {

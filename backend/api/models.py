@@ -129,7 +129,7 @@ class Group(AbstractChat):
     participants=models.ManyToManyField(User,blank=True)
     name=models.CharField(max_length=256)
     messages=GenericRelation(Message)
-    image=models.ImageField(upload_to='GroupProfile',default='default/groupProfile/group-profile.png', blank=True,null=True)
+    image=models.ImageField(upload_to='GroupProfile',default='default/groupProfile/group.png', blank=True,null=True)
 
 
 
