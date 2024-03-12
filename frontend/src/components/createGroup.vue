@@ -1,7 +1,7 @@
 <template>
     <div class="container p-5 w-50">
       <div class="mb-4" style="text-align: center">
-        <h1>Create Post Page</h1>
+        <h1>Create Group Page</h1>
       </div>
       <form @submit.prevent="createPost">
       <div class="mb-3">

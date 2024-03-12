@@ -39,7 +39,7 @@
         <td>{{user.followers_count}}</td>
         <td>{{user.followings_count}}</td>
         <!-- <td class="text-end"><span class="fw-bolder">$0.99</span> <i class="fa fa-ellipsis-h  ms-2"></i></td> -->
-        <th scope="row"><input type="checkbox" @click="addParticipants(user.id)"></th>
+        <th scope="row"><input type="checkbox" :value="user.id" v-model="participants"></th>
     </tr>
     
    
@@ -94,6 +94,7 @@ export default {
         this.participants.push(id);
       },
       async save(){
+        console.log(this.participants);
         let body={
           "participants":this.participants,
         }
