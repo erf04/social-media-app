@@ -8,7 +8,7 @@ import userPage from '@/components/UserPage.vue'
 import profileInfo from "@/components/ProfileInfo.vue";
 import profilePostList from "@/components/ProfilePostList.vue";
 import chatView from "@/components/ChatView.vue";
-import CreateGroup  from "@/components/CreateGroup.vue";
+import CreateGroup  from "@/components/createGroup.vue";
 // import chatHistory from "@/components/ChatHistory.vue";
 import AddParticipants from  "@/components/AddParticipants.vue";
 

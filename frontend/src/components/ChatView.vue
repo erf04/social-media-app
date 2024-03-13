@@ -130,6 +130,7 @@
                           }}</span>
                       </div>
                       <small v-if="!isPrivate">{{ currentChatRoom.participants.length }} Members</small>
+                      <div v-if="isTyping">user is typing...</div>
                     </div>
                   </button>
                 </div>
@@ -187,7 +188,7 @@
                 <div class="input-group-prepend">
                   <span class="input-group-text"><i class="fa fa-send"></i></span>
                 </div>
-                <input @keyup.enter="sendMessage" v-model="new_message_body" type="text" class="form-control"
+                <input @input="startTyping" @keyup.enter="sendMessage" v-model="new_message_body" type="text" class="form-control"
                        placeholder="Enter text here...">
               </div>
             </div>
@@ -212,9 +213,9 @@
 // who send message
 // profile (posts), user profile (about & posts)
 // loading icon for fetch messages,main page and etc
-// is typing 
+// is typing      ok
 // add private chat creation
-// enter in login page (or signup)
+// enter in login page (or signup)    ok
 // href and a tag for replied messages
 //loading icon for fetching messages
 
@@ -222,8 +223,9 @@ import {JWTAuth} from "../../services/jwt";
 import axios from "axios";
 import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
 import {nextTick} from 'vue';
-import "../../node_modules/bootstrap/dist/css/bootstrap.css"; // or however you load your CSS
+import "../../node_modules/bootstrap/dist/css/bootstrap.css";
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
+import debounce from "lodash/debounce";
 const baseURL = "http://localhost:8000/api";
 const BaseURL = "http://localhost:8000/api";
 
@@ -274,6 +276,7 @@ export default {
       isReply: false,
       userInfo: {},
       searchValue:'',
+      isTyping: false,
     }
   },
   computed: {},
@@ -401,9 +404,7 @@ export default {
             // this.scroll();
           }
           this.scrollToEnd();
-
         }
-
       }
     },
 
@@ -480,7 +481,14 @@ export default {
         })
 
       }
-    }
+    },
+    startTyping() {
+      this.isTyping = true;
+      this.debounceStopTyping();
+    },
+    debounceStopTyping: debounce(function () {
+      this.isTyping = false;
+    }, 1000),
   },
   watch: {
     groupInfo(n) {
@@ -489,7 +497,13 @@ export default {
     },
     searchValue: function () { 
         this.searchHandler();
-     }
+     },
+    new_message_body() {
+      // this.$refs.status.innerHTML = `somebody is typing...`;
+      // setTimeout(() => this.typing = '12', 5000);
+      // this.$refs.status.innerHTML = 'khar';
+      // console.log("new_message_body", this.$refs.status.innerHTML);
+    }
 
   },
   async mounted() {
