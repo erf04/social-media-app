@@ -13,17 +13,17 @@
     <form>
       <div class="form-outline mb-4">
         <label class="form-label" for="form2Example1">username</label>
-        <input type="email" id="form2Example1" class="form-control" v-model="username"/>
+        <input @keyup.enter="submit" type="email" id="form2Example1" class="form-control" v-model="username"/>
       </div>
 
       <div class="form-outline mb-4">
         <label class="form-label" for="form2Example2">Password</label>
-        <input type="password" id="form2Example2" class="form-control" v-model="password"/>
+        <input @keyup.enter="submit" type="password" id="form2Example2" class="form-control" v-model="password"/>
       </div>
 
       <div class="form-outline mb-4">
         <label class="form-label" for="form2Example3">Email</label>
-        <input type="email" id="form2Example3" class="form-control" v-model="email"/>
+        <input @keyup.enter="submit" type="email" id="form2Example3" class="form-control" v-model="email"/>
       </div>
 
       <div class="row mb-4">
@@ -83,10 +83,7 @@ export default {
 
   methods: {
     async submit() {
-
-
       this.isLoggedIn = await jwtAuth.signup(this.username.trim(), this.password.trim(), this.email.trim());
-
       // jwtAuth.signup(this.username.trim(),this.password.trim(),this.email.trim())
       // .then(()=>{
       //   this.isLoggedIn=true;
