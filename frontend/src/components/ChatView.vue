@@ -75,6 +75,7 @@
                   <img :src="getAbsoluteUrl(member.image)" style="width: 30px; height: 30px; border-radius: 50%"/>
                   <div>
                     <h3>{{ member.username }}</h3>
+                    <button class="btn btn-success" style="background-color: green;" v-if="member.id !== this.currentChatRoom.creator.id" @click="set_admin(member.id,false)">set admin</button>
                     <p>last seen</p>
                   </div>
                   <hr/>
@@ -341,9 +342,16 @@ export default {
       }))
 
     },
+    async set_admin(user_id,is_staff){
+      this.websocket.send(JSON.stringify({
+        "command":"set_admin",
+        "user":user_id,
+        "is_staff":is_staff
+      }))
+    },
     async selectRoom(room) {
-
       this.isPrivate ? this.currentPrivateRoom = {...room} : this.currentChatRoom = {...room};
+      console.log("creator.id:"+this.currentChatRoom.creator.id," user.id"+this.user.id);
 
       // router.push({name: 'chat', params: {name}});
       this.saveSelectedRoom();
@@ -355,7 +363,7 @@ export default {
           this.$router.push('/login')
         // await nextTick();
         else
-          await this.handleRoom(room.id, chatType.GROUP);
+          await this.handleRoom(room.id, this.isPrivate ? chatType.PRIVATE : chatType.GROUP);
         // await nextTick();
       }, 4.5 * 60 * 1000);
     },
@@ -396,12 +404,16 @@ export default {
             this.messages = data["messages"];
             // this.scroll();
 
-          } else if (command === "new_message") {
+          }
+          else if (command === "new_message") {
             console.log(data['data']);
             this.new_message = data['data'];
             this.messages.push(this.new_message);
             this.new_message_body = '';
             // this.scroll();
+          }
+          else if (command==="set_admin"){
+            console.log(data);
           }
           this.scrollToEnd();
         }

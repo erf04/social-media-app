@@ -71,7 +71,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
 
         elif command=="set_admin":
             result=await self.set_admin(text_data_json)
-            await self.chat_message(result,command="set_admin")
+            await self.send_to_chat_message(result,command="set_admin")
 
     @database_sync_to_async
     def fetch_messages(self,text_data):
@@ -185,13 +185,18 @@ class GroupConsumer(AsyncWebsocketConsumer):
         }
     
     @database_sync_to_async
-    def set_admin(self,text_data):
+    def set_admin(self,text_data:dict):
         is_staff=text_data['is_staff']
         user_id=text_data['user']
-        admins=self.room.admins
-        if (self.user in admins) or (self.user == self.room.creator):
+        admins=self.room.admins.all()
+        try:
+            admin=GroupAdmin.objects.get(user=self.user)
+        except:
+            admin=None
+        if (admin in admins and admin.is_staff) or (self.user == self.room.creator):
             new_admin=User.objects.get(pk=user_id)
-            group_admin=GroupAdmin.objects.create(supervisor=self.user,is_staff=is_staff,user=new_admin,creation_time=datetime.datetime.now())
+            
+            group_admin=GroupAdmin.objects.create(group=self.room,supervisor=self.user,is_staff=is_staff,user=new_admin,creation_time=datetime.datetime.now())
             serialized=GroupAdminSerializer(group_admin,many=False)
             return serialized.data
         else:
@@ -216,6 +221,7 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
             self.chat=chat
             # check if the user is creator or the_other user
             current_user=self.scope['user']
+            print(current_user)
             if not await self.check_permission(current_user):
                 print("in if")
                 # await self.send(json.dumps({

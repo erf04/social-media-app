@@ -12,5 +12,6 @@ admin.site.register(Forward)
 admin.site.register(CommentContainer)
 admin.site.register(Group)
 admin.site.register(PrivateChat)
+admin.site.register(GroupAdmin)
 
 
