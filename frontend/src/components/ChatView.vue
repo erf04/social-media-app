@@ -19,7 +19,8 @@
               <div class="input-group-prepend">
                 <span class="input-group-text"><i class="fa fa-search"></i></span>
               </div>
-              <input type="text" class="form-control" placeholder="Search..." v-model="searchValue" @change="searchHandler()">
+              <input type="text" class="form-control" placeholder="Search..." v-model="searchValue"
+                     @change="searchHandler()">
             </div>
             <ul class="list-unstyled chat-list mt-2 mb-0" v-if="!this.isPrivate">
               <li class="clearfix" v-for="group in groups" :key="group.id">
@@ -145,42 +146,65 @@
             </div>
             <div class="chat-history" id="chat-history" ref="chatHistory">
               <ul class="m-b-0" id="chatList">
-                <li v-for="(message) in messages" :key="message.id" @contextmenu.prevent="onContextMenu($event, message.body)" class="clearfix">
-                  <div v-if="message.sender.username === userInfo.username">
-                    <div ref="textRight" class="message-data text-right">
+                <div v-for="(message) in messages" :key="message.id"
+                     @contextmenu.prevent="onContextMenu($event, message.body)"
+                      style="margin-bottom: 2em">
+<!--                  <div v-show="changeTime" class="time-stamp"-->
+<!--                       style="margin: 0 auto; background: red; text-align: center; width: fit-content">-->
+<!--                    {{ showTime(getFormattedDate(message.timestamp)) }}-->
+<!--                  </div>-->
+                  <li class="clearfix"
+                      :style="message.sender.username === userInfo.username ? `text-align: end` : `text-align: start`">
+                    <div v-if="message.sender.username === userInfo.username">
+                      <div ref="textRight" class="message-data text-right">
                     <span class="message-data-time">
-                      <span> {{ message.sender.username }} </span>
+<!--                      <span> {{ message.sender.username }} </span>-->
                       <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>
                       <span v-else-if="getFormattedDate(message.timestamp) === yesterdayTime"> Yesterday </span>
-                      <span v-else> {{ message.timestamp }} </span>
+                      <span v-else> {{ getFormattedDate(message.timestamp) }} </span>
                     </span>
-                      <img :src="getAbsoluteUrl(message.sender.image)" alt="user profile picture"/>
+                        <img :src="getAbsoluteUrl(message.sender.image)" alt="user profile picture"/>
+                      </div>
+                      <div ref="whoSend" class="message other-message">
+                        <h6>
+                          {{ message.sender.username }}
+                        </h6>
+                        <!-- @click="goToRepliedMessage" -->
+                        <!--  {{ repliedText }} -->
+                        <div class="repliedMessage">khar</div>
+                        <div>
+                          {{ message.body }}
+                        </div>
+                        <div style="text-align: start; font-size: small">
+                          {{ getFormattedTime(message.timestamp) }}
+                        </div>
+                      </div>
                     </div>
-                    <div ref="whoSend" class="message other-message float-right">
-                      <!-- @click="goToRepliedMessage" -->
-                      <!--  {{ repliedText }} -->
-                      <div class="repliedMessage">khar</div>
-                      {{ message.body }}
-                    </div>
-                  </div>
-                  <div v-else>
-                    <div class="message-data">
+                    <div v-else>
+                      <div class="message-data">
                     <span class="message-data-time">
-                      <span> {{ message.sender.username }} </span>
+<!--                      <span> {{ message.sender.username }} </span>-->
                       <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>
                       <span v-else-if="getFormattedDate(message.timestamp) === yesterdayTime"> Yesterday </span>
-                      <span v-else> {{ message.timestamp }} </span>
+                      <span v-else> {{ getFormattedDate(message.timestamp) }} </span>
                     </span>
-                      <img :src="getAbsoluteUrl(message.sender.image)" alt="user profile picture"/>
+                        <img :src="getAbsoluteUrl(message.sender.image)" alt="user profile picture"/>
+                      </div>
+                      <div class="message my-message">
+                        <h6>{{ message.sender.username }}</h6>
+                        <!-- @click="goToRepliedMessage" -->
+                        <!--  {{ repliedText }} -->
+                        <div class="repliedMessage">khar</div>
+                        <div>
+                          {{ message.body }}
+                        </div>
+                        <div style="text-align: end; font-size: small">
+                          {{ getFormattedTime(message.timestamp) }}
+                        </div>
+                      </div>
                     </div>
-                    <div class="message my-message">
-                      <!-- @click="goToRepliedMessage" -->
-                      <!--  {{ repliedText }} -->
-                      <div class="repliedMessage">khar</div>
-                      {{ message.body }}
-                    </div>
-                  </div>
-                </li>
+                  </li>
+                </div>
               </ul>
             </div>
             <div class="chat-message clearfix">
@@ -189,7 +213,8 @@
                 <div class="input-group-prepend">
                   <span class="input-group-text"><i class="fa fa-send"></i></span>
                 </div>
-                <input @input="startTyping" @keyup.enter="sendMessage" v-model="new_message_body" type="text" class="form-control"
+                <input @input="startTyping" @keyup.enter="sendMessage" v-model="new_message_body" type="text"
+                       class="form-control"
                        placeholder="Enter text here...">
               </div>
             </div>
@@ -211,22 +236,24 @@
 // add participants (not complete)        ok
 // last seen
 // static position for inputs
-// who send message
+// who send message     ok
 // profile (posts), user profile (about & posts)
 // loading icon for fetch messages,main page and etc
 // is typing      ok
 // add private chat creation
 // enter in login page (or signup)    ok
 // href and a tag for replied messages
-//loading icon for fetching messages
+// loading icon for fetching messages
 
 import {JWTAuth} from "../../services/jwt";
 import axios from "axios";
 import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
 import {nextTick} from 'vue';
 import "../../node_modules/bootstrap/dist/css/bootstrap.css";
+
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 import debounce from "lodash/debounce";
+
 const baseURL = "http://localhost:8000/api";
 const BaseURL = "http://localhost:8000/api";
 
@@ -276,8 +303,10 @@ export default {
       },
       isReply: false,
       userInfo: {},
-      searchValue:'',
+      searchValue: '',
       isTyping: false,
+      changeTime: false,
+      timeStamp: '',
     }
   },
   computed: {},
@@ -330,6 +359,9 @@ export default {
     },
     getFormattedDate(date) {
       return date.split(" ")[0].trim();
+    },
+    getFormattedTime(date) {
+      return date.split(" ")[1].trim();
     },
     async sendMessage() {
       console.log("open");
@@ -443,54 +475,53 @@ export default {
       this.isPrivate = false;
       this.currentPrivateRoom = null;
       axios.get('http://localhost:8000/chat/groups/', {
-      headers: {
-        Authorization: `JWT ${await jwtAuth.getAccessToken()}`
-      }
-    })
-        .then(result => {
-          this.groups = result.data;
-          // console.log(this.groups);
-        })
-        .catch(error => {
-          console.log(error);
-        })
+        headers: {
+          Authorization: `JWT ${await jwtAuth.getAccessToken()}`
+        }
+      })
+          .then(result => {
+            this.groups = result.data;
+            // console.log(this.groups);
+          })
+          .catch(error => {
+            console.log(error);
+          })
     },
-    async searchHandler(){
+    async searchHandler() {
       // console.log(this.isPrivate);
-      if (!this.isPrivate){
+      if (!this.isPrivate) {
 
-        let body={
-          "key":this.searchValue
+        let body = {
+          "key": this.searchValue
         }
-        axios.post(`${BaseURL}/chat/groups/filter`,body,{
-          headers:{
-            Authorization:`JWT ${await jwtAuth.getAccessToken()}`
+        axios.post(`${BaseURL}/chat/groups/filter`, body, {
+          headers: {
+            Authorization: `JWT ${await jwtAuth.getAccessToken()}`
           }
         })
-        .then(response=>{
-          this.groups=response.data;
-        })
-        .catch(err=>{
-          console.log(err);
-        })
+            .then(response => {
+              this.groups = response.data;
+            })
+            .catch(err => {
+              console.log(err);
+            })
 
-      }
-      else{
+      } else {
 
-        let body={
-          "key":this.searchValue
+        let body = {
+          "key": this.searchValue
         }
-        axios.post(`${BaseURL}/chat/pv/filter`,body,{
-          headers:{
-            Authorization:`JWT ${await jwtAuth.getAccessToken()}`
+        axios.post(`${BaseURL}/chat/pv/filter`, body, {
+          headers: {
+            Authorization: `JWT ${await jwtAuth.getAccessToken()}`
           }
         })
-        .then(response=>{
-          this.privateRooms=response.data;
-        })
-        .catch(err=>{
-          console.log(err);
-        })
+            .then(response => {
+              this.privateRooms = response.data;
+            })
+            .catch(err => {
+              console.log(err);
+            })
 
       }
     },
@@ -501,20 +532,22 @@ export default {
     debounceStopTyping: debounce(function () {
       this.isTyping = false;
     }, 1000),
+    showTime(newDate) {
+      console.log("showTime", newDate)
+      this.timeStamp = newDate;
+      return this.timeStamp;
+    }
   },
   watch: {
     groupInfo(n) {
       console.log("new", n.id);
       this.newGroupId = n.id;
     },
-    searchValue: function () { 
-        this.searchHandler();
-     },
-    new_message_body() {
-      // this.$refs.status.innerHTML = `somebody is typing...`;
-      // setTimeout(() => this.typing = '12', 5000);
-      // this.$refs.status.innerHTML = 'khar';
-      // console.log("new_message_body", this.$refs.status.innerHTML);
+    searchValue: function () {
+      this.searchHandler();
+    },
+    timeStamp() {
+      this.changeTime = true;
     }
 
   },
