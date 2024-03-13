@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import Group,User,Message,CommentContainer,PrivateChat
+from api.models import Group,User,Message,CommentContainer,PrivateChat,GroupAdmin
 from api.serializers import UserSerializer,PostSerializer
 from api.models import User
 
@@ -63,4 +63,11 @@ class CompleteUserSerializer(serializers.ModelSerializer):
     def get_followings_count(self,obj:User):
         return User.objects.filter(followers__follower=obj).count()
         
+
+class GroupAdminSerializer(serializers.ModelSerializer):
+    user=UserSerializer(many=False)
+    supervisor=UserSerializer(many=False)
+    class Meta:
+        model=GroupAdmin
+        fields=('user', 'supervisor','is_staff')
 

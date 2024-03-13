@@ -1,12 +1,12 @@
 import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .serializers import MessageSerializer,GroupSerializer
+from .serializers import MessageSerializer,GroupSerializer,GroupAdminSerializer
 
 from channels.db import database_sync_to_async
 from channels.layers import get_channel_layer
 from channels.db import database_sync_to_async
-from api.models import  User,PrivateChat,Message,Group
+from api.models import  User,PrivateChat,Message,Group,GroupAdmin
 from .serializers import MessageSerializer,GroupSerializer,PrivateChatSerializer
 import datetime
 import copy
@@ -61,7 +61,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
         # self.send_to_chat_message(text_data)
         if command=="new_message":
             result=await self.create_new_message(text_data_json)
-            await self.send_to_chat_message(result)
+            await self.send_to_chat_message(result,command="new_message")
 
         elif command=="fetch_messages":
 
@@ -69,11 +69,9 @@ class GroupConsumer(AsyncWebsocketConsumer):
        
             await self.chat_message(result)
 
-        # elif command=="change_permission":
-        #     type=text_data_json["command_type"]
-        #     selected_user_id=text_data_json["selected_user_id"]
-        #     command_caller_id=text_data_json["command_caller_id"]
-        #     if type=="to_admin":
+        elif command=="set_admin":
+            result=await self.set_admin(text_data_json)
+            await self.chat_message(result,command="set_admin")
 
     @database_sync_to_async
     def fetch_messages(self,text_data):
@@ -118,7 +116,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
         return serialized.data
 
 
-    async def send_to_chat_message(self,text_data):
+    async def send_to_chat_message(self,text_data,command):
         
      
         # Send message to room group
@@ -126,7 +124,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
             self.room_group_name, {
                 "type": "chat.message",
                 "data":text_data,
-                "command":"new_message"
+                "command":command
 
             }
         )
@@ -185,6 +183,23 @@ class GroupConsumer(AsyncWebsocketConsumer):
             "messages":dict_messages,
             "chat_info":group_serialized
         }
+    
+    @database_sync_to_async
+    def set_admin(self,text_data):
+        is_staff=text_data['is_staff']
+        user_id=text_data['user']
+        admins=self.room.admins
+        if (self.user in admins) or (self.user == self.room.creator):
+            new_admin=User.objects.get(pk=user_id)
+            group_admin=GroupAdmin.objects.create(supervisor=self.user,is_staff=is_staff,user=new_admin,creation_time=datetime.datetime.now())
+            serialized=GroupAdminSerializer(group_admin,many=False)
+            return serialized.data
+        else:
+            self.send(json.dumps({
+                "error":"you don't have permission"
+            }))
+
+        
         
 
 

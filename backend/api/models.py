@@ -149,6 +149,7 @@ class GroupAdmin(models.Model):
     is_staff=models.BooleanField(default=False)
     group=models.ForeignKey(Group,on_delete=models.CASCADE,related_name= 'admins')
     user=models.ForeignKey(User,on_delete=models.CASCADE,related_name= 'group_adminship')
+    creation_time=models.DateTimeField()
 
     
 
