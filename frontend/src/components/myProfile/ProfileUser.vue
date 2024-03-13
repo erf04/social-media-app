@@ -48,10 +48,10 @@
 
 <script>
 import router from "@/router";
-import {JWTAuth} from '../../services/jwt.js';
-import footerMenu from './FooterMenu.vue';
-import profileInfo from "@/components/ProfileInfo.vue";
-import profilePosts from "@/components/ProfilePosts.vue"
+import {JWTAuth} from '../../../services/jwt.js';
+import footerMenu from '@/components/FooterMenu.vue';
+import profileInfo from "./ProfileInfo.vue";
+import profilePosts from "./ProfilePosts.vue"
 import axios from "axios";
 
 const baseURL = "http://localhost:8000/api";

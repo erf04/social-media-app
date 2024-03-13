@@ -247,11 +247,11 @@
 // send btn
 // min height for chat log & min width for messages
 
-import {JWTAuth} from "../../services/jwt";
+import {JWTAuth} from "../../../services/jwt";
 import axios from "axios";
 import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
 import {nextTick} from 'vue';
-import "../../node_modules/bootstrap/dist/css/bootstrap.css";
+import "../../../node_modules/bootstrap/dist/css/bootstrap.css";
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 import debounce from "lodash/debounce";

@@ -9,44 +9,39 @@
   </div>
 
   <div style="text-align: center; margin-top: 5rem" class="container w-25">
-    <h2>login</h2><br>
+    <h2>signup</h2><br>
     <form>
-      <!-- Email input -->
       <div class="form-outline mb-4">
         <label class="form-label" for="form2Example1">username</label>
         <input @keyup.enter="submit" type="email" id="form2Example1" class="form-control" v-model="username"/>
       </div>
 
-      <!-- Password input -->
       <div class="form-outline mb-4">
         <label class="form-label" for="form2Example2">Password</label>
         <input @keyup.enter="submit" type="password" id="form2Example2" class="form-control" v-model="password"/>
       </div>
 
-      <!-- 2 column grid layout for inline styling -->
+      <div class="form-outline mb-4">
+        <label class="form-label" for="form2Example3">Email</label>
+        <input @keyup.enter="submit" type="email" id="form2Example3" class="form-control" v-model="email"/>
+      </div>
+
       <div class="row mb-4">
-<!--        <div class="col d-flex justify-content-center">-->
+        <div class="col d-flex justify-content-center">
           <!-- Checkbox -->
 <!--          <div class="form-check">-->
 <!--            <input class="form-check-input" type="checkbox" value="" id="form2Example31" checked/>-->
 <!--            <label class="form-check-label" for="form2Example31"> Remember me </label>-->
 <!--          </div>-->
-<!--        </div>-->
-
-        <div class="col">
-          <!-- Simple link -->
-          <a href="#!">Forgot password?</a>
         </div>
       </div>
 
       <!-- Submit button -->
-      <button type="button" class="btn btn-primary btn-block mb-4" @keyup.enter="submit" @click="submit">login</button>
+      <button type="button" class="btn btn-primary btn-block mb-4" @keyup.enter="submit" @click="submit">register</button>
 
       <!-- Register buttons -->
       <div class="text-center">
-        <p>Not a member?
-          <router-link to="/signup">Register</router-link>
-        </p>
+
         <p>or sign up with:</p>
         <button type="button" class="btn btn-link btn-floating mx-1">
           <i class="fab fa-facebook-f"></i>
@@ -69,33 +64,37 @@
 </template>
 
 <script>
-import {JWTAuth, messages} from '../../services/jwt.js';
+import {JWTAuth, messages} from '../../../services/jwt.js';
 import router from "@/router";
-import {isMemoSame} from "vue";
+
 
 const jwtAuth = new JWTAuth('http://localhost:8000/auth/');
-
-// When the user clicks anywhere outside of the modal, close it
-// window.onclick = function (event) {
-//   if (event.target === modal) {
-//     modal.style.display = "none";
-//   }
-// }
-
+// console.log(messages);
 export default {
   data() {
     return {
       username: '',
       password: '',
+      email: '',
       isLoggedIn: Boolean,
       messages: messages,
     };
   },
 
   methods: {
-    isMemoSame,
     async submit() {
-      this.isLoggedIn = await jwtAuth.login(this.username.trim(), this.password.trim());
+      this.isLoggedIn = await jwtAuth.signup(this.username.trim(), this.password.trim(), this.email.trim());
+      // jwtAuth.signup(this.username.trim(),this.password.trim(),this.email.trim())
+      // .then(()=>{
+      //   this.isLoggedIn=true;
+      //   router.push('/');
+
+      // }).catch(error=>{
+      //   alert(error);
+      //   this.isLoggedIn=false;
+
+      // })
+
       console.log(this.isLoggedIn);
       if (this.isLoggedIn === true) {
         await router.push('/');
@@ -104,9 +103,25 @@ export default {
         modal.style.display = "block";
         const text = this.$refs.showMessage;
         for (const textElement of messages) {
-          text.innerHTML = textElement.detail;
+          const type = Object.keys(textElement);
+          var result = '';
+          for (const string of type) {
+            console.log(`string :${string}`);
+
+            if (string === 'email') result += textElement.email;
+            if (string === 'password')
+              result += textElement.password;
+            if (string === 'username')
+              result += textElement.username;
+            result+="<br/>"
+
+          }
+          // console.log("result:"+result);
+          text.innerHTML = result;
         }
-        console.log("MESSAGES:", messages);
+        // console.log("MESSAGES:", messages)
+        // console.log("MESSAGES:", messages[0]);
+        // console.log(messages);
       }
     },
     closeModal() {
@@ -114,6 +129,9 @@ export default {
       modal.style.display = 'none';
     }
   },
+  mounted() {
+
+  }
 }
 </script>
 

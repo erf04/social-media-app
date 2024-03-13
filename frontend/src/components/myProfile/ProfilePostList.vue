@@ -97,7 +97,7 @@
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import {JWTAuth} from '../../services/jwt';
+import {JWTAuth} from '../../../services/jwt';
 import {mixins} from "@/mixins"
 import router from "@/router";
 

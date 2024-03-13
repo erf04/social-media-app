@@ -1,5 +1,5 @@
 import router from "@/router";
-import home from "./components/Home.vue"
+import home from "@/components/homePage/Home.vue"
 
 export const mixins = {
     components: [

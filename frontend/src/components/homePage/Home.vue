@@ -1,6 +1,6 @@
 <template>
   <div class="w-100 border-bottom mb-4 pb-0 p-2 d-flex justify-content-between" style="background-color: #29292e">
-    <img src="../assets/logo1.png" style="width: 250px; height: 60px" alt="logo"/>
+    <img src="../../assets/logo1.png" style="width: 250px; height: 60px" alt="logo"/>
     <div class="d-flex align-items-center">
       <h4 style="color: white">Welcome {{ userInfo.username }} !</h4>
       <div class="btn-group">
@@ -24,18 +24,15 @@
       </div>
     </div>
   </div>
-  <authTest @name="username($event)"/>
   <posts/>
   <footerMenu/>
 </template>
 
 <script>
 
-import authTest from './authTest.vue';
-import posts from './APost.vue';
-import footerMenu from './FooterMenu.vue';
-// import router from "@/router";
-import {JWTAuth} from '../../services/jwt.js';
+import posts from './MyPosts.vue';
+import footerMenu from '@/components/FooterMenu.vue';
+import {JWTAuth} from '../../../services/jwt.js';
 import {mixins} from "@/mixins";
 import router from "@/router";
 import axios from "axios";
@@ -57,7 +54,6 @@ export default {
   mixins: [mixins],
   name: 'App',
   components: {
-    authTest,
     posts,
     footerMenu,
   },
