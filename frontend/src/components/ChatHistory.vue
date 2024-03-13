@@ -128,7 +128,6 @@ export default {
   },
   watch: {
     groupInfo(n) {
-      // console.log("vfdhgiukfdynguyfdhgfjdyghfgdfhgkhdfkjhdfbgjkdf");
       console.log("new", n.id);
       this.newGroupId = n.id;
     }
@@ -137,6 +136,7 @@ export default {
     // console.log(`today:${this.today}  yesterday:${this.yesterday}`);
     // await nextTick();
     this.currentUser = await jwtAuth.getCurrentUser();
+    console.log("this.currentUser", this.currentUser);
     // console.log("this.groupInfo", this.groupInfo);
     this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/group/${this.newGroupId}/?token=${await jwtAuth.getAccessToken()}`);
     this.websocket.onopen = () => {

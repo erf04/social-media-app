@@ -1,14 +1,20 @@
 <template>
-  
+
   <!-- <button>btn</button> -->
   <div class="container mt-5">
     <div class="row clearfix">
       <div class="col-lg-12">
         <div class="card chat-app">
           <div id="plist" class="people-list">
-            <button type="button" class="btn btn-success" style="background-color: blue;" @click="goToGroupCreationForm()">add group</button>
-            <button type="button" class="btn btn-success" style="background-color:green;" @click="fetchPrivateRooms()">pv</button>
-            <button type="button" class="btn btn-success" style="background-color:green;" @click="fetchGroups()">groups</button>
+            <button type="button" class="btn btn-success" style="background-color: blue;"
+                    @click="goToGroupCreationForm()">add group
+            </button>
+            <button type="button" class="btn btn-success" style="background-color:green;" @click="fetchPrivateRooms()">
+              pv
+            </button>
+            <button type="button" class="btn btn-success" style="background-color:green;" @click="fetchGroups()">
+              groups
+            </button>
             <div class="input-group">
               <div class="input-group-prepend">
                 <span class="input-group-text"><i class="fa fa-search"></i></span>
@@ -16,7 +22,7 @@
               <input type="text" class="form-control" placeholder="Search..." v-model="searchValue" @change="searchHandler()">
             </div>
             <ul class="list-unstyled chat-list mt-2 mb-0" v-if="!this.isPrivate">
-              <li class="clearfix"  v-for="group in groups" :key="group.id" >
+              <li class="clearfix" v-for="group in groups" :key="group.id">
                 <button @click="selectRoom(group)">
                   <img :src="getAbsoluteUrl(group.image)" alt="avatar"/>
                   <div class="about">
@@ -30,11 +36,16 @@
               </li>
             </ul>
             <ul class="list-unstyled chat-list mt-2 mb-0" v-else>
-              <li class="clearfix"  v-for="privateRoom in privateRooms" :key="privateRoom.id" >
+              <li class="clearfix" v-for="privateRoom in privateRooms" :key="privateRoom.id">
                 <button @click="selectRoom(privateRoom)">
-                  <img :src="getAbsoluteUrl(privateRoom.creator.id===this.user.id?privateRoom.the_other.image:privateRoom.creator.image)" alt="avatar"/>
+                  <img
+                      :src="getAbsoluteUrl(privateRoom.creator.id===this.user.id?privateRoom.the_other.image:privateRoom.creator.image)"
+                      alt="avatar"/>
                   <div class="about">
-                    <div class="name">{{ privateRoom.creator.id==this.user.id?privateRoom.the_other.username:privateRoom.creator.username }}</div>
+                    <div class="name">{{
+                        privateRoom.creator.id === this.user.id ? privateRoom.the_other.username : privateRoom.creator.username
+                      }}
+                    </div>
                     <!-- <div class="status"><i class="fa fa-circle offline"></i> {{ group.participants.length }} <span
                         v-if="group.participants.length>1"> members</span><span
                         v-else-if="group.participants.length<=1">member</span>
@@ -44,60 +55,62 @@
               </li>
             </ul>
           </div>
-        <div v-if="!this.isPrivate">
-          <div v-if="this.currentChatRoom !== null" class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1"
-               id="offcanvasWithBothOptions"
-               aria-labelledby="offcanvasWithBothOptionsLabel">
-            <div class="offcanvas-header p-0">
-              <img :src="getAbsoluteUrl(currentChatRoom.image)" style="max-height: 200px; width: 100%"/>
-              <!-- <img :src="getAbsoluteUrl(currentChatRoom.image)" style="max-height: 200px; width: 100%"/> -->
-              <button style="position: absolute; top: 10px; right: 10px; background-color: red;" type="button"
-                      class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-              <!--              <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Backdrop with scrolling</h5>-->
-            </div>
-            <div class="offcanvas-body">
-              <h6>This group created in {{ currentChatRoom.creation_date }}.</h6>
-              <h2>Members</h2>
-              <div v-for="member in currentChatRoom.participants" :key="member.id" class="d-flex"
-                   style="gap: 10px; padding-left: 20px">
-                <img :src="getAbsoluteUrl(member.image)" style="width: 30px; height: 30px; border-radius: 50%"/>
-                <div>
-                  <h3>{{ member.username }}</h3>
-                  <p>last seen</p>
+          <div v-if="!this.isPrivate">
+            <div v-if="this.currentChatRoom !== null" class="offcanvas offcanvas-start" data-bs-scroll="true"
+                 tabindex="-1"
+                 id="offcanvasWithBothOptions"
+                 aria-labelledby="offcanvasWithBothOptionsLabel">
+              <div class="offcanvas-header p-0">
+                <img :src="getAbsoluteUrl(currentChatRoom.image)" style="max-height: 200px; width: 100%"/>
+                <!-- <img :src="getAbsoluteUrl(currentChatRoom.image)" style="max-height: 200px; width: 100%"/> -->
+                <button style="position: absolute; top: 10px; right: 10px; background-color: red;" type="button"
+                        class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                <!--              <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Backdrop with scrolling</h5>-->
+              </div>
+              <div class="offcanvas-body">
+                <h6>This group created in {{ currentChatRoom.creation_date }}.</h6>
+                <h2>Members</h2>
+                <div v-for="member in currentChatRoom.participants" :key="member.id" class="d-flex"
+                     style="gap: 10px; padding-left: 20px">
+                  <img :src="getAbsoluteUrl(member.image)" style="width: 30px; height: 30px; border-radius: 50%"/>
+                  <div>
+                    <h3>{{ member.username }}</h3>
+                    <p>last seen</p>
+                  </div>
+                  <hr/>
                 </div>
-                <hr/>
               </div>
             </div>
           </div>
-        </div>
-        <div v-else>
-          <div v-if="this.currentPrivateRoom !== null" class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1"
-               id="offcanvasWithBothOptions"
-               aria-labelledby="offcanvasWithBothOptionsLabel">
-            <div class="offcanvas-header p-0">
-              <img :src="getAbsoluteUrl(currentPrivateRoom.image)" style="max-height: 200px; width: 100%"/>
-              <!-- <img :src="getAbsoluteUrl(currentChatRoom.image)" style="max-height: 200px; width: 100%"/> -->
-              <button style="position: absolute; top: 10px; right: 10px; background-color: red;" type="button"
-                      class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-              <!--              <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Backdrop with scrolling</h5>-->
-            </div>
-            <div class="offcanvas-body">
-              <h6>This private chat created in {{ currentPrivateRoom.creation_date }}.</h6>
-              <h2>Members</h2>
-              <!-- <div v-for="member in currentChatRoom.participants" :key="member.id" class="d-flex"
-                   style="gap: 10px; padding-left: 20px">
-                <img :src="getAbsoluteUrl(member.image)" style="width: 30px; height: 30px; border-radius: 50%"/>
-                <div>
-                  <h3>{{ member.username }}</h3>
-                  <p>last seen</p>
-                </div>
-                <hr/>
-              </div> -->
+          <div v-else>
+            <div v-if="this.currentPrivateRoom !== null" class="offcanvas offcanvas-start" data-bs-scroll="true"
+                 tabindex="-1"
+                 id="offcanvasWithBothOptions"
+                 aria-labelledby="offcanvasWithBothOptionsLabel">
+              <div class="offcanvas-header p-0">
+                <img :src="getAbsoluteUrl(currentPrivateRoom.image)" style="max-height: 200px; width: 100%"/>
+                <!-- <img :src="getAbsoluteUrl(currentChatRoom.image)" style="max-height: 200px; width: 100%"/> -->
+                <button style="position: absolute; top: 10px; right: 10px; background-color: red;" type="button"
+                        class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                <!--              <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Backdrop with scrolling</h5>-->
+              </div>
+              <div class="offcanvas-body">
+                <h6>This private chat created in {{ currentPrivateRoom.creation_date }}.</h6>
+                <h2>Members</h2>
+                <!-- <div v-for="member in currentChatRoom.participants" :key="member.id" class="d-flex"
+                     style="gap: 10px; padding-left: 20px">
+                  <img :src="getAbsoluteUrl(member.image)" style="width: 30px; height: 30px; border-radius: 50%"/>
+                  <div>
+                    <h3>{{ member.username }}</h3>
+                    <p>last seen</p>
+                  </div>
+                  <hr/>
+                </div> -->
+              </div>
             </div>
           </div>
-        </div>
-          <div class="chat" 
-          v-if="currentChatRoom!==null || currentPrivateRoom !== null"
+          <div class="chat"
+               v-if="currentChatRoom!==null || currentPrivateRoom !== null"
           >
             <div class="chat-header clearfix">
               <div class="row">
@@ -105,12 +118,16 @@
                   <button style="text-align: start" type="button" data-bs-toggle="offcanvas"
                           data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
                     <a href="javascript:void(0);" data-toggle="modal" data-target="#view_info">
-                      <img :src="getAbsoluteUrl(this.isPrivate? currentPrivateRoom.creator.id===user.id ? currentPrivateRoom.the_other.image:currentPrivateRoom.creator.image : currentChatRoom.image)" alt="avatar">
+                      <img
+                          :src="getAbsoluteUrl(this.isPrivate? currentPrivateRoom.creator.id===user.id ? currentPrivateRoom.the_other.image:currentPrivateRoom.creator.image : currentChatRoom.image)"
+                          alt="avatar">
                     </a>
                     <div class="chat-about">
                       <div class="d-flex align-items-center small" style="gap: 10px">
                         <h6 class="mb-0" v-if="!isPrivate">{{ currentChatRoom.name }} </h6>
-                        <span> Created By {{ this.isPrivate?currentPrivateRoom.creator.username:currentChatRoom.creator.username }}</span>
+                        <span> Created By {{
+                            this.isPrivate ? currentPrivateRoom.creator.username : currentChatRoom.creator.username
+                          }}</span>
                       </div>
                       <small v-if="!isPrivate">{{ currentChatRoom.participants.length }} Members</small>
                     </div>
@@ -126,48 +143,55 @@
             </div>
             <div class="chat-history" id="chat-history" ref="chatHistory">
               <ul class="m-b-0" id="chatList">
-                <li v-for="(message, index) in messages" :key="message.id" class="clearfix"
-                    @contextmenu.prevent="showOptions(index)">
-                  <div class="message-data text-right">
-                    <div class="options" ref="optionsMenu">
-                      <ul>
-                        <li>
-                          <button @click="showRepliedMessage(message)">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                 stroke="currentColor" class="w-6 h-6 me-2">
-                              <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" style="width: 20px; height: 20px"/>
-                            </svg>
-                            Reply
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
+                <li v-for="(message) in messages" :key="message.id" @contextmenu.prevent="onContextMenu($event, message.body)" class="clearfix">
+                  <div v-if="message.sender.username === userInfo.username">
+                    <div ref="textRight" class="message-data text-right">
                     <span class="message-data-time">
+                      <span> {{ message.sender.username }} </span>
                       <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>
                       <span v-else-if="getFormattedDate(message.timestamp) === yesterdayTime"> Yesterday </span>
                       <span v-else> {{ message.timestamp }} </span>
                     </span>
-                    <img :src="getAbsoluteUrl(message.sender.image)" alt="user profile picture"/>
+                      <img :src="getAbsoluteUrl(message.sender.image)" alt="user profile picture"/>
+                    </div>
+                    <div ref="whoSend" class="message other-message float-right">
+                      <!-- @click="goToRepliedMessage" -->
+                      <!--  {{ repliedText }} -->
+                      <div class="repliedMessage">khar</div>
+                      {{ message.body }}
+                    </div>
                   </div>
-                  <div class="message other-message float-right">{{ message.body }}</div>
+                  <div v-else>
+                    <div class="message-data">
+                    <span class="message-data-time">
+                      <span> {{ message.sender.username }} </span>
+                      <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>
+                      <span v-else-if="getFormattedDate(message.timestamp) === yesterdayTime"> Yesterday </span>
+                      <span v-else> {{ message.timestamp }} </span>
+                    </span>
+                      <img :src="getAbsoluteUrl(message.sender.image)" alt="user profile picture"/>
+                    </div>
+                    <div class="message my-message">
+                      <!-- @click="goToRepliedMessage" -->
+                      <!--  {{ repliedText }} -->
+                      <div class="repliedMessage">khar</div>
+                      {{ message.body }}
+                    </div>
+                  </div>
                 </li>
-
               </ul>
             </div>
-
             <div class="chat-message clearfix">
+              <div v-show="isReply" ref="repliedMessage" class="alert alert-success mb-0" role="alert"></div>
               <div class="input-group mb-0">
                 <div class="input-group-prepend">
                   <span class="input-group-text"><i class="fa fa-send"></i></span>
                 </div>
-                <div ref="repliedMessage" class="alert alert-success" role="alert"></div>
                 <input @keyup.enter="sendMessage" v-model="new_message_body" type="text" class="form-control"
                        placeholder="Enter text here...">
               </div>
             </div>
           </div>
-          <!--          <chat-history :groupInfo="groups[groupNumber]" />-->
         </div>
       </div>
     </div>
@@ -176,31 +200,38 @@
 
 <script>
 
-//flexible the #chat-history
-//add user private chats to front         ok
-//fix reply
-//add group and add private chat          ok
-//able to add admin to a group --erfan
-//fix token expiration** --erfan          ok
+// flexible the #chat-history
+// add user private chats to front         ok
+// fix reply
+// add group and add private chat          ok
+// able to add admin to a group --erfan
+// fix token expiration** --erfan          ok
 // add participants (not complete)        ok
-//loading icon for fetch messages,main page and etc
+// last seen
+// static position for inputs
+// who send message
+// profile (posts), user profile (about & posts)
+// loading icon for fetch messages,main page and etc
 // is typing 
-//add private chat creation
-
+// add private chat creation
+// enter in login page (or signup)
+// href and a tag for replied messages
 
 import {JWTAuth} from "../../services/jwt";
 import axios from "axios";
 import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
-// import router from "@/router";
-import { nextTick } from 'vue';
+import {nextTick} from 'vue';
 import "../../node_modules/bootstrap/dist/css/bootstrap.css"; // or however you load your CSS
-const baseURL="http://localhost:8000";
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
-// const user = await jwtAuth.getCurrentUser();
+const baseURL = "http://localhost:8000/api";
+const BaseURL = "http://localhost:8000/api";
+
+// eslint-disable-next-line no-unused-vars
+const user = await jwtAuth.getCurrentUser();
 // eslint-disable-next-line
-const chatType=Object.freeze({
-  PRIVATE:"pv",
-  GROUP:"group"
+const chatType = Object.freeze({
+  PRIVATE: "pv",
+  GROUP: "group"
 })
 
 export default {
@@ -226,38 +257,71 @@ export default {
       currentUser: Object,
       newGroupId: 0,
       currentChatRoom: this.loadSavedRoom() || {
-        creator:{
-        },
-        participants:[{}]
+        creator: {},
+        participants: [{}]
       },
       isPrivate: false,
-      privateRooms:[{
-        creator:{},
-        the_other:{}
+      privateRooms: [{
+        creator: {},
+        the_other: {}
       }],
-      user:{},
-      currentPrivateRoom:{
-        creator:{},
-        the_other:{}
+      user: {},
+      currentPrivateRoom: {
+        creator: {},
+        the_other: {}
       },
+      isReply: false,
+      userInfo: {},
       searchValue:'',
     }
   },
   computed: {},
   methods: {
+    onContextMenu(e, message) {
+      e.preventDefault();
+      this.$contextmenu({
+        x: e.x,
+        y: e.y,
+        items: [
+          {
+            label: "Reply",
+            onClick: () => {
+              this.showRepliedMessage(message);
+              this.isReply = true;
+            }
+          },
+          {
+            label: "A submenu",
+            children: [
+              {label: "Item1"},
+              {label: "Item2"},
+              {label: "Item3"},
+            ]
+          },
+        ]
+      });
+    },
+    async userData() {
+      const user = await jwtAuth.getCurrentUser();
+      axios.post(`${baseURL}/get-user/`, {
+        username: user == null ? null : user.username
+      })
+          .then(response => {
+            this.userInfo = response.data;
+          })
+          .catch(err => {
+            console.log(err);
+          })
+    },
     async scrollToEnd() {
-
-        await nextTick();
-        let container=document.getElementById("chat-history");
-        container.scrollTop=container.scrollHeight;
+      await nextTick();
+      let container = document.getElementById("chat-history");
+      container.scrollTop = container.scrollHeight;
     },
     showRepliedMessage(message) {
       console.log("message showRepliedMessage", message);
-      this.$refs.repliedMessage.style.display = 'block';
-      this.$refs.repliedMessage.innerText = message.body;
-    },
-    showOptions(n) {
-      this.$refs.optionsMenu[n].style.display = "block";
+      // this.$refs.repliedMessage.style.display = 'block';
+      this.$refs.repliedMessage.innerText = message;
     },
     getFormattedDate(date) {
       return date.split(" ")[0].trim();
@@ -274,22 +338,22 @@ export default {
 
     },
     async selectRoom(room) {
-    
-     this.isPrivate?this.currentPrivateRoom={...room} : this.currentChatRoom={...room};
+
+      this.isPrivate ? this.currentPrivateRoom = {...room} : this.currentChatRoom = {...room};
 
       // router.push({name: 'chat', params: {name}});
       this.saveSelectedRoom();
       // this.kirKhar(room.id,chatType.GROUP);
-      await this.handleRoom(room.id,this.isPrivate? chatType.PRIVATE : chatType.GROUP);
+      await this.handleRoom(room.id, this.isPrivate ? chatType.PRIVATE : chatType.GROUP);
 
-      setInterval(async()=>{
+      setInterval(async () => {
         if (!await jwtAuth.isAuthenticate())
           this.$router.push('/login')
         // await nextTick();
         else
-          await this.handleRoom(room.id,chatType.GROUP);
+          await this.handleRoom(room.id, chatType.GROUP);
         // await nextTick();
-      },4.5*60*1000);
+      }, 4.5 * 60 * 1000);
     },
     saveSelectedRoom() {
       localStorage.setItem('selectedRoom', JSON.stringify(this.currentChatRoom));
@@ -303,11 +367,11 @@ export default {
       return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
     },
 
-    async handleRoom(id,type) {
+    async handleRoom(id, type) {
 
       this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/${type}/${id}/?token=${await jwtAuth.getAccessToken()}`);
       this.websocket.onopen = () => {
-        
+
         this.websocket.send(JSON.stringify({
           "command": "fetch_messages",
         }))
@@ -328,8 +392,7 @@ export default {
             this.messages = data["messages"];
             // this.scroll();
 
-          }
-           else if (command === "new_message") {
+          } else if (command === "new_message") {
             console.log(data['data']);
             this.new_message = data['data'];
             this.messages.push(this.new_message);
@@ -343,28 +406,28 @@ export default {
       }
     },
 
-    goToGroupCreationForm(){
+    goToGroupCreationForm() {
       this.$router.push('/group/create');
     },
-    async fetchPrivateRooms(){
-      this.isPrivate=true;
-      this.currentChatRoom=null;
+    async fetchPrivateRooms() {
+      this.isPrivate = true;
+      this.currentChatRoom = null;
       axios.get('http://localhost:8000/chat/pv/', {
-      headers: {
-        Authorization: `JWT ${await jwtAuth.getAccessToken()}`
-      }
-    })
-        .then(result => {
-          this.privateRooms = result.data;
-          console.log(this.privateRooms);
-        })
-        .catch(error => {
-          console.log(error);
-        })
+        headers: {
+          Authorization: `JWT ${await jwtAuth.getAccessToken()}`
+        }
+      })
+          .then(result => {
+            this.privateRooms = result.data;
+            console.log(this.privateRooms);
+          })
+          .catch(error => {
+            console.log(error);
+          })
     },
-    async fetchGroups(){
-      this.isPrivate=false;
-      this.currentPrivateRoom=null;
+    async fetchGroups() {
+      this.isPrivate = false;
+      this.currentPrivateRoom = null;
       axios.get('http://localhost:8000/chat/groups/', {
       headers: {
         Authorization: `JWT ${await jwtAuth.getAccessToken()}`
@@ -385,7 +448,7 @@ export default {
         let body={
           "key":this.searchValue
         }
-        axios.post(`${baseURL}/chat/groups/filter`,body,{
+        axios.post(`${BaseURL}/chat/groups/filter`,body,{
           headers:{
             Authorization:`JWT ${await jwtAuth.getAccessToken()}`
           }
@@ -403,7 +466,7 @@ export default {
         let body={
           "key":this.searchValue
         }
-        axios.post(`${baseURL}/chat/pv/filter`,body,{
+        axios.post(`${BaseURL}/chat/pv/filter`,body,{
           headers:{
             Authorization:`JWT ${await jwtAuth.getAccessToken()}`
           }
@@ -429,13 +492,12 @@ export default {
 
   },
   async mounted() {
-
-    this.user=await jwtAuth.getCurrentUser();
-
+    this.user = await jwtAuth.getCurrentUser();
+    await this.userData();
     // console.log("messages:"+this.messages);
-    this.currentChatRoom=null;
-    this.currentPrivateRoom=null;
-    this.groups=null;
+    this.currentChatRoom = null;
+    this.currentPrivateRoom = null;
+    this.groups = null;
     // this.isPrivate=false;
     console.log(this.isPrivate);
     // if (!this.isPrivate){
@@ -445,7 +507,7 @@ export default {
     // else
     //   await this.fetchPrivateRooms()
   },
-  created(){
+  created() {
     // this.currentChatRoom=null;
   }
 }
@@ -730,15 +792,12 @@ ul {
   }
 }
 
-.options {
-  width: 80px;
-  height: 100px;
-  background-color: #525252;
-  border: 1px solid gray;
-  border-radius: 5px;
-  display: none;
-  z-index: 9;
-  
+.repliedMessage {
+  background-color: #89cbff;
+  border-right: 5px solid #1d9cff;
+  padding: 5px;
+  color: gray;
 }
+
 
 </style>
