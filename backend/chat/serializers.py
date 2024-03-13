@@ -7,10 +7,15 @@ class GroupSerializer(serializers.ModelSerializer):
     creator=UserSerializer(many=False,required=False)
     creation_date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
     participants=UserSerializer(many=True,required=False)
-    
+    admins=serializers.SerializerMethodField()
     class Meta:
         model=Group
-        fields=('id','name','creator','creation_date','participants','image')
+        fields=('id','name','creator','creation_date','participants','image','admins')
+
+
+    def get_admins(self,obj):
+        return list(User.objects.filter(group_adminship__group=obj).values_list('id',flat=True))
+
 
 
 class CommentContainerSerializer(serializers.ModelSerializer):

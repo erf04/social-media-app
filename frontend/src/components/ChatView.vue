@@ -76,7 +76,7 @@
                   <img :src="getAbsoluteUrl(member.image)" style="width: 30px; height: 30px; border-radius: 50%"/>
                   <div>
                     <h3>{{ member.username }}</h3>
-                    <button class="btn btn-success" style="background-color: green;" v-if="member.id !== this.currentChatRoom.creator.id" @click="set_admin(member.id,false)">set admin</button>
+                    <button class="btn btn-success" style="background-color: green;" v-if="(user.id === this.currentChatRoom.creator.id || isGroupAdmin(user.id)) && member.id !== this.currentChatRoom.creator.id && !isGroupAdmin(member.id)" @click="set_admin(member.id,false)">set admin</button>
                     <p>last seen</p>
                   </div>
                   <hr/>
@@ -282,14 +282,16 @@ export default {
       groups: [
         {
           creator: {},
-          participants: [{}]
+          participants: [{}],
+          admins:[]
         }
       ],
       currentUser: Object,
       newGroupId: 0,
       currentChatRoom: this.loadSavedRoom() || {
         creator: {},
-        participants: [{}]
+        participants: [{}],
+        admins:[]
       },
       isPrivate: false,
       privateRooms: [{
@@ -383,7 +385,6 @@ export default {
     },
     async selectRoom(room) {
       this.isPrivate ? this.currentPrivateRoom = {...room} : this.currentChatRoom = {...room};
-      console.log("creator.id:"+this.currentChatRoom.creator.id," user.id"+this.user.id);
 
       // router.push({name: 'chat', params: {name}});
       this.saveSelectedRoom();
@@ -481,7 +482,7 @@ export default {
       })
           .then(result => {
             this.groups = result.data;
-            // console.log(this.groups);
+            console.log(this.groups);
           })
           .catch(error => {
             console.log(error);
@@ -536,6 +537,13 @@ export default {
       console.log("showTime", newDate)
       this.timeStamp = newDate;
       return this.timeStamp;
+    },
+    isGroupAdmin(userId){
+      if (this.currentChatRoom===null)
+        return false;
+      if (this.currentChatRoom.admins.includes(userId)) 
+        return true;
+      return false;
     }
   },
   watch: {

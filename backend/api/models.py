@@ -151,6 +151,9 @@ class GroupAdmin(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE,related_name= 'group_adminship')
     creation_time=models.DateTimeField()
 
+    class Meta:
+        unique_together = ('user', 'group')
+
     
 
 
