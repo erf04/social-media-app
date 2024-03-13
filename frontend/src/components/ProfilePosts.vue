@@ -1,9 +1,14 @@
 <template>
+  <div v-if="posts.length !== 0">
   <div class="container d-flex flex-wrap justify-content-start" style="gap: 5px;">
-    <div v-for="(post) in posts" :key="post.id" class="card"
-         style="height: 250px; width: 18rem" @click="showPostList">
-      <img :src="getAbsoluteUrl(post.content)" style="margin: auto 0; height: 100%; object-fit: cover" class="card-img-top" alt="vue-logo">
+      <div v-for="(post) in posts" :key="post.id" class="card"
+           style="height: 250px; width: 18rem" @click="showPostList">
+        <img :src="getAbsoluteUrl(post.content)" style="margin: auto 0; height: 100%; object-fit: cover" class="card-img-top" alt="vue-logo">
+      </div>
     </div>
+  </div>
+  <div style="height: 500px" v-else>
+    <h3 style="text-align: center">No Post Yet!</h3>
   </div>
 </template>
 
@@ -56,7 +61,6 @@ export default {
     showPostList() {
       router.push('profile/postsView');
     },
-
     toggleReadMore() {
       const moreText = document.querySelector('.read-more-content');
       const buttonText = document.querySelector('.read-more-button');

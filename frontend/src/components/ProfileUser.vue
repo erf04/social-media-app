@@ -23,12 +23,12 @@
           <p class="proile-rating">RANKINGS : <span>8/10</span></p>
           <ul class="nav nav-tabs" style="margin-top: 60px;" id="myTab" role="tablist">
             <li class="nav-item">
-              <button class="nav-link active" @click="showUserInfo = true; showPosts = false;" id="home-tab">
+              <button :class="showUserInfo ? `active` : ``" class="nav-link" @click="showUserInfo = true; showPosts = false;" id="home-tab">
                 About
               </button>
             </li>
             <li class="nav-item">
-              <button class="nav-link" @click="showPosts = true; showUserInfo = false" id="profile-tab">Posts</button>
+              <button :class="showPosts ? `active` : ``" class="nav-link" @click="showPosts = true; showUserInfo = false" id="profile-tab">Posts</button>
             </li>
           </ul>
         </div>

@@ -243,6 +243,8 @@
 // enter in login page (or signup)    ok
 // href and a tag for replied messages
 // loading icon for fetching messages
+// send btn
+// min height for chat log & min width for messages
 
 import {JWTAuth} from "../../services/jwt";
 import axios from "axios";
