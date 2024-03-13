@@ -23,14 +23,14 @@
             Web Developer and Designer
           </h6>
           <p class="proile-rating">RANKINGS : <span>8/10</span></p>
-          <ul class="nav nav-tabs" id="myTab" style="margin-top: 55px;" role="tablist">
+          <ul class="nav nav-tabs" style="margin-top: 60px;" id="myTab" role="tablist">
             <li class="nav-item">
-              <a class="nav-link active" id="home-tab" data-toggle="tab" href="#" role="tab" aria-controls="home"
-                 aria-selected="true">About</a>
+              <button :class="showUserInfo ? `active` : ``" class="nav-link" @click="showUserInfo = true; showPosts = false;" id="home-tab">
+                About
+              </button>
             </li>
             <li class="nav-item">
-              <a class="nav-link" id="profile-tab" data-toggle="tab" href="#" role="tab"
-                 aria-controls="profile" aria-selected="false">Timeline</a>
+              <button :class="showPosts ? `active` : ``" class="nav-link" @click="showPosts = true; showUserInfo = false" id="profile-tab">Posts</button>
             </li>
           </ul>
         </div>
@@ -162,9 +162,12 @@ import {useRoute} from "vue-router";
 const baseURL = "http://localhost:8000/api";
 
 export default {
+  components: {},
   data() {
     return {
-      userInfo: {}
+      userInfo: {},
+      showPosts: true,
+      showUserInfo: false,
     }
   },
   methods: {
