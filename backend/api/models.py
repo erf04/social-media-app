@@ -143,3 +143,13 @@ class PrivateChat(AbstractChat):
     messages=GenericRelation(Message)
 
 
+
+class GroupAdmin(models.Model):
+    supervisor=models.ForeignKey(User,on_delete=models.CASCADE,related_name= "group_admin_supervisor")
+    is_staff=models.BooleanField(default=False)
+    group=models.ForeignKey(Group,on_delete=models.CASCADE,related_name= 'admins')
+    user=models.ForeignKey(User,on_delete=models.CASCADE,related_name= 'group_adminship')
+
+    
+
+
