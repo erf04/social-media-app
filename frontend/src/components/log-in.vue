@@ -14,14 +14,13 @@
       <!-- Email input -->
       <div class="form-outline mb-4">
         <label class="form-label" for="form2Example1">username</label>
-
-        <input type="email" id="form2Example1" class="form-control" v-model="username"/>
+        <input @keyup.enter="submit" type="email" id="form2Example1" class="form-control" v-model="username"/>
       </div>
 
       <!-- Password input -->
       <div class="form-outline mb-4">
         <label class="form-label" for="form2Example2">Password</label>
-        <input type="password" id="form2Example2" class="form-control" v-model="password"/>
+        <input @keyup.enter="submit" type="password" id="form2Example2" class="form-control" v-model="password"/>
       </div>
 
       <!-- 2 column grid layout for inline styling -->

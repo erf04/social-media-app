@@ -216,6 +216,7 @@
 // add private chat creation
 // enter in login page (or signup)
 // href and a tag for replied messages
+//loading icon for fetching messages
 
 import {JWTAuth} from "../../services/jwt";
 import axios from "axios";
