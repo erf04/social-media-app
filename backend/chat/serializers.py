@@ -49,9 +49,17 @@ class MessageSerializer(serializers.ModelSerializer):
     timestamp=serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S",read_only=True)
     liked_by=UserSerializer(many=True, required=False)
     saved_by=UserSerializer(many=True,required=False)
+    reply_to=serializers.SerializerMethodField()
     class Meta:
         model=Message
         fields=('id','sender','reply_to','liked_by','saved_by','body','timestamp')
+
+    def get_reply_to(self, obj:Message):
+        if obj.reply_to:
+            serializer = self.__class__(obj.reply_to)
+            return serializer.data
+        else:
+            return None
 
 
 class PrivateChatSerializer(serializers.ModelSerializer):
