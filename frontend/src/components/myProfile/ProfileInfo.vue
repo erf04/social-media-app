@@ -114,7 +114,7 @@
 <script>
 
 import router from "@/router";
-import {JWTAuth} from '../../services/jwt.js';
+import {JWTAuth} from '../../../services/jwt.js';
 import axios from "axios";
 
 const baseURL = "http://localhost:8000/api";

@@ -54,11 +54,11 @@
   
 <script>
   
-  import axios from 'axios';
-  import { JWTAuth } from '../../services/jwt';
-  import router from "@/router";
-  const baseURL="http://localhost:8000";
-  const jwtAuth=new JWTAuth('http://localhost:8000/auth');
+import axios from 'axios';
+import { JWTAuth } from '../../../services/jwt';
+import router from "@/router";
+const baseURL="http://localhost:8000";
+const jwtAuth=new JWTAuth('http://localhost:8000/auth');
 export default {
     data() {
       return {

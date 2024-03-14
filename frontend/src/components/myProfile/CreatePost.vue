@@ -26,7 +26,7 @@
 <script>
 
 import axios from 'axios';
-import { JWTAuth } from '../../services/jwt';
+import { JWTAuth } from '../../../services/jwt';
 import router from "@/router";
 const baseURL="http://localhost:8000/api";
 const jwtAuth=new JWTAuth('http://localhost:8000/auth')
