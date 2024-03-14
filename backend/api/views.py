@@ -90,6 +90,14 @@ def getUserByUsername(request:Request):
     return Response(serializer.data)
 
 
+@api_view(["GET"])
+@permission_classes([permissions.IsAuthenticated])
+def getAllUsers(request:Request):
+    users = User.objects.all()
+    serialized=UserSerializer(users, many=True)
+    return Response(serialized.data,status=status.HTTP_200_OK)
+
+
 
     
 
