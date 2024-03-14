@@ -1,6 +1,4 @@
 <template>
-
-  <!-- <button>btn</button> -->
   <div class="container mt-5">
     <div class="row clearfix">
       <div class="col-lg-12">
@@ -218,6 +216,7 @@
             </div>
             <div class="chat-message clearfix">
               <div v-show="isReply" ref="repliedMessage" class="alert alert-success mb-0" role="alert"></div>
+              <div v-show="isEdit" ref="editedMessage" class="alert alert-info mb-0" role="alert"></div>
               <div class="input-group mb-0">
                 <div class="input-group-prepend">
                   <span class="input-group-text"><i class="fa fa-send"></i></span>
@@ -238,19 +237,18 @@
 
 // flexible the #chat-history
 // add user private chats to front         ok
-// fix reply
+// fix reply                               ok
 // add group and add private chat          ok
 // able to add admin to a group --erfan
 // fix token expiration** --erfan          ok
-// add participants (not complete)        ok
+// add participants (not complete)         ok
 // last seen
-// static position for inputs
-// who send message     ok
+// who send message                        ok
 // profile (posts), user profile (about & posts)
 // loading icon for fetch messages,main page and etc
 // is typing      ok
 // add private chat creation
-// enter in login page (or signup)    ok
+// enter in login page (or signup)         ok
 // href and a tag for replied messages
 // loading icon for fetching messages
 // send btn
@@ -324,6 +322,7 @@ export default {
         the_other: {}
       },
       isReply: false,
+      isEdit: false,
       userInfo: {},
       searchValue: '',
       isTyping: false,
@@ -331,6 +330,7 @@ export default {
       timeStamp: '',
       isTypingUser:{},
       repliedId: null,
+      editedId: null,
     }
   },
   computed: {},
@@ -351,6 +351,30 @@ export default {
             }
           },
           {
+            label: "Speak",
+            onClick: () => {
+              const text = new SpeechSynthesisUtterance(message);
+              text.rate = 1;
+              speechSynthesis.speak(text);
+            }
+          },
+          {
+            label: "Edit",
+            onClick: () => {
+              this.showEditedMessage(message);
+              this.isEdit = true;
+              this.editedId = id;
+              this.new_message_body = message;
+            }
+          },
+          {
+            label: "Copy",
+            onClick: () => {
+              navigator.clipboard.writeText(message);
+              alert("Text Copied!");
+            }
+          },
+          {
             label: "A submenu",
             children: [
               {label: "Item1"},
@@ -368,9 +392,10 @@ export default {
       container.scrollTop = container.scrollHeight;
     },
     showRepliedMessage(message) {
-      console.log("message showRepliedMessage", message);
-      // this.$refs.repliedMessage.style.display = 'block';
       this.$refs.repliedMessage.innerText = message;
+    },
+    showEditedMessage(message) {
+      this.$refs.editedMessage.innerText = message;
     },
     getFormattedDate(date) {
       return date.split(" ")[0].trim();
@@ -379,16 +404,21 @@ export default {
       return date.split(" ")[1].trim();
     },
     async sendMessage() {
-      console.log("open");
-      this.$refs.repliedMessage.style.display = 'none';
-      this.websocket.send(JSON.stringify({
-        "command": "new_message",
-        "message": {
-          "body": this.new_message_body,
-          "reply_to_id": this.repliedId,
-        }
-      }))
-
+      if (this.isEdit) {
+        console.log("should change the message body");
+        this.new_message_body = '';
+      } else {
+        this.websocket.send(JSON.stringify({
+          "command": "new_message",
+          "message": {
+            "body": this.new_message_body,
+            "reply_to_id": this.repliedId,
+          }
+        }))
+      }
+      this.repliedId = null;
+      this.isReply = false;
+      this.isEdit = false;
     },
     async set_admin(user_id,is_staff){
       this.websocket.send(JSON.stringify({
