@@ -61,6 +61,7 @@ export default {
     return {
       update: false,
       userInfo: {},
+      isAuthenticate: false,
     }
   },
   methods: {
@@ -96,8 +97,12 @@ export default {
       console.log(user);
     },
   },
-  mounted() {
-    this.userData();
+  async mounted() {
+    this.isAuthenticate = await jwtAuth.isAuthenticate();
+    console.log("this.isAuthenticate", this.isAuthenticate);
+    if (!this.isAuthenticate) await router.push('/login')
+    else await this.userData();
+        // this.isAuthenticate : router.push('/login') ? router.push('')
   }
 }
 </script>
