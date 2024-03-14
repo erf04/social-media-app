@@ -174,8 +174,10 @@
                         </h6>
                         <!-- @click="goToRepliedMessage" -->
                         <!--  {{ repliedText }} -->
-                        <div v-if="message.reply_to_id != null" class="repliedMessage">{{ message.reply_to_id }}</div>
-                        {{message.reply_to_id}}
+                        <div v-if="message.reply_to != null" class="repliedMessage">
+                          <p style="font-weight: bold;" class="m-0">{{message.reply_to.sender.username}}</p>
+                          <p class="m-0">{{ message.reply_to.body }}</p>
+                        </div>
                         <div>
                           {{ message.body }}
                         </div>
@@ -198,8 +200,10 @@
                         <h6>{{ message.sender.username }}</h6>
                         <!-- @click="goToRepliedMessage" -->
                         <!--  {{ repliedText }} -->
-                        <div v-if="message.reply_to_id != null" class="repliedMessage">{{ message.reply_to_id }}</div>
-                        {{message.reply_to_id}}
+                        <div v-if="message.reply_to != null" class="repliedMessage">
+                          <p style="font-weight: bold" class="m-0">{{message.reply_to.sender.username}}</p>
+                          <p class="m-0">{{ message.reply_to.body }}</p>
+                        </div>
                         <div>
                           {{ message.body }}
                         </div>
@@ -253,6 +257,7 @@
 // min height for chat log & min width for messages
 // is staff field for set admin
 // remain group with reload
+// more options in context menu (bring from chatroom)
 
 import {JWTAuth} from "../../../services/jwt";
 import axios from "axios";

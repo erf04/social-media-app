@@ -10,6 +10,7 @@ import userPage from '@/components/userProfile/UserPage.vue'
 import chatView from "@/components/chat/ChatView.vue";
 import CreateGroup  from "@/components/chat/CreateGroup.vue";
 import AddParticipants from  "@/components/chat/AddParticipants.vue";
+import search from "@/components/SearchPage.vue"
 
 const routes = [
     {path: '/', component: Home},
@@ -23,7 +24,8 @@ const routes = [
     {path: '/chat', component: chatView},
     {path: '/group/create', component:CreateGroup },
     {path: '/group/add/:id', component:AddParticipants },
-    
+    {path: '/search', component:search },
+
 ]
 
 const router = createRouter({

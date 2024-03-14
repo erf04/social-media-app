@@ -99,10 +99,7 @@ export default {
   },
   async mounted() {
     this.isAuthenticate = await jwtAuth.isAuthenticate();
-    console.log("this.isAuthenticate", this.isAuthenticate);
-    if (!this.isAuthenticate) await router.push('/login')
-    else await this.userData();
-        // this.isAuthenticate : router.push('/login') ? router.push('')
+    this.isAuthenticate ? await this.userData() : await router.push('/login')
   }
 }
 </script>
