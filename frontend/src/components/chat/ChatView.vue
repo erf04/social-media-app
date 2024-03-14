@@ -134,7 +134,7 @@
                           }}</span>
                       </div>
                       <small v-if="!isPrivate">{{ currentChatRoom.participants.length }} Members</small>
-                      <div v-if="isTyping">user is typing...</div>
+                      <div v-if="isTyping">{{this.isTypingUser.username}} is typing...</div>
                     </div>
                   </button>
                 </div>
@@ -248,7 +248,7 @@
 // loading icon for fetching messages
 // send btn
 // min height for chat log & min width for messages
-
+// is staff field for set admin 
 import {JWTAuth} from "../../../services/jwt";
 import axios from "axios";
 import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
@@ -260,7 +260,6 @@ import debounce from "lodash/debounce";
 
 
 const baseURL = "http://localhost:8000";
-const BaseURL = "http://localhost:8000/api";
 
 // eslint-disable-next-line no-unused-vars
 const user = await jwtAuth.getCurrentUser();
@@ -288,12 +287,15 @@ export default {
         {
           creator: {},
           participants: [{}],
-          admins:[]
+          admins:[{
+            supervisor:{},
+            user:{},
+          }]
         }
       ],
       currentUser: Object,
       newGroupId: 0,
-      currentChatRoom: this.loadSavedRoom() || {
+      currentChatRoom:{
         creator: {},
         participants: [{}],
         admins:[{
@@ -317,6 +319,7 @@ export default {
       isTyping: false,
       changeTime: false,
       timeStamp: '',
+      isTypingUser:{},
     }
   },
   computed: {},
@@ -445,6 +448,14 @@ export default {
           else if (command==="set_admin"){
             console.log(data);
           }
+          else if (command==="is_typing"){
+            this.isTyping=true;
+            this.isTypingUser=data.data;
+          }
+          else if (command==="stop_typing"){
+            console.log("stop");
+            this.isTyping=false;
+          }
           this.scrollToEnd();
         }
       }
@@ -509,7 +520,7 @@ export default {
         let body = {
           "key": this.searchValue
         }
-        axios.post(`${BaseURL}/chat/pv/filter`, body, {
+        axios.post(`${baseURL}/chat/pv/filter`, body, {
           headers: {
             Authorization: `JWT ${await jwtAuth.getAccessToken()}`
           }
@@ -525,9 +536,15 @@ export default {
     },
     startTyping() {
       this.isTyping = true;
+      this.websocket.send(JSON.stringify({
+        "command":"is_typing",
+      }))
       this.debounceStopTyping();
     },
     debounceStopTyping: debounce(function () {
+      this.websocket.send(JSON.stringify({
+        "command":"stop_typing"
+      }))
       this.isTyping = false;
     }, 1000),
     showTime(newDate) {
@@ -536,8 +553,10 @@ export default {
       return this.timeStamp;
     },
     isGroupAdmin(userId){
+      // console.log(this.currentChatRoom);
+      console.log(this.groups);
       let admins=this.currentChatRoom.admins;
-      
+      // console.log(admins);
       let result=admins.some((admin) => admin.user.id == userId);
       return result;
 

@@ -8,6 +8,7 @@ from channels.layers import get_channel_layer
 from channels.db import database_sync_to_async
 from api.models import  User,PrivateChat,Message,Group,GroupAdmin
 from .serializers import MessageSerializer,GroupSerializer,PrivateChatSerializer
+from api.serializers import UserSerializer
 import datetime
 import copy
 
@@ -54,7 +55,6 @@ class GroupConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        print(text_data_json)
         
         
         command = text_data_json["command"]
@@ -72,6 +72,15 @@ class GroupConsumer(AsyncWebsocketConsumer):
         elif command=="set_admin":
             result=await self.set_admin(text_data_json)
             await self.send_to_chat_message(result,command="set_admin")
+
+
+        elif command=="is_typing":
+            result=await self.is_typing()
+            await self.send_to_chat_message(result,command="is_typing")
+
+        elif command=="stop_typing":
+            result=""
+            await self.send_to_chat_message(result,command="stop_typing")
 
     @database_sync_to_async
     def fetch_messages(self,text_data):
@@ -203,6 +212,11 @@ class GroupConsumer(AsyncWebsocketConsumer):
             self.send(json.dumps({
                 "error":"you don't have permission"
             }))
+
+
+    async def is_typing(self):
+        user= self.user
+        return UserSerializer(user,many=False).data
 
         
         
