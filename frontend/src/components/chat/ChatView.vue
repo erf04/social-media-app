@@ -388,7 +388,7 @@ export default {
       this.isPrivate ? this.currentPrivateRoom = {...room} : this.currentChatRoom = {...room};
 
       // router.push({name: 'chat', params: {name}});
-      this.saveSelectedRoom();
+      //this.saveSelectedRoom();
       // this.kirKhar(room.id,chatType.GROUP);
       await this.handleRoom(room.id, this.isPrivate ? chatType.PRIVATE : chatType.GROUP);
 
@@ -592,6 +592,8 @@ export default {
     this.groups = null;
     // this.isPrivate=false;
     console.log(this.isPrivate);
+    if (!await jwtAuth.isAuthenticate())
+          this.$router.push('/login')
     // if (!this.isPrivate){
 
     //   await this.fetchGroups()
