@@ -150,7 +150,7 @@
             <div class="chat-history" id="chat-history" ref="chatHistory">
               <ul class="m-b-0" id="chatList">
                 <div v-for="(message) in messages" :key="message.id"
-                     @contextmenu.prevent="onContextMenu($event, message.body)"
+                     @contextmenu.prevent="onContextMenu($event, message.body, message.id)"
                       style="margin-bottom: 2em">
 <!--                  <div v-show="changeTime" class="time-stamp"-->
 <!--                       style="margin: 0 auto; background: red; text-align: center; width: fit-content">-->
@@ -174,7 +174,8 @@
                         </h6>
                         <!-- @click="goToRepliedMessage" -->
                         <!--  {{ repliedText }} -->
-                        <div class="repliedMessage">khar</div>
+                        <div v-if="message.reply_to_id != null" class="repliedMessage">{{ message.reply_to_id }}</div>
+                        {{message.reply_to_id}}
                         <div>
                           {{ message.body }}
                         </div>
@@ -197,7 +198,8 @@
                         <h6>{{ message.sender.username }}</h6>
                         <!-- @click="goToRepliedMessage" -->
                         <!--  {{ repliedText }} -->
-                        <div class="repliedMessage">khar</div>
+                        <div v-if="message.reply_to_id != null" class="repliedMessage">{{ message.reply_to_id }}</div>
+                        {{message.reply_to_id}}
                         <div>
                           {{ message.body }}
                         </div>
@@ -249,7 +251,9 @@
 // loading icon for fetching messages
 // send btn
 // min height for chat log & min width for messages
-// is staff field for set admin 
+// is staff field for set admin
+// remain group with reload
+
 import {JWTAuth} from "../../../services/jwt";
 import axios from "axios";
 import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
@@ -321,12 +325,14 @@ export default {
       changeTime: false,
       timeStamp: '',
       isTypingUser:{},
+      repliedId: null,
     }
   },
   computed: {},
   methods: {
-    onContextMenu(e, message) {
+    onContextMenu(e, message, id) {
       e.preventDefault();
+      console.log("contextmenu", id);
       this.$contextmenu({
         x: e.x,
         y: e.y,
@@ -336,6 +342,7 @@ export default {
             onClick: () => {
               this.showRepliedMessage(message);
               this.isReply = true;
+              this.repliedId = id;
             }
           },
           {
@@ -368,11 +375,12 @@ export default {
     },
     async sendMessage() {
       console.log("open");
+      this.$refs.repliedMessage.style.display = 'none';
       this.websocket.send(JSON.stringify({
         "command": "new_message",
         "message": {
           "body": this.new_message_body,
-          "reply_to_id": null,
+          "reply_to_id": this.repliedId,
         }
       }))
 
@@ -436,15 +444,12 @@ export default {
           if (command === "fetch_messages") {
             console.log(data);
             this.messages = data["messages"];
-            // this.scroll();
-
           }
           else if (command === "new_message") {
             console.log(data['data']);
             this.new_message = data['data'];
             this.messages.push(this.new_message);
             this.new_message_body = '';
-            // this.scroll();
           }
           else if (command==="set_admin"){
             console.log(data);
