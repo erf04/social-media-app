@@ -83,6 +83,7 @@
                   </div>
                   <hr/>
                 </div>
+                <button class="btn btn-success" style="background-color: red;" v-if="user.id == currentChatRoom.creator.id || isGroupAdmin(user.id)" @click="goToAddParticipants(currentChatRoom.id)">add participants</button>
               </div>
             </div>
           </div>
@@ -490,7 +491,6 @@ export default {
       })
           .then(result => {
             this.groups = result.data;
-            console.log(this.groups);
           })
           .catch(error => {
             console.log(error);
@@ -554,7 +554,7 @@ export default {
     },
     isGroupAdmin(userId){
       // console.log(this.currentChatRoom);
-      console.log(this.groups);
+
       let admins=this.currentChatRoom.admins;
       // console.log(admins);
       let result=admins.some((admin) => admin.user.id == userId);
@@ -565,6 +565,9 @@ export default {
       let admins=this.currentChatRoom.admins;
       let result=admins.find((admin) => admin.user.id == userId).is_staff;
       return result;
+    },
+    goToAddParticipants(groupID){
+      this.$router.push(`/group/add/${groupID}`)
     }
 
   },

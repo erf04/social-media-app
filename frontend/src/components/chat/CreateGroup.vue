@@ -59,7 +59,7 @@
         })
           .then(response =>{
             console.log(response);
-            router.push('/group/add');
+            router.push(`/group/add/${response.data.id}`);
           })
           .catch(error=>{
             console.log(error);

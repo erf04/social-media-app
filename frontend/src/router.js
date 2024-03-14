@@ -22,7 +22,7 @@ const routes = [
     {path: '/profile/postsView', component: profilePostList},
     {path: '/chat', component: chatView},
     {path: '/group/create', component:CreateGroup },
-    {path: '/group/add', component:AddParticipants },
+    {path: '/group/add/:id', component:AddParticipants },
     
 ]
 

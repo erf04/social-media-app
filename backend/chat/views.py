@@ -59,16 +59,18 @@ class PrivateRoomView(APIView):
 
 @api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
-def add_participants_to_last_group(request:Request):
+def add_participants_to_group(request:Request):
     participants_id_list=request.data["participants"]
+    group_id=request.data["group_id"]
     print(f"ids:{participants_id_list}")
     myuser=request.user
-    last_group=Group.objects.filter(creator=myuser).last()
+    # last_group=Group.objects.filter(creator=myuser).last()
+    group=Group.objects.get(pk=group_id)
     for id in  participants_id_list:
         user=User.objects.get(pk=id)
-        last_group.participants.add(user)
+        group.participants.add(user)
 
-    serialized=GroupSerializer(last_group,many=False)
+    serialized=GroupSerializer(group,many=False)
     return Response(serialized.data,status=status.HTTP_200_OK)
 
 

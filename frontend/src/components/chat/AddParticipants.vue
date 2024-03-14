@@ -56,7 +56,8 @@
   
 import axios from 'axios';
 import { JWTAuth } from '../../../services/jwt';
-import router from "@/router";
+import {useRoute} from "vue-router";
+
 const baseURL="http://localhost:8000";
 const jwtAuth=new JWTAuth('http://localhost:8000/auth');
 export default {
@@ -68,35 +69,17 @@ export default {
     },
   
     methods:{
-      async createPost(){
-        const formData = new FormData();
-        
-        let access=await jwtAuth.getAccessToken();
-        
-        axios.post(`${baseURL}/chat/groups/`,formData,{
-          headers:{
-            Authorization:`JWT ${access}`,
-            "Content-Type": "multipart/form-data"
-          }
-        })
-          .then(response =>{
-            console.log(response);
-            router.push('/chat');
-          })
-          .catch(error=>{
-            console.log(error);
-          })
-      },
+
       getAbsoluteUrl(relativeUrl) {
+        
         return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
       },
-      addParticipants(id){
-        this.participants.push(id);
-      },
+
       async save(){
         console.log(this.participants);
         let body={
           "participants":this.participants,
+          "group_id":this.group_id
         }
         axios.post(`${baseURL}/chat/groups/add/`,body,{
           headers:{
@@ -110,7 +93,8 @@ export default {
         .catch(err=>{
           console.log(err);
         })
-      }
+      },
+
 
   
     },
@@ -129,6 +113,10 @@ export default {
         })
 
     },
+    created(){
+      this.group_id=useRoute().params.id
+    }
+    
   
   }
   
