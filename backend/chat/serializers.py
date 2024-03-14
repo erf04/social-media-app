@@ -3,11 +3,19 @@ from api.models import Group,User,Message,CommentContainer,PrivateChat,GroupAdmi
 from api.serializers import UserSerializer,PostSerializer
 from api.models import User
 
+class GroupAdminSerializer(serializers.ModelSerializer):
+    user=UserSerializer(many=False)
+    supervisor=UserSerializer(many=False)
+    class Meta:
+        model=GroupAdmin
+        fields=('user', 'supervisor','is_staff')
+
+
 class GroupSerializer(serializers.ModelSerializer):
     creator=UserSerializer(many=False,required=False)
     creation_date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
     participants=UserSerializer(many=True,required=False)
-    admins=serializers.SerializerMethodField()
+    admins=GroupAdminSerializer(many=True)
     class Meta:
         model=Group
         fields=('id','name','creator','creation_date','participants','image','admins')
@@ -69,10 +77,4 @@ class CompleteUserSerializer(serializers.ModelSerializer):
         return User.objects.filter(followers__follower=obj).count()
         
 
-class GroupAdminSerializer(serializers.ModelSerializer):
-    user=UserSerializer(many=False)
-    supervisor=UserSerializer(many=False)
-    class Meta:
-        model=GroupAdmin
-        fields=('user', 'supervisor','is_staff')
 

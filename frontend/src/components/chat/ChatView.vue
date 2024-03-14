@@ -76,7 +76,9 @@
                   <img :src="getAbsoluteUrl(member.image)" style="width: 30px; height: 30px; border-radius: 50%"/>
                   <div>
                     <h3>{{ member.username }}</h3>
-                    <button class="btn btn-success" style="background-color: green;" v-if="(user.id === this.currentChatRoom.creator.id || isGroupAdmin(user.id)) && member.id !== this.currentChatRoom.creator.id && !isGroupAdmin(member.id)" @click="set_admin(member.id,false)">set admin</button>
+                    <button class="btn btn-success" style="background-color: green;" v-if="(user.id === this.currentChatRoom.creator.id || (isGroupAdmin(user.id) && isGroupAdminStaff(user.id))) && (member.id !== this.currentChatRoom.creator.id && !isGroupAdmin(member.id))" @click="set_admin(member.id,false)">set admin</button>
+                    <small v-if="isGroupAdmin(member.id)"><b>admin</b></small>
+                    <small v-if="member.id === currentChatRoom.creator.id"><b>creator</b></small>
                     <p>last seen</p>
                   </div>
                   <hr/>
@@ -154,8 +156,8 @@
 <!--                    {{ showTime(getFormattedDate(message.timestamp)) }}-->
 <!--                  </div>-->
                   <li class="clearfix"
-                      :style="message.sender.username === userInfo.username ? `text-align: end` : `text-align: start`">
-                    <div v-if="message.sender.username === userInfo.username">
+                      :style="message.sender.id === user.id ? `text-align: end` : `text-align: start`">
+                    <div v-if="message.sender.id === user.id">
                       <div ref="textRight" class="message-data text-right">
                     <span class="message-data-time">
 <!--                      <span> {{ message.sender.username }} </span>-->
@@ -256,7 +258,8 @@ import "../../../node_modules/bootstrap/dist/css/bootstrap.css";
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 import debounce from "lodash/debounce";
 
-const baseURL = "http://localhost:8000/api";
+
+const baseURL = "http://localhost:8000";
 const BaseURL = "http://localhost:8000/api";
 
 // eslint-disable-next-line no-unused-vars
@@ -293,7 +296,10 @@ export default {
       currentChatRoom: this.loadSavedRoom() || {
         creator: {},
         participants: [{}],
-        admins:[]
+        admins:[{
+          supervisor:{},
+          user:{}
+        }]
       },
       isPrivate: false,
       privateRooms: [{
@@ -339,18 +345,7 @@ export default {
         ]
       });
     },
-    async userData() {
-      const user = await jwtAuth.getCurrentUser();
-      axios.post(`${baseURL}/get-user/`, {
-        username: user == null ? null : user.username
-      })
-          .then(response => {
-            this.userInfo = response.data;
-          })
-          .catch(err => {
-            console.log(err);
-          })
-    },
+
     async scrollToEnd() {
       await nextTick();
       let container = document.getElementById("chat-history");
@@ -497,7 +492,7 @@ export default {
         let body = {
           "key": this.searchValue
         }
-        axios.post(`${BaseURL}/chat/groups/filter`, body, {
+        axios.post(`${baseURL}/chat/groups/filter`, body, {
           headers: {
             Authorization: `JWT ${await jwtAuth.getAccessToken()}`
           }
@@ -541,12 +536,18 @@ export default {
       return this.timeStamp;
     },
     isGroupAdmin(userId){
-      if (this.currentChatRoom===null)
-        return false;
-      if (this.currentChatRoom.admins.includes(userId)) 
-        return true;
-      return false;
+      let admins=this.currentChatRoom.admins;
+      
+      let result=admins.some((admin) => admin.user.id == userId);
+      return result;
+
+    },
+    isGroupAdminStaff(userId){
+      let admins=this.currentChatRoom.admins;
+      let result=admins.find((admin) => admin.user.id == userId).is_staff;
+      return result;
     }
+
   },
   watch: {
     groupInfo(n) {
@@ -563,7 +564,6 @@ export default {
   },
   async mounted() {
     this.user = await jwtAuth.getCurrentUser();
-    await this.userData();
     // console.log("messages:"+this.messages);
     this.currentChatRoom = null;
     this.currentPrivateRoom = null;

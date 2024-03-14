@@ -65,9 +65,10 @@ export default {
   },
   methods: {
     async logout() {
-      this.isLoggedIn = jwtAuth.logout();
-      location.reload();
+      this.isLoggedIn =jwtAuth.logout();
+      //location.reload();
       console.log("loggedIn:" + this.isLoggedIn);
+      this.$router.push('/login');
     },
     username(name) {
       this.userName = name;

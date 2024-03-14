@@ -215,6 +215,7 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         chat_id=self.scope["url_route"]["kwargs"]["chat_id"]
         self.user=self.scope["user"]
+        self.room_group_name=""
         # get chat object from id
         try:
             chat:PrivateChat=await self.get_private_chat(chat_id)
