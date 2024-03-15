@@ -10,7 +10,7 @@
       </button>
     </div>
     <div class="w-75 mx-auto">
-      <div v-for="user in resultUsers" :key="user.pk">
+      <div v-for="user in users" :key="user.pk">
         <div class="results mx-auto">
           <div class="d-flex align-items-center" style="gap: 10px">
             <img style="width: 30px; height: 30px; border-radius: 50%" :src="getAbsoluteUrl(user.image)" alt="">
@@ -74,7 +74,7 @@ export default {
           })
           .then(response => {
             console.log(response.data);
-            this.resultUsers = response.data;
+            this.users = response.data;
           })
           .catch(error => {
             console.log(error);

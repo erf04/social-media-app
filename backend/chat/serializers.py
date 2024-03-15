@@ -94,8 +94,8 @@ class CompleteUserSerializer(serializers.ModelSerializer):
     followings_count=serializers.SerializerMethodField()
     is_following=IsFollowingSerializerField(source="*",read_only=True)
     is_follower=IsFollowerSerializerField(source="*",read_only=True)
-
-    class Meta:
+    image=serializers.SerializerMethodField()
+    class Meta: 
         model = User
         fields=("id","username","email","image","followers_count","followings_count","is_following","is_follower")
 
@@ -105,6 +105,9 @@ class CompleteUserSerializer(serializers.ModelSerializer):
     
     def get_followings_count(self,obj:User):
         return User.objects.filter(followers__follower=obj).count()
+    
+    def get_image(self,obj:User):
+        return f"/media/{obj.image}"
     
 
         

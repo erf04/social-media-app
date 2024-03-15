@@ -106,13 +106,13 @@ class getAllCompletedUsers(generics.ListAPIView):
 
 
 
-@api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
-def filter_users(request:Request):
-    key=request.data["key"]
-    users=User.objects.filter(username__contains=key)
-    serialized=UserSerializer(users,many=True)
-    return Response(serialized.data,status=status.HTTP_200_OK)
+# @api_view(['POST'])
+# @permission_classes([permissions.IsAuthenticated])
+# def filter_users(request:Request):
+#     key=request.data["key"]
+#     users=User.objects.filter(username__contains=key)
+#     serialized=CompleteUserSerializer(users,many=True)
+#     return Response(serialized.data,status=status.HTTP_200_OK)
     
 
 class filterCompletedUsers(generics.ListAPIView):
