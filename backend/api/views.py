@@ -97,7 +97,7 @@ class getAllCompletedUsers(generics.ListAPIView):
     permission_classes=[permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return User.objects.all()
+        return User.objects.all().exclude(id=self.request.user.id)
     
     def get_serializer_context(self):
         context= super().get_serializer_context()
@@ -125,7 +125,7 @@ class filterCompletedUsers(generics.ListAPIView):
     
     def post(self,request,*args,**kwargs):
         key = request.data.get("key")
-        queryset = User.objects.filter(username__contains=key)
+        queryset = User.objects.filter(username__contains=key).exclude(id=request.user.id)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     
@@ -154,6 +154,18 @@ def get_followers(request:Request):
 @api_view(['GET'])
 def get_followings(request:Request):
     pass
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def remove_follower(request:Request):
+    id=request.data['following_id']
+    followed=User.objects.get(pk=id)
+    followerObj=Follower.objects.get(follower=request.user,followed=followed)
+    followerObj.delete()
+    response={
+        "message":f"user with username:{followed.username} unfollowed by {request.user.username}"
+    }
+    return Response(data=response,status=status.HTTP_200_OK)
 
 
 

@@ -21,6 +21,7 @@ urlpatterns = [
     path('users/all/',views.getAllCompletedUsers.as_view()),
     path('users/filter/',views.filterCompletedUsers.as_view()),
     path('follower/add/',views.add_following),
+    path('follower/remove/',views.remove_follower),
     
 
     

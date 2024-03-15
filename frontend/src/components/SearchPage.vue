@@ -19,7 +19,7 @@
               <p class="m-0" style="font-size: small">{{user.followers_count}} Followers</p>
             </div>
           </div>
-          <button v-text="user.is_following ? 'Following' : 'Follow'" ref="followBtn" class="followBtn" @mouseleave="leave($event.target)" @mouseenter="hover($event.target)" @click="followToggle($event.target)"></button>
+          <button v-text="user.is_following ? 'Following' : 'Follow'" ref="followBtn" class="followBtn" @mouseleave="leave($event.target)" @mouseenter="hover($event.target)" @click="followToggle($event.target,user.id)"></button>
         </div>
         <hr/>
       </div>
@@ -86,16 +86,19 @@ export default {
     getAbsoluteUrl(relativeUrl) {
       return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
     },
-    followToggle(element) {
+    async followToggle(element,followingId) {
       if (element.innerText === "Follow") {
+        await this.follow(followingId);
         element.innerText = "Following"
         element.style.backgroundColor = "inherit";
         element.style.color = "#53ee9f";
       } else {
+        await this.unfollow(followingId);
         element.innerText = "Follow"
         element.style.backgroundColor = "#53ee9f";
         element.style.color = "black";
       }
+      await this.filteredUsers();
     },
     hover(element) {
       if (element.innerText === 'Following') {
@@ -126,6 +129,22 @@ export default {
         "following_id":followingId
       }
       axios.post(`${baseURL}/follower/add/`,body,{
+        headers:{
+          Authorization:`JWT ${await jwtAuth.getAccessToken()}`
+        }
+      })
+      .then(res=>{
+        console.log(res);
+      })
+      .catch(err=>{
+        console.log(err);
+      })
+    },
+    async unfollow(followingId){
+      let body={
+        "following_id":followingId
+      }
+      axios.post(`${baseURL}/follower/remove/`,body,{
         headers:{
           Authorization:`JWT ${await jwtAuth.getAccessToken()}`
         }

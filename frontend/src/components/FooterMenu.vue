@@ -51,13 +51,13 @@ export default {
   methods: {
     GoToCreatePost() {
       if (this.fromProfile) router.push('createPost');
-      else router.push('profile/createPost');
+      else router.push('/profile/createPost');
     },
     GoToChat() {
-      router.push('chat');
+      router.push('/chat');
     },
     GoToSearch() {
-      router.push('search');
+      router.push('/search');
     }
   }
 }

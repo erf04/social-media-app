@@ -246,6 +246,7 @@
       </div>
     </div>
   </div>
+  <footerMenu/>
 </template>
 
 <script>
@@ -280,6 +281,7 @@ import axios from "axios";
 import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
 import {nextTick} from 'vue';
 import "../../../node_modules/bootstrap/dist/css/bootstrap.css";
+import footerMenu from '@/components/FooterMenu.vue';
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 import debounce from "lodash/debounce";
@@ -297,7 +299,7 @@ const chatType = Object.freeze({
 
 export default {
   components: {
-    // chatHistory,
+    footerMenu,
   },
   data() {
     return {
@@ -690,7 +692,7 @@ export default {
 <style scoped>
 
 #chat-history {
-  max-height: 500px; /* Set a maximum height to enable scrolling */
+  max-height: 450px; /* Set a maximum height to enable scrolling */
   overflow-y: auto; /* Enable vertical scrolling */
   scroll-behavior: smooth; /* Enable smooth scroll behavior */
 }

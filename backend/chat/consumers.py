@@ -120,7 +120,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
 
 
         serialized=MessageSerializer(message,many=False)
-        print(serialized.data)
+        # print(serialized.data)
         # self.send_to_chat_message(serialized.data)
         return serialized.data
 
@@ -299,25 +299,27 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         # self.send_to_chat_message(text_data)
         if command=="new_message":
             result=await self.create_new_message(text_data_json)
-            await self.send_to_chat_message(result)
+            await self.send_to_chat_message(result,command="new_message")
 
         elif command=="fetch_messages":
             result=await self.fetch_messages() 
        
             await self.chat_message(result)
 
-        # elif command=="change_permission":
-        #     type=text_data_json["command_type"]
-        #     selected_user_id=text_data_json["selected_user_id"]
-        #     command_caller_id=text_data_json["command_caller_id"]
-        #     if type=="to_admin":
+        elif command=="is_typing":
+            result=await self.is_typing()
+            await self.send_to_chat_message(result,command="is_typing")
+
+        elif command=="stop_typing":
+            result=""
+            await self.send_to_chat_message(result,command="stop_typing")
 
 
 
      # Receive message from room group
     
 
-    async def send_to_chat_message(self,text_data):
+    async def send_to_chat_message(self,text_data,command):
         
      
         # Send message to room group
@@ -325,7 +327,7 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name, {
                 "type": "chat.message",
                 "data":text_data,
-                "command":"new_message"
+                "command":command
 
             }
         )
@@ -384,6 +386,10 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
             "messages":dict_messages,
             "chat_info":group_serialized
         }
+    
+    async def is_typing(self):
+        user= self.user
+        return UserSerializer(user,many=False).data
         
 
     
