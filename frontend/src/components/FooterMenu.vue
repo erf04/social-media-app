@@ -65,7 +65,7 @@ export default {
 
 <style>
 .footer {
-//padding: 3rem; padding: 10px 2rem 10px 2rem; display: flex;
+  padding: 3rem; padding: 10px 2rem 10px 2rem; display: flex;
   align-items: center;
   justify-content: center;
   gap: 100px;
