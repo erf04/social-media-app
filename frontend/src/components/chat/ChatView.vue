@@ -221,7 +221,7 @@
                 <div class="input-group-prepend">
                   <span class="input-group-text"><i class="fa fa-send"></i></span>
                 </div>
-                <input @input="startTyping" @keyup.enter="sendMessage" v-model="new_message_body" type="text"
+                <input @input="startTyping" @keyup.enter="sendMessage()" v-model="new_message_body" type="text"
                        class="form-control"
                        placeholder="Enter text here...">
               </div>
@@ -256,6 +256,7 @@
 // is staff field for set admin
 // remain group with reload
 // more options in context menu (bring from chatroom)
+// close button for reply
 
 import {JWTAuth} from "../../../services/jwt";
 import axios from "axios";
@@ -408,6 +409,7 @@ export default {
         console.log("should change the message body");
         this.new_message_body = '';
       } else {
+        // console.log("in send");
         this.websocket.send(JSON.stringify({
           "command": "new_message",
           "message": {
@@ -428,11 +430,13 @@ export default {
       }))
     },
     async selectRoom(room) {
+      // console.log(JSON.stringify(this.currentChatRoom),JSON.stringify(room));
+      let jsonRoom=JSON.stringify(room);
+      if (JSON.stringify(this.currentChatRoom)==jsonRoom || JSON.stringify(this.currentPrivateRoom)==jsonRoom){
+        return;
+      }
       this.isPrivate ? this.currentPrivateRoom = {...room} : this.currentChatRoom = {...room};
 
-      // router.push({name: 'chat', params: {name}});
-      //this.saveSelectedRoom();
-      // this.kirKhar(room.id,chatType.GROUP);
       await this.handleRoom(room.id, this.isPrivate ? chatType.PRIVATE : chatType.GROUP);
 
       setInterval(async () => {
@@ -460,7 +464,7 @@ export default {
 
       this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/${type}/${id}/?token=${await jwtAuth.getAccessToken()}`);
       this.websocket.onopen = () => {
-
+        console.log("open");
         this.websocket.send(JSON.stringify({
           "command": "fetch_messages",
         }))
@@ -469,7 +473,7 @@ export default {
         console.log("close");
         // console.log(event.data);
       }
-      this.websocket.onmessage = (event) => {
+      this.websocket.onmessage = async(event) => {
         let data = JSON.parse(event.data);
         if (!('command' in data)) {
           // message received from server
@@ -479,25 +483,28 @@ export default {
           if (command === "fetch_messages") {
             console.log(data);
             this.messages = data["messages"];
+            await this.scrollToEnd();
           }
           else if (command === "new_message") {
             console.log(data['data']);
             this.new_message = data['data'];
             this.messages.push(this.new_message);
             this.new_message_body = '';
+            await this.scrollToEnd();
+
           }
           else if (command==="set_admin"){
             console.log(data);
           }
           else if (command==="is_typing"){
+            console.log("typing");
             this.isTyping=true;
             this.isTypingUser=data.data;
           }
           else if (command==="stop_typing"){
-            console.log("stop");
+            // console.log("stop");
             this.isTyping=false;
           }
-          this.scrollToEnd();
         }
       }
     },
