@@ -37,6 +37,16 @@ class PostSerializer(serializers.ModelSerializer):
         self.validated_data['author']=author
         self.validated_data['created_at']=creation_date
         return super().save()  # Call the parent's save() method
+    
+
+
+
+class FollowerSerializer(serializers.ModelSerializer):
+    follower=UserSerializer(many=False)
+    followed=UserSerializer(many=False)
+    class Meta:
+        model = Follower
+        fields=('follower','followed')
 
 
         

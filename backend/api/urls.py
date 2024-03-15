@@ -18,8 +18,9 @@ urlpatterns = [
     path('posts/',views.showUserPosts,name="show-user-posts"),
     path('posts/create/',views.create_post),
     path('get-user/',views.getUserByUsername,name="getUser"),
-    path('users/all/',views.getAllUsers),
+    path('users/all/',views.getAllCompletedUsers.as_view()),
     path('users/filter/',views.filter_users),
+    path('follower/add/',views.add_following),
     
 
     
