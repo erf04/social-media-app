@@ -1,7 +1,9 @@
 from rest_framework import serializers
-from api.models import Group,User,Message,CommentContainer,PrivateChat,GroupAdmin
+from api.models import Group,User,Message,CommentContainer,PrivateChat,GroupAdmin,Follower
 from api.serializers import UserSerializer,PostSerializer
 from api.models import User
+from rest_framework.request import Request
+from django.conf import settings
 
 class GroupAdminSerializer(serializers.ModelSerializer):
     user=UserSerializer(many=False)
@@ -70,12 +72,32 @@ class PrivateChatSerializer(serializers.ModelSerializer):
         fields=('id','creator','the_other')
 
 
+class IsFollowingSerializerField(serializers.Field):
+    def to_representation(self, user):
+        request:Request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return Follower.objects.filter(follower=request.user, followed=user).exists()
+        return False
+    
+
+class IsFollowerSerializerField(serializers.Field):
+    def to_representation(self, user):
+        request=self.context.get('request')
+        if request and request.user.is_authenticated:
+            return Follower.objects.filter(follower=user, followed=request.user).exists()
+        return False
+
+    
+
 class CompleteUserSerializer(serializers.ModelSerializer):
     followers_count=serializers.SerializerMethodField()
     followings_count=serializers.SerializerMethodField()
-    class Meta:
+    is_following=IsFollowingSerializerField(source="*",read_only=True)
+    is_follower=IsFollowerSerializerField(source="*",read_only=True)
+    image=serializers.SerializerMethodField()
+    class Meta: 
         model = User
-        fields=("id","username","email","image","followers_count","followings_count")
+        fields=("id","username","email","image","followers_count","followings_count","is_following","is_follower")
 
     def get_followers_count(self,obj:User):
         return User.objects.filter(followings__followed=obj).count()
@@ -83,6 +105,11 @@ class CompleteUserSerializer(serializers.ModelSerializer):
     
     def get_followings_count(self,obj:User):
         return User.objects.filter(followers__follower=obj).count()
+    
+    def get_image(self,obj:User):
+        return f"/media/{obj.image}"
+    
+
         
 
 

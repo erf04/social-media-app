@@ -10,7 +10,7 @@
       </button>
     </div>
     <div class="w-75 mx-auto">
-      <div v-for="user in resultUsers" :key="user.pk">
+      <div v-for="user in users" :key="user.pk">
         <div class="results mx-auto">
           <div class="d-flex align-items-center" style="gap: 10px">
             <img style="width: 30px; height: 30px; border-radius: 50%" :src="getAbsoluteUrl(user.image)" alt="">
@@ -25,16 +25,22 @@
       </div>
     </div>
   </div>
+  
+  <footerMenu/>
 </template>
 
 <script>
 import {JWTAuth} from "../../services/jwt";
 import axios from "axios";
+import footerMenu from '@/components/FooterMenu.vue';
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 const baseURL = "http://localhost:8000/api";
 
 export default {
+  components: {
+    footerMenu,
+  },
   data() {
     return {
       users: [],
@@ -44,12 +50,13 @@ export default {
   },
   methods: {
     async getAllUsers() {
-      await axios.get(`${baseURL}/users/all/`, {
+      axios.get(`${baseURL}/users/all/`, {
         headers: {
           Authorization: `JWT ${await jwtAuth.getAccessToken()}`
         },
       })
           .then(response => {
+            console.log(response.data);
             this.users = response.data;
           })
           .catch(error => {
@@ -57,7 +64,7 @@ export default {
           })
     },
     async filteredUsers() {
-      await axios.post(`${baseURL}/users/filter/`, {
+      axios.post(`${baseURL}/users/filter/`, {
             key: this.searchValue,
           },
           {
@@ -68,6 +75,8 @@ export default {
           .then(response => {
             console.log("Filtered users", response.data);
             this.resultUsers = response.data;
+            console.log(response.data);
+            this.users = response.data;
           })
           .catch(error => {
             console.log(error);
@@ -109,6 +118,27 @@ export default {
         element.target.innerText = "Follow";
         element.target.style.backgroundColor = "#53ee9f";
       }
+    },
+    async follow(followingId){
+      let body={
+        "following_id":followingId
+      }
+      axios.post(`${baseURL}/follower/add/`,body,{
+        headers:{
+          Authorization:`JWT ${await jwtAuth.getAccessToken()}`
+        }
+      })
+      .then(res=>{
+        console.log(res);
+      })
+      .catch(err=>{
+        console.log(err);
+      })
+    }
+  },
+  watch:{
+    searchValue:function (){
+      this.filteredUsers();
     }
   },
   mounted() {

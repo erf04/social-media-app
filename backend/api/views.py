@@ -3,12 +3,14 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view,permission_classes,parser_classes
-from .serializers import TaskSerializer,UserSerializer,PostSerializer
+from .serializers import TaskSerializer,UserSerializer,PostSerializer,FollowerSerializer
 from .models import *
 from django.shortcuts import get_object_or_404
 from .permissions import IsOwnerOrReadOnly
 from rest_framework import permissions,generics
 from rest_framework.parsers import MultiPartParser, FormParser
+from chat.serializers import CompleteUserSerializer
+from rest_framework import generics
 # Create your views here.
 
 
@@ -90,21 +92,68 @@ def getUserByUsername(request:Request):
     return Response(serializer.data)
 
 
-@api_view(["GET"])
-@permission_classes([permissions.IsAuthenticated])
-def getAllUsers(request:Request):
-    users = User.objects.all()
-    serialized=UserSerializer(users, many=True)
-    return Response(serialized.data,status=status.HTTP_200_OK)
+class getAllCompletedUsers(generics.ListAPIView):
+    serializer_class=CompleteUserSerializer
+    permission_classes=[permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return User.objects.all()
+    
+    def get_serializer_context(self):
+        context= super().get_serializer_context()
+        context['request']=self.request
+        return context
+
+
+
+# @api_view(['POST'])
+# @permission_classes([permissions.IsAuthenticated])
+# def filter_users(request:Request):
+#     key=request.data["key"]
+#     users=User.objects.filter(username__contains=key)
+#     serialized=CompleteUserSerializer(users,many=True)
+#     return Response(serialized.data,status=status.HTTP_200_OK)
+    
+
+class filterCompletedUsers(generics.ListAPIView):
+    serializer_class=CompleteUserSerializer
+    permission_classes=[permissions.IsAuthenticated]
+
+    # def get_queryset(self):
+    #     key=self.request.query_params.get("key")
+    #     return User.objects.filter(username__contains=key)
+    
+    def post(self,request,*args,**kwargs):
+        key = request.data.get("key")
+        queryset = User.objects.filter(username__contains=key)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+
+    def get_serializer_context(self):
+        context= super().get_serializer_context()
+        context['request']=self.request
+        return context
+
 
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
-def filter_users(request:Request):
-    key=request.data["key"]
-    users=User.objects.filter(username__contains=key)
-    serialized=UserSerializer(users,many=True)
-    return Response(serialized.data,status=status.HTTP_200_OK)
+def add_following(request:Request):
+    followed_id=request.data["following_id"]
+    follower=request.user
+    followed=User.objects.get(pk=followed_id)
+    followerObj=Follower.objects.create(follower=follower,followed=followed)
+    serialized=FollowerSerializer(followerObj,many=False)
+    return Response(serialized.data,status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+def get_followers(request:Request):
+    pass
+
+@api_view(['GET'])
+def get_followings(request:Request):
+    pass
 
 
 
