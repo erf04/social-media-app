@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.request import Request
 from rest_framework.response import Response
-from api.models import Group,PrivateChat,User,Follower
+from api.models import Group,PrivateChat,User,Follower, Message
 from rest_framework import status
 from rest_framework.decorators import api_view,permission_classes,parser_classes
 from .serializers import GroupSerializer,PrivateChatSerializer
@@ -106,5 +106,9 @@ def filter_pv(request:Request):
     serialized=PrivateChatSerializer(private_chats,many=True)
     return Response(serialized.data,status=status.HTTP_200_OK)
 
-
-
+@api_view(["POST"])
+@permission_classes([permissions.IsAuthenticated])
+def delete_message(request):
+    message_id = request.data["message_id"]
+    message = Message.objects.get(pk=message_id).delete()
+    return Response({"message": "deleted"}, status=status.HTTP_200_OK)

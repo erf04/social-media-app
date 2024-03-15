@@ -274,7 +274,8 @@
 // more options in context menu (bring from chatroom)
 // close button for reply
 // got to profile in search result
-// footer isn't at the bottom of the page
+// footer isn't at the bottom of the page     ok
+//
 
 import {JWTAuth} from "../../../services/jwt";
 import axios from "axios";
@@ -398,8 +399,15 @@ export default {
           },
           {
             label: "Delete",
-            onClick: () => {
-              alert("delete");
+            onClick: async () => {
+              await axios.post(`${baseURL}/chat/message/delete/`, {
+                message_id: id,
+              }, {
+                headers: {
+                  Authorization: `JWT ${await jwtAuth.getAccessToken()}`
+                }
+              })
+              this.fetchMessages();
             }
           },
           {
@@ -495,8 +503,13 @@ export default {
       return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
     },
 
-    async handleRoom(id, type) {
+    fetchMessages() {
+      this.websocket.send(JSON.stringify({
+        "command": "fetch_messages",
+      }))
+    },
 
+    async handleRoom(id, type) {
       this.websocket = new ReconnectingWebSocket(`ws://localhost:8000/ws/${type}/${id}/?token=${await jwtAuth.getAccessToken()}`);
       this.websocket.onopen = () => {
         console.log("open");
@@ -526,7 +539,6 @@ export default {
             this.messages.push(this.new_message);
             this.new_message_body = '';
             await this.scrollToEnd();
-
           }
           else if (command==="set_admin"){
             console.log(data);

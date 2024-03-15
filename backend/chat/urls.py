@@ -8,6 +8,6 @@ urlpatterns = [
     path('get-users/',views.get_followers_and_followings),
     path('groups/filter',views.filter_groups),
     path('pv/filter',views.filter_pv),
-    
+    path('message/delete/',views.delete_message),
     
 ]
