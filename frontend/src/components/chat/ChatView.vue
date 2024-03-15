@@ -157,13 +157,12 @@
                   <li class="clearfix"
                       :style="message.sender.id === user.id ? `text-align: end` : `text-align: start`">
                     <div v-if="message.sender.id === user.id">
-                      <div ref="textRight" class="message-data text-right">
-                    <span class="message-data-time">
-<!--                      <span> {{ message.sender.username }} </span>-->
-                      <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>
-                      <span v-else-if="getFormattedDate(message.timestamp) === yesterdayTime"> Yesterday </span>
-                      <span v-else> {{ getFormattedDate(message.timestamp) }} </span>
-                    </span>
+                      <div :ref="message.id" class="message-data text-right">
+                        <span class="message-data-time">
+                          <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>
+                          <span v-else-if="getFormattedDate(message.timestamp) === yesterdayTime"> Yesterday </span>
+                          <span v-else> {{ getFormattedDate(message.timestamp) }} </span>
+                        </span>
                         <img :src="getAbsoluteUrl(message.sender.image)" alt="user profile picture"/>
                       </div>
                       <div ref="whoSend" class="message other-message">
@@ -172,10 +171,15 @@
                         </h6>
                         <!-- @click="goToRepliedMessage" -->
                         <!--  {{ repliedText }} -->
-                        <div v-if="message.reply_to != null" class="repliedMessage">
-                          <p style="font-weight: bold;" class="m-0">{{message.reply_to.sender.username}}</p>
-                          <p class="m-0">{{ message.reply_to.body }}</p>
+
+                        <div v-if="message.reply_to != null" class="repliedMessage" @click="goToRepliedMessage(message.reply_to.id)">
+<!--                          <a :href="'#/chat/#' + `${message.reply_to.id}`">-->
+<!--                            <p>{{message.reply_to.id}}</p>-->
+                            <p style="font-weight: bold;" class="m-0">{{message.reply_to.sender.username}}</p>
+                            <p class="m-0">{{ message.reply_to.body }}</p>
+<!--                          </a>-->
                         </div>
+
                         <div>
                           {{ message.body }}
                         </div>
@@ -185,22 +189,25 @@
                       </div>
                     </div>
                     <div v-else>
-                      <div class="message-data">
-                    <span class="message-data-time">
-<!--                      <span> {{ message.sender.username }} </span>-->
-                      <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>
-                      <span v-else-if="getFormattedDate(message.timestamp) === yesterdayTime"> Yesterday </span>
-                      <span v-else> {{ getFormattedDate(message.timestamp) }} </span>
-                    </span>
+                      <div class="message-data" :ref="message.id">
+                        <span class="message-data-time">
+    <!--                      <span> {{ message.sender.username }} </span>-->
+                          <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>
+                          <span v-else-if="getFormattedDate(message.timestamp) === yesterdayTime"> Yesterday </span>
+                          <span v-else> {{ getFormattedDate(message.timestamp) }} </span>
+                        </span>
                         <img :src="getAbsoluteUrl(message.sender.image)" alt="user profile picture"/>
                       </div>
                       <div class="message my-message">
                         <h6>{{ message.sender.username }}</h6>
                         <!-- @click="goToRepliedMessage" -->
                         <!--  {{ repliedText }} -->
-                        <div v-if="message.reply_to != null" class="repliedMessage">
-                          <p style="font-weight: bold" class="m-0">{{message.reply_to.sender.username}}</p>
+                        <div v-if="message.reply_to != null" class="repliedMessage" @click="goToRepliedMessage(message.reply_to.id)">
+<!--                          <a :href="`/  chat/#${message.reply_to.id}`">-->
+<!--                          <p>{{message.reply_to.id}}</p>-->
+                          <p style="font-weight: bold;" class="m-0">{{message.reply_to.sender.username}}</p>
                           <p class="m-0">{{ message.reply_to.body }}</p>
+<!--                        </a>-->
                         </div>
                         <div>
                           {{ message.body }}
@@ -215,7 +222,14 @@
               </ul>
             </div>
             <div class="chat-message clearfix">
-              <div v-show="isReply" ref="repliedMessage" class="alert alert-success mb-0" role="alert"></div>
+              <div v-show="isReply" ref="repliedMessage" class="alert alert-success mb-0" role="alert">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div></div>
+                  <div>
+                    <span @click="cancelReply" class="close d-flex align-items-center">&times;</span>
+                  </div>
+                </div>
+              </div>
               <div v-show="isEdit" ref="editedMessage" class="alert alert-info mb-0" role="alert"></div>
               <div class="input-group mb-0">
                 <div class="input-group-prepend">
@@ -223,6 +237,7 @@
                 </div>
                 <input @input="startTyping" @keyup.enter="sendMessage()" v-model="new_message_body" type="text"
                        class="form-control"
+                       ref="inputMessage"
                        placeholder="Enter text here...">
               </div>
             </div>
@@ -257,6 +272,8 @@
 // remain group with reload
 // more options in context menu (bring from chatroom)
 // close button for reply
+// got to profile in search result
+// footer isn't at the bottom of the page
 
 import {JWTAuth} from "../../../services/jwt";
 import axios from "axios";
@@ -346,7 +363,9 @@ export default {
           {
             label: "Reply",
             onClick: () => {
-              this.showRepliedMessage(message);
+              console.log("Replyyyy", this.$refs.repliedMessage.childNodes[0].childNodes[0]);
+              this.$refs.repliedMessage.childNodes[0].childNodes[0].innerHTML = message;
+              this.$refs.inputMessage.focus();
               this.isReply = true;
               this.repliedId = id;
             }
@@ -362,7 +381,7 @@ export default {
           {
             label: "Edit",
             onClick: () => {
-              this.showEditedMessage(message);
+              this.$refs.editedMessage.innerText = message + this.$refs.editedMessage.innerText;
               this.isEdit = true;
               this.editedId = id;
               this.new_message_body = message;
@@ -376,6 +395,12 @@ export default {
             }
           },
           {
+            label: "Delete",
+            onClick: () => {
+              alert("delete");
+            }
+          },
+          {
             label: "A submenu",
             children: [
               {label: "Item1"},
@@ -386,17 +411,25 @@ export default {
         ]
       });
     },
-
+    cancelReply() {
+      this.repliedId = null;
+      this.isReply = false;
+    },
+    goToRepliedMessage(id) {
+      const el = this.$refs[`${id}`][0];
+      const elParent = this.$refs[`${id}`][0].parentNode;
+      elParent.style.backgroundColor = "#89cbff";
+      elParent.style.transition = "1s";
+      setTimeout(() => {
+        elParent.style.backgroundColor = "inherit";
+      }, 1500);
+      // console.log("goToRepliedMessage", el.parentNode);
+      el.scrollIntoView({behavior: "smooth"});
+    },
     async scrollToEnd() {
       await nextTick();
       let container = document.getElementById("chat-history");
       container.scrollTop = container.scrollHeight;
-    },
-    showRepliedMessage(message) {
-      this.$refs.repliedMessage.innerText = message;
-    },
-    showEditedMessage(message) {
-      this.$refs.editedMessage.innerText = message;
     },
     getFormattedDate(date) {
       return date.split(" ")[0].trim();
@@ -940,5 +973,18 @@ ul {
   color: gray;
 }
 
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
 
 </style>

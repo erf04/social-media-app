@@ -16,10 +16,10 @@
             <img style="width: 30px; height: 30px; border-radius: 50%" :src="getAbsoluteUrl(user.image)" alt="">
             <div>
               <h6 class="m-0">{{ user.username }}</h6>
-              <p class="m-0" style="font-size: small">n Followers</p>
+              <p class="m-0" style="font-size: small">{{user.followers_count}} Followers</p>
             </div>
           </div>
-          <button class="followBtn" @mouseleave="sagi2($event)" @mouseenter="sagi($event)" @click="followToggle($event)">Follow</button>
+          <button v-text="user.is_following ? 'Following' : 'Follow'" ref="followBtn" class="followBtn" @mouseleave="leave($event.target)" @mouseenter="hover($event.target)" @click="followToggle($event.target)"></button>
         </div>
         <hr/>
       </div>
@@ -46,6 +46,7 @@ export default {
       users: [],
       searchValue: '',
       resultUsers: [],
+      followStatus: '',
     }
   },
   methods: {
@@ -56,7 +57,7 @@ export default {
         },
       })
           .then(response => {
-            console.log(response.data);
+            // console.log(response.data);
             this.users = response.data;
           })
           .catch(error => {
@@ -73,7 +74,9 @@ export default {
             }
           })
           .then(response => {
-            console.log(response.data);
+            console.log("Filtered users", response.data);
+            this.resultUsers = response.data;
+            // console.log(response.data);
             this.users = response.data;
           })
           .catch(error => {
@@ -84,37 +87,38 @@ export default {
       return relativeUrl = 'http://localhost:8000/api' + relativeUrl;
     },
     followToggle(element) {
-      if (element.target.innerText === "Follow") {
-        element.target.innerText = "Following"
-        element.target.style.backgroundColor = "inherit";
-        element.target.style.color = "#53ee9f";
+      if (element.innerText === "Follow") {
+        element.innerText = "Following"
+        element.style.backgroundColor = "inherit";
+        element.style.color = "#53ee9f";
       } else {
-        element.target.innerText = "Follow"
-        element.target.style.backgroundColor = "#53ee9f";
+        element.innerText = "Follow"
+        element.style.backgroundColor = "#53ee9f";
+        element.style.color = "black";
       }
     },
-    sagi(element) {
-      if (element.target.innerText === 'Following') {
-        element.target.innerText = "UnFollow";
-        element.target.style.backgroundColor = "red";
-        element.target.style.color = "black";
+    hover(element) {
+      if (element.innerText === 'Following') {
+        element.innerText = "UnFollow";
+        element.style.backgroundColor = "red";
+        element.style.color = "black";
       } else {
-        element.target.innerText = "Follow"
-        element.target.style.backgroundColor = "#53ee9f";
+        element.innerText = "Follow"
+        element.style.backgroundColor = "#53ee9f";
       }
     },
-    sagi2(element) {
-      if (element.target.innerText === 'UnFollow') {
-        element.target.innerText = "Following"
-        element.target.style.backgroundColor = "inherit";
-        element.target.style.color = "#53ee9f";
-      } else if (element.target.innerText === "Following") {
-        element.target.innerText = "Following";
-        element.target.style.backgroundColor = "inherit";
-        element.target.style.color = "#53ee9f";
-      } else if (element.target.innerText === "Follow") {
-        element.target.innerText = "Follow";
-        element.target.style.backgroundColor = "#53ee9f";
+    leave(element) {
+      if (element.innerText === 'UnFollow') {
+        element.innerText = "Following"
+        element.style.backgroundColor = "inherit";
+        element.style.color = "#53ee9f";
+      } else if (element.innerText === "Following") {
+        element.innerText = "Following";
+        element.style.backgroundColor = "inherit";
+        element.style.color = "#53ee9f";
+      } else if (element.innerText === "Follow") {
+        element.innerText = "Follow";
+        element.style.backgroundColor = "#53ee9f";
       }
     },
     async follow(followingId){
@@ -141,6 +145,15 @@ export default {
   },
   mounted() {
     this.getAllUsers();
+  },
+  updated() {
+    for(let element of this.$refs.followBtn) {
+      if (element.innerHTML === "Following") {
+        element.innerText = "Following"
+        element.style.backgroundColor = "inherit";
+        element.style.color = "#53ee9f";
+      }
+    }
   }
 }
 </script>

@@ -69,7 +69,7 @@ export default {
   align-items: center;
   justify-content: center;
   gap: 100px;
-  position: sticky;
+  position: fixed;
   bottom: 0;
   background-color: #42b983;
   width: 100%;
