@@ -395,6 +395,12 @@ export default {
             }
           },
           {
+            label: "Delete",
+            onClick: () => {
+              alert("delete");
+            }
+          },
+          {
             label: "A submenu",
             children: [
               {label: "Item1"},
