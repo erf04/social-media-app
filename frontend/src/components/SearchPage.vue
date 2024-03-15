@@ -66,7 +66,7 @@ export default {
             }
           })
           .then(response => {
-            console.log(response.data);
+            console.log("Filtered users", response.data);
             this.resultUsers = response.data;
           })
           .catch(error => {
