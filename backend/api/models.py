@@ -102,7 +102,7 @@ class AbstractMessage(AbstractContent):
 class Message(AbstractMessage):
     
     sender = models.ForeignKey(User,on_delete=models.CASCADE,related_name= "sent_chat_messages")
-    reply_to=models.ForeignKey('self',on_delete=models.CASCADE,null=True,blank=True)  # for replying to a message
+    reply_to=models.ForeignKey('self',on_delete=models.DO_NOTHING,null=True,blank=True)  # for replying to a message
     liked_by=models.ManyToManyField(User,related_name='message_likes',blank=True)
     saved_by=models.ManyToManyField(User,related_name='message_saves',blank=True)
 
