@@ -20,7 +20,8 @@
     "reconnecting-websocket": "^4.4.0",
     "vue": "^3.2.13",
     "vue-native-websocket": "^2.0.15",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "vue-webrtc": "^3.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

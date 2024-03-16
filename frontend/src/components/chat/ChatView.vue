@@ -359,16 +359,14 @@ export default {
       repliedId: null,
       editedId: null,
       arrived:true,
-      height: 0,
     }
   },
   computed: {},
   methods: {
     sagi(e) {
       // console.log("scroll", e.target.scrollTop);
-      this.height = e.target.scrollHeight - e.target.clientHeight;
-      console.log(this.height);
-      if (this.height - e.target.scrollTop > 250) {
+      const height = e.target.scrollHeight - e.target.clientHeight;
+      if (height - e.target.scrollTop > 300) {
         // alert("bottom btn");
         // this.$refs.bottomBtn.style.display = "block";
         this.$refs.bottomBtn.style.transition = "0.3s";
