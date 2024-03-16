@@ -1,9 +1,9 @@
 <template>
-  <div class="container mt-5">
+  <div class="container mt-1">
     <div class="row clearfix">
       <div class="col-lg-12">
         <div class="card chat-app">
-          <div id="plist" class="people-list">
+          <div id="plist" class="people-list pt-0">
             <button type="button" class="btn btn-success" style="background-color: blue;"
                     @click="goToGroupCreationForm()">add group
             </button>
@@ -34,7 +34,7 @@
                 </button>
               </li>
             </ul>
-            <ul class="list-unstyled chat-list mt-2 mb-0" v-else>
+            <ul class="list-unstyled chat-list mb-0" v-else>
               <li class="clearfix" v-for="privateRoom in privateRooms" :key="privateRoom.id">
                 <button @click="selectRoom(privateRoom)">
                   <img
@@ -115,7 +115,7 @@
           <div class="chat"
                v-if="currentChatRoom!==null || currentPrivateRoom !== null"
           >
-            <div class="chat-header clearfix">
+            <div class="chat-header clearfix pb-1">
               <div class="row">
                 <div class="col-lg-6">
                   <button style="text-align: start" type="button" data-bs-toggle="offcanvas"
@@ -126,14 +126,16 @@
                           alt="avatar">
                     </a>
                     <div class="chat-about">
-                      <div class="d-flex align-items-center small" style="gap: 10px">
+                      <div class="d-flex align-items-baseline small mb-1" style="gap: 10px">
                         <h6 class="mb-0" v-if="!isPrivate">{{ currentChatRoom.name }} </h6>
                         <span> Created By {{
                             this.isPrivate ? currentPrivateRoom.creator.username : currentChatRoom.creator.username
                           }}</span>
                       </div>
-                      <small v-if="!isPrivate">{{ currentChatRoom.participants.length }} Members</small>
-                      <div v-if="isTyping">{{this.isTypingUser.username}} is typing...</div>
+                      <div class="d-flex align-items-center" style="gap: 10px">
+                        <small v-if="!isPrivate">{{ currentChatRoom.participants.length }} Members</small>
+                        <small class="p-0 m-0" v-if="isTyping">{{this.isTypingUser.username}} is typing...</small>
+                      </div>
                     </div>
                   </button>
                 </div>
@@ -145,11 +147,11 @@
                 </div>
               </div>
             </div>
-            <div class="chat-history" id="chat-history" ref="chatHistory">
+            <div class="chat-history py-1" id="chat-history" ref="chatHistory">
               <ul class="m-b-0" id="chatList">
                 <div v-for="(message) in messages" :key="message.id"
                      @contextmenu.prevent="onContextMenu($event, message.body, message.id)"
-                      style="margin-bottom: 2em">
+                      style="margin-bottom: 1em">
 <!--                  <div v-show="changeTime" class="time-stamp"-->
 <!--                       style="margin: 0 auto; background: red; text-align: center; width: fit-content">-->
 <!--                    {{ showTime(getFormattedDate(message.timestamp)) }}-->
@@ -157,7 +159,7 @@
                   <li class="clearfix"
                       :style="message.sender.id === user.id ? `text-align: end` : `text-align: start`">
                     <div v-if="message.sender.id === user.id">
-                      <div :ref="message.id" class="message-data text-right">
+                      <div :ref="message.id" class="message-data text-right m-0">
                         <span class="message-data-time">
                           <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>
                           <span v-else-if="getFormattedDate(message.timestamp) === yesterdayTime"> Yesterday </span>
@@ -169,17 +171,10 @@
                         <h6>
                           {{ message.sender.username }}
                         </h6>
-                        <!-- @click="goToRepliedMessage" -->
-                        <!--  {{ repliedText }} -->
-
                         <div v-if="message.reply_to != null" class="repliedMessage" @click="goToRepliedMessage(message.reply_to.id)">
-<!--                          <a :href="'#/chat/#' + `${message.reply_to.id}`">-->
-<!--                            <p>{{message.reply_to.id}}</p>-->
-                            <p style="font-weight: bold;" class="m-0">{{message.reply_to.sender.username}}</p>
-                            <p class="m-0">{{ message.reply_to.body }}</p>
-<!--                          </a>-->
+                          <p style="font-weight: bold;" class="m-0">{{message.reply_to.sender.username}}</p>
+                          <p class="m-0">{{ message.reply_to.body }}</p>
                         </div>
-
                         <div>
                           {{ message.body }}
                         </div>
@@ -189,7 +184,7 @@
                       </div>
                     </div>
                     <div v-else>
-                      <div class="message-data" :ref="message.id">
+                      <div class="message-data m-0" :ref="message.id">
                         <span class="message-data-time">
     <!--                      <span> {{ message.sender.username }} </span>-->
                           <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>
@@ -222,7 +217,7 @@
               </ul>
             </div>
             <div class="chat-message clearfix">
-              <div v-show="isReply" ref="repliedMessage" class="alert alert-success mb-0" role="alert">
+              <div v-show="isReply" ref="repliedMessage" class="alert alert-success mb-0 p-0 px-3" role="alert">
                 <div class="d-flex justify-content-between align-items-center">
                   <div></div>
                   <div>
@@ -230,13 +225,13 @@
                   </div>
                 </div>
               </div>
-              <div v-show="isEdit" ref="editedMessage" class="alert alert-info mb-0" role="alert"></div>
+              <div v-show="isEdit" ref="editedMessage" class="alert alert-info mb-0 p-0 px-3" role="alert"></div>
               <div class="input-group mb-0">
                 <div class="input-group-prepend">
                   <span class="input-group-text"><i class="fa fa-send"></i></span>
                 </div>
                 <input @input="startTyping" @keyup.enter="sendMessage()" v-model="new_message_body" type="text"
-                       class="form-control"
+                       class="form-control p-2"
                        ref="inputMessage"
                        placeholder="Enter text here...">
               </div>
