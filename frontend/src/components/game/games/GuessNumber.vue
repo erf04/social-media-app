@@ -1,13 +1,13 @@
 <template>
-  <div>
+  <div ref="container">
     <p id="message">Guess, my sagi friend!</p>
     <p class="hint">
       hint: <span style="color: blue">try up</span>
       <span style="color: red">try down</span>
       <span style="color: green">match</span>
     </p>
-    <button id="check_sagi">Start</button> <br />
-    <button id="another_nums">Change numbers</button>
+    <button @click="button_click1($event)" ref="button1" id="check_sagi">Start</button> <br />
+    <button @click="button_click2" ref="change_nums" id="another_nums">Change numbers</button>
     <ul id="answers">
       <li class="answer"></li>
       <li class="answer"></li>
@@ -20,158 +20,140 @@
 </template>
 
 <script>
+
 export default {
   data() {
     return {
-
+      change_nums: null,
+      answers: [],
+      count: 0,
+      rst_count: 0,
+      container: null,
     }
   },
   methods: {
-    main() {
-      /*
-    scoreboard & new_player ...
-    print reset counts (after win text)
-    background & display champion cup after winner:
-        const img = document.createElement("img");
-        img.src = "https://picsum.photos/200/301";
-*/
-
-      const button1 = document.getElementById("check_sagi");
-      const button2 = document.getElementById("another_nums");
-      button1.addEventListener("click", button_click1);
-      button2.addEventListener("click", button_click2);
-      let change_nums = document.getElementById("another_nums");
-      cursor(0);
-      // let body = document.getElementsByName("body");
-      const container = document.getElementsByTagName("div")[0];
-      let answers = [];
-      let count = 0;
-      var rst_count = 0;
-      for (let j = 0; j < 5; j++) answers[j] = Math.floor(Math.random() * 10);
-
-      function button_click1(event) {
-        if (event.target.innerHTML === "Check combo") {
-          check(answers);
-        } else if (event.target.innerHTML === "Restart") {
-          event.target.innerHTML = "Check combo";
-          fill_again();
+    cursor(ability) {
+      if (ability) {
+        this.change_nums.style.cursor = "default";
+        this.change_nums.style.opacity = "1";
+      } else {
+        this.change_nums.style.cursor = "not-allowed";
+        this.change_nums.style.opacity = "0.6";
+      }
+    },
+    button_click1(event) {
+      if (event.target.innerHTML === "Check combo") {
+        this.check(this.answers);
+      } else if (event.target.innerHTML === "Restart") {
+        event.target.innerHTML = "Check combo";
+        this.fill_again();
+      } else {
+        this.cursor(1);
+        event.target.innerHTML = "Check combo";
+        this.input_maker();
+      }
+    },
+    button_click2() {
+      if (this.change_nums.style.cursor !== "not-allowed") {
+        this.fill_again();
+        this.rst_count++;
+      }
+    },
+    input_maker() {
+      let input;
+      let rand_num;
+      for (let i = 0; i < 5; i++) {
+        input = document.createElement("input");
+        rand_num = Math.floor(Math.random() * 10);
+        input.setAttribute("type", "number");
+        input.max = 9;
+        input.min = 0;
+        input.size = 1;
+        input.style.width = "50px";
+        input.style.height = "50px";
+        input.style.textAlign = "center";
+        input.style.fontSize = "3em";
+        input.style.width = "100px";
+        input.style.height = "100px";
+        input.classList.add("num");
+        input.value = rand_num;
+        input.order = 1;
+        this.container.appendChild(input);
+      }
+    },
+    check(answers) {
+      let flag1 = false,
+          flag2 = false,
+          flag3 = false;
+      let elements = document.getElementsByClassName("num");
+      for (let i = 0; i < 5; i++) {
+        elements[i].style.width = "100px";
+        elements[i].style.height = "100px";
+        if (elements[i].value == answers[i]) {
+          elements[i].style.background = "green";
+          flag1 = true;
+        } else if (elements[i].value < answers[i]) {
+          elements[i].style.background = "blue";
+          flag2 = true;
         } else {
-          cursor(1);
-          event.target.innerHTML = "Check combo";
-          input_maker();
+          elements[i].style.background = "red";
+          flag3 = true;
         }
       }
+      this.count++;
 
-      function button_click2(rst_count) {
-        if (change_nums.style.cursor !== "not-allowed") {
-          fill_again();
-          rst_count++;
-        }
-        return rst_count;
+      if (flag1 && !flag2 && !flag3) {
+        let win_text = document.createElement("p");
+        win_text.innerHTML = `You're the winner sagi!
+        \nYou could win in ${this.count} times.\n`;
+        win_text.style.fontSize = "36px";
+        win_text.style.fontFamily = "tahoma";
+        win_text.style.color = "black";
+        win_text.style.background = "yellow";
+        win_text.style.marginTop = "100px";
+        win_text.classList.add("win_text");
+        this.container.appendChild(win_text);
+
+        let rst_time_text = document.createElement("p");
+        rst_time_text.innerHTML = `You changed numbers
+        ${this.rst_count} times.`;
+        rst_time_text.style.fontSize = "36px";
+        rst_time_text.style.fontFamily = "tahoma";
+        rst_time_text.style.color = "black";
+        rst_time_text.style.background = "yellow";
+        rst_time_text.classList.add("rst_time_text");
+        this.container.appendChild(rst_time_text);
+        document.getElementById("check_sagi").innerHTML = "Restart";
+        this.cursor(0);
       }
-      rst_count = button_click2(rst_count);
-
-      function cursor(ability) {
-        if (ability) {
-          change_nums.style.cursor = "default";
-          change_nums.style.opacity = "1";
-        } else {
-          change_nums.style.cursor = "not-allowed";
-          change_nums.style.opacity = "0.6";
-        }
+    },
+    fill_again() {
+      this.count = 0;
+      let elements = document.getElementsByClassName("num");
+      let rand_num, answer_num;
+      for (let i = 0; i < 5; i++) {
+        rand_num = Math.floor(Math.random() * 10);
+        answer_num = Math.floor(Math.random() * 10);
+        elements[i].value = rand_num;
+        this.answers[i] = answer_num;
+        elements[i].style.background = "white";
       }
-
-      function input_maker() {
-        let input;
-        let rand_num;
-        for (let i = 0; i < 5; i++) {
-          input = document.createElement("input");
-          rand_num = Math.floor(Math.random() * 10);
-          input.setAttribute("type", "number");
-          input.max = 9;
-          input.min = 0;
-          input.size = 1;
-          input.style.width = "50px";
-          input.style.height = "50px";
-          input.style.textAlign = "center";
-          input.style.fontSize = "3em";
-          input.style.width = "100px";
-          input.style.height = "100px";
-          input.classList.add("num");
-          input.value = rand_num;
-          input.order = 1;
-          container.appendChild(input);
-        }
-      }
-
-      function check(answers) {
-        let flag1 = false,
-            flag2 = false,
-            flag3 = false;
-        let elements = document.getElementsByClassName("num");
-        for (let i = 0; i < 5; i++) {
-          elements[i].style.width = "100px";
-          elements[i].style.height = "100px";
-          if (elements[i].value == answers[i]) {
-            elements[i].style.background = "green";
-            flag1 = true;
-          } else if (elements[i].value < answers[i]) {
-            elements[i].style.background = "blue";
-            flag2 = true;
-          } else {
-            elements[i].style.background = "red";
-            flag3 = true;
-          }
-        }
-        count++;
-
-        if (flag1 && !flag2 && !flag3) {
-          let win_text = document.createElement("p");
-          win_text.innerHTML = `You're the winner sagi!
-        \nYou could win in ${count} times.\n`;
-          win_text.style.fontSize = "36px";
-          win_text.style.fontFamily = "tahoma";
-          win_text.style.color = "black";
-          win_text.style.background = "yellow";
-          win_text.style.marginTop = "100px";
-          win_text.classList.add("win_text");
-          container.appendChild(win_text);
-
-          let rst_time_text = document.createElement("p");
-          rst_time_text.innerHTML = `You changed numbers
-        ${rst_count} times.`;
-          rst_time_text.style.fontSize = "36px";
-          rst_time_text.style.fontFamily = "tahoma";
-          rst_time_text.style.color = "black";
-          rst_time_text.style.background = "yellow";
-          rst_time_text.classList.add("rst_time_text");
-          container.appendChild(rst_time_text);
-
-          document.getElementById("check_sagi").innerHTML = "Restart";
-          cursor(0);
-        }
-      }
-
-      function fill_again() {
-        count = 0;
-        let elements = document.getElementsByClassName("num");
-        let rand_num, answer_num;
-        for (let i = 0; i < 5; i++) {
-          rand_num = Math.floor(Math.random() * 10);
-          answer_num = Math.floor(Math.random() * 10);
-          elements[i].value = rand_num;
-          answers[i] = answer_num;
-          elements[i].style.background = "white";
-        }
-
-        let win_text = document.getElementsByClassName("win_text")[0];
-        container.removeChild(win_text);
-        let rst_time_text = document.getElementsByClassName("rst_time_text")[0];
-        container.removeChild(rst_time_text);
-        cursor(1);
-      }
-
+      // let win_text = document.getElementsByClassName("win_text")[0];
+      // this.container.removeChild(win_text);
+      // let rst_time_text = document.getElementsByClassName("rst_time_text")[0];
+      // this.container.removeChild(rst_time_text);
+      this.cursor(1);
     }
+  },
+  mounted() {
+    // eslint-disable-next-line no-unused-vars
+    const button1 = document.getElementById("check_sagi");
+    // eslint-disable-next-line no-unused-vars
+    const button2 = document.getElementById("another_nums");
+    // eslint-disable-next-line no-unused-vars
+    this.container = document.getElementsByTagName("div")[0];
+    this.change_nums = document.getElementById("another_nums");
+    for (let j = 0; j < 5; j++) this.answers[j] = Math.floor(Math.random() * 10);
   }
 }
 </script>
