@@ -13,5 +13,7 @@ admin.site.register(CommentContainer)
 admin.site.register(Group)
 admin.site.register(PrivateChat)
 admin.site.register(GroupAdmin)
+admin.site.register(Game)
+admin.site.register(GameLog)
 
 

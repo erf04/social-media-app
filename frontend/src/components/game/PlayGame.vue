@@ -5,7 +5,7 @@
       <h3>Have Fun! :)</h3>
     </div>
     <div class="centerBox flex-wrap justify-content-start" style="gap: 50px">
-      <div v-for="game in games" :key="game.name" :style="`background-image: ${getAbsoluteUrl(game.image)}`" class="categoryWrapper">
+      <div v-for="game in games" :key="game.id" :style="`background-image: ${getAbsoluteUrl(game.image)}`" class="categoryWrapper">
         <h1>{{ game.name }}</h1>
         <button @click="goToGame(game.route)">
           <span>
@@ -25,6 +25,12 @@
 <script>
 import router from "@/router";
 import footerMenu from "@/components/FooterMenu.vue";
+import axios from "axios";
+import { JWTAuth } from "../../../services/jwt";
+const baseURL="http://localhost:8000/game";
+
+const jwtAuth = new JWTAuth("http://localhost:8000/auth");
+
 
 export default {
   components: {
@@ -32,18 +38,7 @@ export default {
   },
   data() {
     return {
-      games: [
-        {
-          image: '',
-          name: "Bita Game",
-          route: "bitaGame",
-        },
-        {
-          image: '',
-          name: "Guess Number",
-          route: "guessNumber",
-        },
-      ]
+      games: [{}]
     }
   },
   methods: {
@@ -52,7 +47,25 @@ export default {
     },
     goToGame(game) {
       router.push('game/'+game);
-    }
+    },
+    async getGames(){
+      axios.get(`${baseURL}/list/`,{
+        headers:{
+          Authorization:`JWT ${await jwtAuth.getAccessToken()}`
+        }
+      })
+      .then(res=>{
+        console.log(res);
+        this.games=res.data;
+      })
+      .catch(err=>{
+        console.log(err);
+      })
+    },
+
+  },
+  async mounted(){
+    await this.getGames();
   }
 }
 </script>

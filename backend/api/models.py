@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey,GenericRelation
+from datetime import datetime
 # Create your models here.
 
 class Task(models.Model):
@@ -153,6 +154,25 @@ class GroupAdmin(models.Model):
 
     class Meta:
         unique_together = ('user', 'group')
+
+
+class Game(models.Model):
+    name=models.CharField(max_length=100)
+    image=models.ImageField(upload_to='games')
+    description=models.TextField()
+
+    def __str__(self) -> str:
+        return self.name
+    
+
+class GameLog(models.Model):
+    player=models.ForeignKey(User,on_delete=models.CASCADE,related_name="game_logs")
+    score=models.IntegerField(default=0)
+    game=models.ForeignKey(Game,on_delete=models.PROTECT,related_name="player_logs")
+    date=models.DateTimeField(default=datetime.now)
+
+
+
 
     
 
