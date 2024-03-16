@@ -115,6 +115,16 @@
           <div class="chat"
                v-if="currentChatRoom!==null || currentPrivateRoom !== null"
           >
+            <div class="d-flex align-items-center justify-content-center" ref="bottomBtn" style="opacity: 0; background-color: darkcyan; border-radius: 50%; position: absolute;
+                 width: 40px; height: 40px; bottom: 90px; right: 40px; z-index: 99;">
+              <div>
+                <button @click="scrollToEnd" style="background: none">
+                  <svg style="width: 25px; height: 25px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                  </svg>
+                </button>
+              </div>
+            </div>
             <div class="chat-header clearfix pb-1">
               <div class="row">
                 <div class="col-lg-6">
@@ -147,7 +157,7 @@
                 </div>
               </div>
             </div>
-            <div class="chat-history py-1" id="chat-history" ref="chatHistory">
+            <div @scroll="sagi($event)" class="chat-history py-1" id="chat-history" ref="chatHistory">
               <ul class="m-b-0" id="chatList">
                 <div v-for="(message) in messages" :key="message.id"
                      @contextmenu.prevent="onContextMenu($event, message.body, message.id)"
@@ -349,10 +359,26 @@ export default {
       repliedId: null,
       editedId: null,
       arrived:true,
+      height: 0,
     }
   },
   computed: {},
   methods: {
+    sagi(e) {
+      // console.log("scroll", e.target.scrollTop);
+      this.height = e.target.scrollHeight - e.target.clientHeight;
+      console.log(this.height);
+      if (this.height - e.target.scrollTop > 250) {
+        // alert("bottom btn");
+        // this.$refs.bottomBtn.style.display = "block";
+        this.$refs.bottomBtn.style.transition = "0.3s";
+        this.$refs.bottomBtn.style.opacity = "1";
+      } else {
+        // this.$refs.bottomBtn.style.display = "none";
+        this.$refs.bottomBtn.style.transition = "0.3s";
+        this.$refs.bottomBtn.style.opacity = "0";
+      }
+    },
     onContextMenu(e, message, id) {
       e.preventDefault();
       console.log("contextmenu", id);
@@ -363,7 +389,6 @@ export default {
           {
             label: "Reply",
             onClick: () => {
-              console.log("Replyyyy", this.$refs.repliedMessage.childNodes[0].childNodes[0]);
               this.$refs.repliedMessage.childNodes[0].childNodes[0].innerHTML = message;
               this.$refs.inputMessage.focus();
               this.isReply = true;
