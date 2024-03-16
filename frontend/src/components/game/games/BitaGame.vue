@@ -1,12 +1,12 @@
-<template>
-  <button type="submit" id="add">Add Player</button>
+<template @keyup.enter="start" @keyup.space="jumping_up = setInterval(jump_up, 1)">
+  <button @click="add" type="submit" id="add">Add Player</button>
   <br />
   <input type="text" id="playerName" />
-  <button type="submit" id="begin">Start</button>
+  <button @click="start" type="submit" id="begin">Start</button>
   <p id="name">Player Name:&nbsp;</p>
   <p id="score">Score:&nbsp;</p>
   <div id="container">
-    <img shape="circle" src="bita_sagi.jpg" id="runner" />
+    <img shape="circle" src="../../../assets/bita/bita_sagi.jpg" id="runner" />
   </div>
 </template>
 
@@ -15,197 +15,180 @@
 export default {
   data() {
     return {
+      begin_button: null,
+      Name: '',
+      score: 0,
+      playerName: null,
+      addbtn: null,
+      audio: null,
+      block_jump: 0,
+      flag: false,
+      flag1: true,
+      runner: null,
+      block: null,
+      container: null,
+      block_width: 40,
+      block_height: 40,
+      block_pos: null,
+      x: null,
+      checking: null,
+      jumping_up: null,
+      jumping_down: null,
+      runner_width: 0,
+      runner_pos: 0,
+      container_width: 0,
     }
   },
   methods: {
-    main() {
-      /*
-  score
-  controling keypress
-*/
-
-//DOM
-      var block;
-      var runner = document.getElementById("runner");
-      var begin_button = document.getElementById("begin");
-      var container = document.getElementById("container");
-      var addbtn = document.getElementById("add");
-      var playerName = document.getElementById("playerName");
-
-//set sizes
-      var container_width = container.clientWidth;
-      var block_width = 40;
-      var block_height = 40;
-      var runner_width = runner.clientWidth;
-
-//calculations
-      var block_pos,
-          x,
-          checking,
-          flag,
-          audio = new Audio("bita_sagi_chagh.m4a"),
-          flag1 = true;
-
-      begin_button.disabled = true;
-      begin_button.style.cursor = "not-allowed";
-
-      addbtn.addEventListener("click", add);
-
-      begin_button.addEventListener("click", start);
-      document.addEventListener("keypress", function (e) {
-        if (e.keyCode == 13 && begin_button.disabled === false) start();
-      });
-
-      function add() {
-        begin_button.disabled = true;
-        begin_button.style.cursor = "not-allowed";
-        Name.innerHTML = "Player Name: ";
-        score.innerHTML = "Score: ";
-        playerName.style.display = "block";
-        if (playerName.value !== "")
-          submit();
-        else if (addbtn.innerHTML==="Submit" && playerName.value === ""){
-          alert("type the sagi player name!");
-        }
-        addbtn.innerHTML = "Submit";
+    add() {
+      this.begin_button.disabled = true;
+      this.begin_button.style.cursor = "not-allowed";
+      this.Name.innerHTML = "Player Name: ";
+      this.score.innerHTML = "Score: ";
+      this.playerName.style.display = "block";
+      if (this.playerName.value !== "")
+        this.submit();
+      else if (this.addbtn.innerHTML==="Submit" && this.playerName.value === ""){
+        alert("type the sagi player name!");
       }
-
-      var Name = document.getElementById("name");
-      var score = document.getElementById("score");
-      var block_jump = 0;
-      function submit() {
-        Name.innerHTML += playerName.value;
-        score.innerHTML += block_jump;
-        begin_button.disabled = false;
-        begin_button.style.cursor = "pointer";
-        begin_button.innerHTML = "Start";
-        playerName.value = "";
-        playerName.style.display = "none";
-        addbtn.innerHTML = "Add Player";
+      this.addbtn.innerHTML = "Submit";
+    },
+    submit() {
+      this.Name.innerHTML += this.playerName.value;
+      this.score.innerHTML += this.block_jump;
+      this.begin_button.disabled = false;
+      this.begin_button.style.cursor = "pointer";
+      this.begin_button.innerHTML = "Start";
+      this.playerName.value = "";
+      this.playerName.style.display = "none";
+      this.addbtn.innerHTML = "Add Player";
+    },
+    start() {
+      this.audio.pause();
+      this.audio.currentTime = 0;
+      this.flag1 = true;
+      this.flag = true;
+      this.begin_button.style.cursor = "not-allowed";
+      this.begin_button.disabled = true;
+      this.runner.style.top = "0";
+      if (this.block) this.container.removeChild(this.block);
+      this.set_pre_block_pos();
+      this.x = setInterval(this.block_move, 0.5);
+      this.checking = setInterval(this.check, 0.5);
+    },
+    jump_up() {
+      if (this.runner_pos === -(this.block_width + 50)) {
+        clearInterval(this.jumping_up);
+        this.jumping_down = setInterval(this.jump_down, 1);
+      } else if (this.flag1) {
+        this.runner_pos--;
+        this.runner.style.top = this.runner_pos + "px";
       }
-
-      function start() {
-        audio.pause();
-        audio.currentTime = 0;
-        flag1 = true;
-        flag = true;
-        begin_button.style.cursor = "not-allowed";
-        begin_button.disabled = true;
-        runner.style.top = "0";
-        if (block) container.removeChild(block);
-        set_pre_block_pos();
-        x = setInterval(block_move, 0.5);
-        checking = setInterval(check, 0.5);
+    },
+    jump_down() {
+      if (this.runner_pos === 0) {
+        clearInterval(this.jumping_down);
+      } else if (this.flag1) {
+        this.runner_pos++;
+        this.runner.style.top = this.runner_pos + "px";
       }
+    },
+    check() {
+      if (
+          this.runner_pos <= 0 &&
+          this.runner_pos >= -this.block_height &&
+          this.block_pos <=
+          -(
+              this.container_width -
+              20 -
+              this.block_width -
+              this.runner_width +
+              this.calculate_x(this.runner_width / 2, this.runner_pos)
+          )
+      ) {
+        this.block_jump = 0;
+        this.flag1 = false;
+        this.audio.play();
+        clearInterval(this.checking);
+        clearInterval(this.x);
+        clearInterval(this.jumping_up);
+        clearInterval(this.jumping_down);
+        this.runner_pos = 0;
 
-      var jumping_up, jumping_down;
-      document.addEventListener("keypress", function (ev) {
-        if (ev.keyCode == 32) {
-          if (flag && runner_pos === 0) jumping_up = setInterval(jump_up, 1);
-        }
-      });
-
-      var runner_pos = 0;
-
-      function jump_up() {
-        if (runner_pos === -(block_width + 50)) {
-          clearInterval(jumping_up);
-          jumping_down = setInterval(jump_down, 1);
-        } else if (flag1) {
-          runner_pos--;
-          runner.style.top = runner_pos + "px";
-        }
+        this.flag = false;
+        this.begin_button.innerHTML = "Restart";
+        this.begin_button.disabled = false;
+        this.begin_button.style.cursor = "pointer";
       }
-
-      function jump_down() {
-        if (runner_pos === 0) {
-          clearInterval(jumping_down);
-        } else if (flag1) {
-          runner_pos++;
-          runner.style.top = runner_pos + "px";
-        }
+    },
+    appear_block_pic(img) {
+      this.score.innerHTML = "Score: " + this.block_jump;
+      this.block_jump++;
+      let index = Math.floor(Math.random() * 3);
+      if (index === 0) {
+        img.src = "../../../assets/bita/burger.jpg";
+        this.block_height = 40;
+      } else if (index === 1) {
+        img.src = "../../../assets/bita/pizza.png";
+        this.block_height = 45;
+        img.style.height = 45 + "px";
+        img.style.marginTop = 155 + "px";
+      } else {
+        img.src = "../../../assets/bita/shake.jpg";
+        img.style.height = 50 + "px";
+        img.style.marginTop = 150 + "px";
+        this.block_height = 50;
       }
-
-      function check() {
-        if (
-            runner_pos <= 0 &&
-            runner_pos >= -block_height &&
-            block_pos <=
-            -(
-                container_width -
-                20 -
-                block_width -
-                runner_width +
-                calculate_x(runner_width / 2, runner_pos)
-            )
-        ) {
-          block_jump = 0;
-          flag1 = false;
-          audio.play();
-          clearInterval(checking);
-          clearInterval(x);
-          clearInterval(jumping_up);
-          clearInterval(jumping_down);
-          runner_pos = 0;
-
-          flag = false;
-          begin_button.innerHTML = "Restart";
-          begin_button.disabled = false;
-          begin_button.style.cursor = "pointer";
-        }
+      return img;
+    },
+    block_move() {
+      if (this.block_pos === -(this.container_width - this.block_width)) {
+        this.block_pos = 0;
+        this.container.removeChild(this.block);
+        for (let i = 0; i < 1; i++) this.set_pre_block_pos();
+      } else {
+        this.block_pos--;
+        this.block.style.left = this.block_pos + "px";
       }
-
-      function appear_block_pic(img) {
-        score.innerHTML = "Score: " + block_jump;
-        block_jump++;
-        let index = Math.floor(Math.random() * 3);
-        if (index === 0) {
-          img.src = "burger.jpg";
-          block_height = 40;
-        } else if (index === 1) {
-          img.src = "pizza.png";
-          block_height = 45;
-          img.style.height = 45 + "px";
-          img.style.marginTop = 155 + "px";
-        } else {
-          img.src = "shake.jpg";
-          img.style.height = 50 + "px";
-          img.style.marginTop = 150 + "px";
-          block_height = 50;
-        }
-        return img;
-      }
-
-      function block_move() {
-        if (block_pos === -(container_width - block_width)) {
-          block_pos = 0;
-          container.removeChild(block);
-          for (let i = 0; i < 1; i++) set_pre_block_pos();
-        } else {
-          block_pos--;
-          block.style.left = block_pos + "px";
-        }
-      }
-
-      function set_pre_block_pos() {
-        let middle = container_width / 2;
-        let pos = -Math.floor(Math.random() * middle);
-        block = document.createElement("img");
-        block.classList.add("block");
-        block.style.left = pos + "px";
-        block = appear_block_pic(block);
-        container.appendChild(block);
-        block_pos = pos;
-      }
-
-      function calculate_x(r, jump) {
-        var y;
-        if (jump >= -(block_height - r)) y = 0;
-        else y = r - jump - block_height;
-        let square = Math.pow(r, 2) - Math.pow(y, 2);
-        return r - Math.pow(square, 0.5);
-      }
+    },
+    set_pre_block_pos() {
+      let middle = this.container_width / 2;
+      let pos = -Math.floor(Math.random() * middle);
+      this.block = document.createElement("img");
+      this.block.classList.add("block");
+      this.block.style.left = pos + "px";
+      this.block = this.appear_block_pic(this.block);
+      this.container.appendChild(this.block);
+      this.block_pos = pos;
+    },
+    calculate_x(r, jump) {
+      var y;
+      if (jump >= -(this.block_height - r)) y = 0;
+      else y = r - jump - this.block_height;
+      let square = Math.pow(r, 2) - Math.pow(y, 2);
+      return r - Math.pow(square, 0.5);
     }
+  },
+  mounted() {
+    // eslint-disable-next-line no-unused-vars
+    this.runner = document.getElementById("runner");
+    // eslint-disable-next-line no-unused-vars
+    this.begin_button = document.getElementById("begin");
+    // eslint-disable-next-line no-unused-vars
+    this.container = document.getElementById("container");
+    // eslint-disable-next-line no-unused-vars
+    this.addbtn = document.getElementById("add");
+    // eslint-disable-next-line no-unused-vars
+    this.playerName = document.getElementById("playerName");
+    this.container_width = this.container.clientWidth;
+    this.runner_width = this.runner.clientWidth;
+    this.audio = new Audio("../../../assets/bita/bita_sagi_chagh.m4a");
+    console.log(this.audio);
+    this.begin_button.disabled = true;
+    this.begin_button.style.cursor = "not-allowed";
+    this.Name = document.getElementById("name");
+    this.score = document.getElementById("score");
+    this.block_jump = 0;
   }
 }
 
