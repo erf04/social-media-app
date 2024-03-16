@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     #custom apps
     'api',
     'chat',
+    'game',
     
 ]
 
