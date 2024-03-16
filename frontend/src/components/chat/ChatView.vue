@@ -255,7 +255,7 @@
 // add user private chats to front         ok
 // fix reply                               ok
 // add group and add private chat          ok
-// able to add admin to a group --erfan
+// able to add admin to a group --erfan    ok
 // fix token expiration** --erfan          ok
 // add participants (not complete)         ok
 // last seen
@@ -265,7 +265,7 @@
 // is typing      ok
 // add private chat creation
 // enter in login page (or signup)         ok
-// href and a tag for replied messages
+// href and a tag for replied messages     ok
 // loading icon for fetching messages
 // send btn
 // min height for chat log & min width for messages
@@ -275,7 +275,8 @@
 // close button for reply
 // got to profile in search result
 // footer isn't at the bottom of the page     ok
-//
+// set admin front
+// scroll to end btn
 
 import {JWTAuth} from "../../../services/jwt";
 import axios from "axios";
@@ -352,6 +353,7 @@ export default {
       isTypingUser:{},
       repliedId: null,
       editedId: null,
+      arrived:true,
     }
   },
   computed: {},
@@ -407,6 +409,7 @@ export default {
                   Authorization: `JWT ${await jwtAuth.getAccessToken()}`
                 }
               })
+              this.arrived=false;
               this.fetchMessages();
             }
           },
@@ -531,7 +534,8 @@ export default {
           if (command === "fetch_messages") {
             console.log(data);
             this.messages = data["messages"];
-            await this.scrollToEnd();
+            if (this.arrived)
+              await this.scrollToEnd();
           }
           else if (command === "new_message") {
             console.log(data['data']);
