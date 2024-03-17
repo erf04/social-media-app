@@ -88,6 +88,8 @@ class AbstractMessage(models.Model):
     body = models.TextField()
     timestamp = models.DateTimeField()
     reply_to=models.ForeignKey('self',on_delete=models.CASCADE,null=True,blank=True)  # for replying to a message
+    image=models.ImageField(upload_to="chat_images/",null=True,blank=True)
+
 
     class Meta:
         abstract=True
@@ -106,6 +108,20 @@ class Message(AbstractMessage):
     def message_order(self,room,type):
         # chat_id=Group.objects.get(name=roomname,participants=user).id
         return Message.objects.filter(content_type__model=type,object_id=room.id).order_by('timestamp')
+    
+    @classmethod
+    def create_from_base64(cls, base64_string:str):
+    # Split the base64 string to get the content type and the data
+        format, imgstr = base64_string.split(';base64,') 
+
+        # Decode base64 data
+        binary_data = base64.b64decode(imgstr)
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        filename = f'img_{timestamp}.jpg'
+        # Create a new instance of YourModel and save the image
+        instance = cls()
+        instance.image.save(filename, ContentFile(binary_data),save=False)
+        return instance
 
     
 
@@ -151,28 +167,6 @@ class GroupAdmin(models.Model):
     class Meta:
         unique_together = ('user', 'group')
 
-
-class ChatImage(AbstractMessage):
-    image=models.ImageField(upload_to="chat_images/")
-    sender = models.ForeignKey(User,on_delete=models.CASCADE,related_name= "sent_chat_images")  
-    liked_by=models.ManyToManyField(User,related_name="chat_image_likes",blank=True)
-    saved_by=models.ManyToManyField(User,related_name="chat_image_saves",blank=True)
-    body = models.TextField(null=True,blank=True)
-
-
-    @classmethod
-    def create_from_base64(cls, base64_string:str):
-    # Split the base64 string to get the content type and the data
-        format, imgstr = base64_string.split(';base64,') 
-
-        # Decode base64 data
-        binary_data = base64.b64decode(imgstr)
-        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-        filename = f'img_{timestamp}.jpg'
-        # Create a new instance of YourModel and save the image
-        instance = cls()
-        instance.image.save(filename, ContentFile(binary_data),save=False)
-        return instance
 
 
 
