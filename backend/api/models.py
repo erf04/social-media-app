@@ -3,6 +3,8 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey,GenericRelation
 from datetime import datetime
+import base64
+from django.core.files.base import ContentFile
 # Create your models here.
 
 class Task(models.Model):
@@ -43,19 +45,13 @@ class Follower(models.Model):
             return f"{self.follower} follows {self.followed}"
         
 
-#for likes ,saves and forwards
-class AbstractContent(models.Model):
-    liked_by=models.ManyToManyField(User,blank=True)
-    saved_by=models.ManyToManyField(User,blank=True)
 
-    class Meta:
-        abstract=True
 
 
 
 
 # users can like , save and forward a post too    
-class Post(AbstractContent):
+class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -73,7 +69,7 @@ class Post(AbstractContent):
 
 class AbstractChat(models.Model):
     creation_date=models.DateTimeField()
-    creator=models.ForeignKey(User,on_delete=models.CASCADE)
+    # creator=models.ForeignKey(User,on_delete=models.CASCADE)
 
 
     class Meta:
@@ -84,7 +80,7 @@ class Chat(AbstractChat):
     creator=models.ForeignKey(User,on_delete=models.CASCADE,related_name='created_chats')
 
 
-class AbstractMessage(AbstractContent):
+class AbstractMessage(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     chat = GenericForeignKey('content_type', 'object_id')
@@ -154,6 +150,31 @@ class GroupAdmin(models.Model):
 
     class Meta:
         unique_together = ('user', 'group')
+
+
+class ChatImage(AbstractMessage):
+    image=models.ImageField(upload_to="chat_images/")
+    sender = models.ForeignKey(User,on_delete=models.CASCADE,related_name= "sent_chat_images")  
+    liked_by=models.ManyToManyField(User,related_name="chat_image_likes",blank=True)
+    saved_by=models.ManyToManyField(User,related_name="chat_image_saves",blank=True)
+    body = models.TextField(null=True,blank=True)
+
+
+    @classmethod
+    def create_from_base64(cls, base64_string:str):
+    # Split the base64 string to get the content type and the data
+        format, imgstr = base64_string.split(';base64,') 
+
+        # Decode base64 data
+        binary_data = base64.b64decode(imgstr)
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        filename = f'img_{timestamp}.jpg'
+        # Create a new instance of YourModel and save the image
+        instance = cls()
+        instance.image.save(filename, ContentFile(binary_data),save=False)
+        return instance
+
+
 
 
 class Game(models.Model):

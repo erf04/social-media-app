@@ -244,7 +244,9 @@
                        class="form-control p-2"
                        ref="inputMessage"
                        placeholder="Enter text here...">
-              </div>
+                      </div>
+                      <input type="file" ref="fileInput" @change="handleFileChange">
+                      <button @click="uploadImage" style="background-color: aqua;">Upload Image</button>
             </div>
           </div>
         </div>
@@ -359,6 +361,7 @@ export default {
       repliedId: null,
       editedId: null,
       arrived:true,
+      selectedImage: null,
     }
   },
   computed: {},
@@ -574,6 +577,9 @@ export default {
             // console.log("stop");
             this.isTyping=false;
           }
+          else if (command==="image"){
+            console.log(data);
+          }
         }
       }
     },
@@ -684,7 +690,29 @@ export default {
     },
     goToAddParticipants(groupID){
       this.$router.push(`/group/add/${groupID}`)
-    }
+    },
+    handleFileChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.selectedImage = file;
+      }
+    },
+    async uploadImage() {
+      if (this.selectedImage) {
+        const reader = new FileReader();
+        reader.readAsDataURL(this.selectedImage);
+        reader.onload = () => {
+          // const base64Image = reader.result.split(',')[1];
+          const base64Image=reader.result;
+          // Send base64Image through WebSocket to Django backend
+          // Example: this.websocket.send(base64Image);
+          this.websocket.send(JSON.stringify({
+            "command":"image",
+            "img":base64Image
+          }))
+        };
+      }
+    },
 
   },
   watch: {

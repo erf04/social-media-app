@@ -1,12 +1,12 @@
 import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .serializers import MessageSerializer,GroupSerializer,GroupAdminSerializer
+from .serializers import MessageSerializer,GroupSerializer,GroupAdminSerializer,ChatImageSerializer
 
 from channels.db import database_sync_to_async
 from channels.layers import get_channel_layer
 from channels.db import database_sync_to_async
-from api.models import  User,PrivateChat,Message,Group,GroupAdmin
+from api.models import  User,PrivateChat,Message,Group,GroupAdmin,ChatImage
 from .serializers import MessageSerializer,GroupSerializer,PrivateChatSerializer
 from api.serializers import UserSerializer
 import datetime
@@ -81,6 +81,12 @@ class GroupConsumer(AsyncWebsocketConsumer):
         elif command=="stop_typing":
             result=""
             await self.send_to_chat_message(result,command="stop_typing")
+
+        elif command=="image":
+            result=await self.chat_image(text_data_json)
+            await self.send_to_chat_message(result,command="image")
+
+    
 
     @database_sync_to_async
     def fetch_messages(self,text_data):
@@ -217,6 +223,22 @@ class GroupConsumer(AsyncWebsocketConsumer):
     async def is_typing(self):
         user= self.user
         return UserSerializer(user,many=False).data
+    
+
+    @database_sync_to_async
+    def chat_image(self,text_data:dict):
+        base64_string=text_data["img"]
+        body=text_data.get( 'body', None ) 
+        chatImage=ChatImage.create_from_base64(base64_string=base64_string)
+        chatImage.sender=self.user
+        chatImage.chat=self.room
+        chatImage.body=body
+        chatImage.timestamp=datetime.datetime.now()
+        chatImage.save()
+        serialized=ChatImageSerializer(chatImage,many=False)
+        return serialized.data
+
+
 
         
         

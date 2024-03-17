@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import Group,User,Message,CommentContainer,PrivateChat,GroupAdmin,Follower
+from api.models import Group,User,Message,CommentContainer,PrivateChat,GroupAdmin,Follower,ChatImage
 from api.serializers import UserSerializer,PostSerializer
 from api.models import User
 from rest_framework.request import Request
@@ -108,6 +108,16 @@ class CompleteUserSerializer(serializers.ModelSerializer):
     
     def get_image(self,obj:User):
         return f"/media/{obj.image}"
+    
+
+class ChatImageSerializer(serializers.ModelSerializer):
+    sender=UserSerializer(many=False)
+    liked_by=UserSerializer(many=True)
+    saved_by=UserSerializer(many=True)
+    timestamp=serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S",read_only=True)
+    class Meta:
+        model = ChatImage
+        fields=('id','image','sender','liked_by','saved_by','timestamp','body')
     
 
         

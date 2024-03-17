@@ -15,5 +15,6 @@ admin.site.register(PrivateChat)
 admin.site.register(GroupAdmin)
 admin.site.register(Game)
 admin.site.register(GameLog)
+admin.site.register(ChatImage)
 
 
