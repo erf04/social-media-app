@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import Group,User,Message,CommentContainer,PrivateChat,GroupAdmin,Follower,ChatImage
+from api.models import Group,User,Message,CommentContainer,PrivateChat,GroupAdmin,Follower
 from api.serializers import UserSerializer,PostSerializer
 from api.models import User
 from rest_framework.request import Request
@@ -52,9 +52,10 @@ class MessageSerializer(serializers.ModelSerializer):
     liked_by=UserSerializer(many=True, required=False)
     saved_by=UserSerializer(many=True,required=False)
     reply_to=serializers.SerializerMethodField()
+    type=serializers.SerializerMethodField()
     class Meta:
         model=Message
-        fields=('id','sender','reply_to','liked_by','saved_by','body','timestamp')
+        fields=('id','sender','reply_to','liked_by','saved_by','body','timestamp','type','image')
 
     def get_reply_to(self, obj:Message):
         if obj.reply_to:
@@ -62,6 +63,9 @@ class MessageSerializer(serializers.ModelSerializer):
             return serializer.data
         else:
             return None
+        
+    def get_type(self,obj):
+        return "message"
 
 
 class PrivateChatSerializer(serializers.ModelSerializer):
@@ -110,15 +114,18 @@ class CompleteUserSerializer(serializers.ModelSerializer):
         return f"/media/{obj.image}"
     
 
-class ChatImageSerializer(serializers.ModelSerializer):
-    sender=UserSerializer(many=False)
-    liked_by=UserSerializer(many=True)
-    saved_by=UserSerializer(many=True)
-    timestamp=serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S",read_only=True)
-    class Meta:
-        model = ChatImage
-        fields=('id','image','sender','liked_by','saved_by','timestamp','body')
+# class ChatImageSerializer(serializers.ModelSerializer):
+#     sender=UserSerializer(many=False)
+#     liked_by=UserSerializer(many=True)
+#     saved_by=UserSerializer(many=True)
+#     timestamp=serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S",read_only=True)
+#     type=serializers.SerializerMethodField()
+#     class Meta:
+#         model = ChatImage
+#         fields=('id','image','sender','liked_by','saved_by','timestamp','body','type')
     
+#     def get_type(self, obj:ChatImage):
+#         return "image"
 
         
 

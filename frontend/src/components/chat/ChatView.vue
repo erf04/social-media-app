@@ -185,6 +185,7 @@
                           <p style="font-weight: bold;" class="m-0">{{message.reply_to.sender.username}}</p>
                           <p class="m-0">{{ message.reply_to.body }}</p>
                         </div>
+                        <img v-if="message.image!==null" :src="getAbsoluteUrl(message.image)" alt="" width="80px" height="80px">
                         <div>
                           {{ message.body }}
                         </div>
@@ -246,7 +247,7 @@
                        placeholder="Enter text here...">
                       </div>
                       <input type="file" ref="fileInput" @change="handleFileChange">
-                      <button @click="uploadImage" style="background-color: aqua;">Upload Image</button>
+                      
             </div>
           </div>
         </div>
@@ -482,12 +483,14 @@ export default {
           "message": {
             "body": this.new_message_body,
             "reply_to_id": this.repliedId,
+            "image":this.base64Image
           }
         }))
       }
       this.repliedId = null;
       this.isReply = false;
       this.isEdit = false;
+      this.selectedImage=null;
     },
     async set_admin(user_id,is_staff){
       this.websocket.send(JSON.stringify({
@@ -691,11 +694,12 @@ export default {
     goToAddParticipants(groupID){
       this.$router.push(`/group/add/${groupID}`)
     },
-    handleFileChange(event) {
+    async handleFileChange(event) {
       const file = event.target.files[0];
       if (file) {
         this.selectedImage = file;
       }
+      await this.uploadImage();
     },
     async uploadImage() {
       if (this.selectedImage) {
@@ -703,13 +707,10 @@ export default {
         reader.readAsDataURL(this.selectedImage);
         reader.onload = () => {
           // const base64Image = reader.result.split(',')[1];
-          const base64Image=reader.result;
+          this.base64Image=reader.result;
+          // return base64Image;
           // Send base64Image through WebSocket to Django backend
           // Example: this.websocket.send(base64Image);
-          this.websocket.send(JSON.stringify({
-            "command":"image",
-            "img":base64Image
-          }))
         };
       }
     },

@@ -1,12 +1,12 @@
 import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .serializers import MessageSerializer,GroupSerializer,GroupAdminSerializer,ChatImageSerializer
+from .serializers import MessageSerializer,GroupSerializer,GroupAdminSerializer
 
 from channels.db import database_sync_to_async
 from channels.layers import get_channel_layer
 from channels.db import database_sync_to_async
-from api.models import  User,PrivateChat,Message,Group,GroupAdmin,ChatImage
+from api.models import  User,PrivateChat,Message,Group,GroupAdmin
 from .serializers import MessageSerializer,GroupSerializer,PrivateChatSerializer
 from api.serializers import UserSerializer
 import datetime
@@ -19,6 +19,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
         room_id = self.scope["url_route"]["kwargs"]["room_id"]
         print(room_id)
         self.room:Group=await self.get_room(room_id)
+        self.room_type=self.room.__class__.__name__.lower()
         self.room_name=self.room.name
         group_name=self.room_name.replace(" ","_")
         self.room_group_name = f"chat_{group_name}"
@@ -88,21 +89,10 @@ class GroupConsumer(AsyncWebsocketConsumer):
 
     
 
-    @database_sync_to_async
-    def fetch_messages(self,text_data):
-        user:User=User.objects.get(pk=text_data['sender_id'])
-        messages=Message.message_order(self,self.room,"group")
-        dict_messages=MessageSerializer(messages,many=True).data
-        group_serialized=GroupSerializer(self.room,many=False).data
-        return {
-            "command":"fetch_messages",
-            "messages":dict_messages,
-            "chat_info":group_serialized
-        }
 
 
     @database_sync_to_async
-    def create_new_message(self,text_data):
+    def create_new_message(self,text_data:dict):
         #reply_to,chat,body
     #         user:User=self.scope['user']
         sender_id=text_data["message"]["sender_id"]
@@ -166,6 +156,8 @@ class GroupConsumer(AsyncWebsocketConsumer):
             
         reply_to_id=text_data["message"]["reply_to_id"]
         body=text_data["message"]["body"]
+        base64_image=text_data["message"].get("image",None)
+
         try:
             replied_message=Message.objects.get(pk=reply_to_id) if reply_to_id!=None else None
         except:
@@ -173,9 +165,14 @@ class GroupConsumer(AsyncWebsocketConsumer):
         print(user)
         group:Group=self.room
         print(group)
-
-        message:Message=Message.objects.create(sender=user,chat=group,body=body,reply_to=replied_message,timestamp=datetime.datetime.now())
-
+        # message:Message=Message.objects.create(sender=user,chat=group,body=body,reply_to=replied_message,timestamp=datetime.datetime.now())
+        message=Message.create_from_base64(base64_string=base64_image) if  base64_image else Message()
+        message.sender=user
+        message.chat=group
+        message.body=body
+        message.reply_to=replied_message
+        message.timestamp=datetime.datetime.now()
+        message.save()
         
         serialized=MessageSerializer(message,many=False)
         print(serialized.data)
@@ -189,8 +186,9 @@ class GroupConsumer(AsyncWebsocketConsumer):
         user=self.user
         print(self.room_name,user)
         # user=User.objects.get(pk=user.id)
-        
-        messages=Message.message_order(self,self.room,"group")
+
+        messages=Message.message_order(self,self.room,self.room_type)
+
         dict_messages=MessageSerializer(messages,many=True).data
         group_serialized=GroupSerializer(self.room,many=False).data
         return {
