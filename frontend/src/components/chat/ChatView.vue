@@ -485,16 +485,19 @@ export default {
     },
     async scrollToEnd() {
       // let container = document.getElementById("chat-history");
-      await nextTick();
+      // await nextTick();
       // onUpdated(() => {
-        let el = this.$refs.message;
-        console.log("scrollToEnd", el);
-        let lastEl = el[el.length - 1];
-        lastEl.scrollIntoView({behavior: "smooth"});
+        // let el = this.$refs.message;
+        // console.log("scrollToEnd", el);
+        // let lastEl = el[el.length - 1];
+        // lastEl.scrollIntoView({behavior: "smooth"});
       // })
       // const el = container.lastChild;
       // console.log("scrollToEnd", el);
       // container.scrollTop = container.scrollHeight;
+      await nextTick();
+      let container = document.getElementById("chat-history");
+      container.scrollTop = container.scrollHeight;
     },
     getFormattedDate(date) {
       return date.split(" ")[0].trim();
@@ -503,7 +506,7 @@ export default {
       return date.split(" ")[1].trim();
     },
     async sendMessage() {
-      if (this.$refs.inputMessage.value !== "" || this.selectedImage !== null) {
+      
         if (this.isEdit) {
           console.log("should change the message body");
           this.new_message_body = '';
@@ -523,9 +526,8 @@ export default {
         this.isEdit = false;
         this.selectedImage = null;
         this.$refs.fileInput.value = null;
-      } else {
-        alert("empty message");
-      }
+        this.base64Image=null;
+      
     },
     async set_admin(user_id, is_staff) {
       this.websocket.send(JSON.stringify({
@@ -545,8 +547,13 @@ export default {
       await this.handleRoom(room.id, this.isPrivate ? chatType.PRIVATE : chatType.GROUP);
 
       setInterval(async () => {
-        if (!await jwtAuth.isAuthenticate())
-          this.$router.push('/login')
+        if (!await jwtAuth.isAuthenticate()){
+
+          if (this.websocket!=null){
+            this.websocket.close()
+          }
+          this.$router.push('/login');
+        }
         // await nextTick();
         else
           await this.handleRoom(room.id, this.isPrivate ? chatType.PRIVATE : chatType.GROUP);
@@ -593,6 +600,7 @@ export default {
           if (command === "fetch_messages") {
             console.log(data);
             this.messages = data["messages"];
+            console.log(`this.arrived:${this.arrived}`);
             if (this.arrived)
               await this.scrollToEnd();
           } else if (command === "new_message") {
@@ -618,6 +626,8 @@ export default {
     },
 
     goToGroupCreationForm() {
+      if (this.websocket!=null)
+      this.websocket.close();
       this.$router.push('/group/create');
     },
     async fetchPrivateRooms() {
@@ -730,6 +740,9 @@ export default {
         this.selectedImage = file;
       }
       await this.uploadImage();
+      this.$refs.inputMessage.focus();
+
+
     },
     async uploadImage() {
       if (this.selectedImage) {
