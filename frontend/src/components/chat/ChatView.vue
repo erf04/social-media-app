@@ -74,14 +74,20 @@
                   <img :src="getAbsoluteUrl(member.image)" style="width: 30px; height: 30px; border-radius: 50%"/>
                   <div>
                     <h3>{{ member.username }}</h3>
-                    <button class="btn btn-success" style="background-color: green;" v-if="(user.id === this.currentChatRoom.creator.id || (isGroupAdmin(user.id) && isGroupAdminStaff(user.id))) && (member.id !== this.currentChatRoom.creator.id && !isGroupAdmin(member.id))" @click="set_admin(member.id,false)">set admin</button>
+                    <button class="btn btn-success" style="background-color: green;"
+                            v-if="(user.id === this.currentChatRoom.creator.id || (isGroupAdmin(user.id) && isGroupAdminStaff(user.id))) && (member.id !== this.currentChatRoom.creator.id && !isGroupAdmin(member.id))"
+                            @click="set_admin(member.id,false)">set admin
+                    </button>
                     <small v-if="isGroupAdmin(member.id)"><b>admin</b></small>
                     <small v-if="member.id === currentChatRoom.creator.id"><b>creator</b></small>
                     <p>last seen</p>
                   </div>
                   <hr/>
                 </div>
-                <button class="btn btn-success" style="background-color: red;" v-if="user.id == currentChatRoom.creator.id || isGroupAdmin(user.id)" @click="goToAddParticipants(currentChatRoom.id)">add participants</button>
+                <button class="btn btn-success" style="background-color: red;"
+                        v-if="user.id == currentChatRoom.creator.id || isGroupAdmin(user.id)"
+                        @click="goToAddParticipants(currentChatRoom.id)">add participants
+                </button>
               </div>
             </div>
           </div>
@@ -119,8 +125,9 @@
                  width: 40px; height: 40px; bottom: 90px; right: 40px; z-index: 99;">
               <div>
                 <button @click="scrollToEnd" style="background: none">
-                  <svg style="width: 25px; height: 25px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                  <svg style="width: 25px; height: 25px" xmlns="http://www.w3.org/2000/svg" fill="none"
+                       viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
                   </svg>
                 </button>
               </div>
@@ -144,7 +151,7 @@
                       </div>
                       <div class="d-flex align-items-center" style="gap: 10px">
                         <small v-if="!isPrivate">{{ currentChatRoom.participants.length }} Members</small>
-                        <small class="p-0 m-0" v-if="isTyping">{{this.isTypingUser.username}} is typing...</small>
+                        <small class="p-0 m-0" v-if="isTyping">{{ this.isTypingUser.username }} is typing...</small>
                       </div>
                     </div>
                   </button>
@@ -161,11 +168,11 @@
               <ul class="m-b-0" id="chatList">
                 <div v-for="(message) in messages" :key="message.id"
                      @contextmenu.prevent="onContextMenu($event, message.body, message.id)"
-                      style="margin-bottom: 1em">
-<!--                  <div v-show="changeTime" class="time-stamp"-->
-<!--                       style="margin: 0 auto; background: red; text-align: center; width: fit-content">-->
-<!--                    {{ showTime(getFormattedDate(message.timestamp)) }}-->
-<!--                  </div>-->
+                     style="margin-bottom: 1em">
+                  <!--                  <div v-show="changeTime" class="time-stamp"-->
+                  <!--                       style="margin: 0 auto; background: red; text-align: center; width: fit-content">-->
+                  <!--                    {{ showTime(getFormattedDate(message.timestamp)) }}-->
+                  <!--                  </div>-->
                   <li class="clearfix"
                       :style="message.sender.id === user.id ? `text-align: end` : `text-align: start`">
                     <div v-if="message.sender.id === user.id">
@@ -181,13 +188,19 @@
                         <h6>
                           {{ message.sender.username }}
                         </h6>
-                        <div v-if="message.reply_to != null" class="repliedMessage" @click="goToRepliedMessage(message.reply_to.id)">
-                          <p style="font-weight: bold;" class="m-0">{{message.reply_to.sender.username}}</p>
+                        <div v-if="message.reply_to != null" class="repliedMessage"
+                             @click="goToRepliedMessage(message.reply_to.id)">
+                          <p style="font-weight: bold;" class="m-0">{{ message.reply_to.sender.username }}</p>
                           <p class="m-0">{{ message.reply_to.body }}</p>
+                          <img v-if="message.reply_to.image!==null" :src="getAbsoluteUrl(message.reply_to.image)" alt="" width="auto"
+                               style="max-height: 400px; max-width: 250px" height="auto">
                         </div>
-                        <img v-if="message.image!==null" :src="getAbsoluteUrl(message.image)" alt="" width="80px" height="80px">
-                        <div>
-                          {{ message.body }}
+                        <div class="mt-2">
+                          <img v-if="message.image!==null" :src="getAbsoluteUrl(message.image)" alt="" width="auto"
+                               style="max-height: 400px; max-width: 250px" height="auto">
+                          <p>
+                            {{ message.body }}
+                          </p>
                         </div>
                         <div style="text-align: start; font-size: small">
                           {{ getFormattedTime(message.timestamp) }}
@@ -206,17 +219,19 @@
                       </div>
                       <div class="message my-message">
                         <h6>{{ message.sender.username }}</h6>
-                        <!-- @click="goToRepliedMessage" -->
-                        <!--  {{ repliedText }} -->
-                        <div v-if="message.reply_to != null" class="repliedMessage" @click="goToRepliedMessage(message.reply_to.id)">
-<!--                          <a :href="`/  chat/#${message.reply_to.id}`">-->
-<!--                          <p>{{message.reply_to.id}}</p>-->
-                          <p style="font-weight: bold;" class="m-0">{{message.reply_to.sender.username}}</p>
+                        <div v-if="message.reply_to != null" class="repliedMessage"
+                             @click="goToRepliedMessage(message.reply_to.id)">
+                          <p style="font-weight: bold;" class="m-0">{{ message.reply_to.sender.username }}</p>
                           <p class="m-0">{{ message.reply_to.body }}</p>
-<!--                        </a>-->
+                          <img v-if="message.reply_to.image!==null" :src="getAbsoluteUrl(message.reply_to.image)" alt="" width="auto"
+                               style="max-height: 400px; max-width: 250px" height="auto">
                         </div>
-                        <div>
-                          {{ message.body }}
+                        <div class="mt-2">
+                          <img v-if="message.image!==null" :src="getAbsoluteUrl(message.image)" alt="" width="auto"
+                               style="max-height: 400px; max-width: 250px" height="auto">
+                          <p>
+                            {{ message.body }}
+                          </p>
                         </div>
                         <div style="text-align: end; font-size: small">
                           {{ getFormattedTime(message.timestamp) }}
@@ -245,9 +260,15 @@
                        class="form-control p-2"
                        ref="inputMessage"
                        placeholder="Enter text here...">
-                      </div>
-                      <input type="file" ref="fileInput" @change="handleFileChange">
-                      
+              </div>
+              <label for="img-input">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"/>
+                </svg>
+              </label>
+              <input id="img-input" type="file" ref="fileInput" @change="handleFileChange">
             </div>
           </div>
         </div>
@@ -325,20 +346,20 @@ export default {
         {
           creator: {},
           participants: [{}],
-          admins:[{
-            supervisor:{},
-            user:{},
+          admins: [{
+            supervisor: {},
+            user: {},
           }]
         }
       ],
       currentUser: Object,
       newGroupId: 0,
-      currentChatRoom:{
+      currentChatRoom: {
         creator: {},
         participants: [{}],
-        admins:[{
-          supervisor:{},
-          user:{}
+        admins: [{
+          supervisor: {},
+          user: {}
         }]
       },
       isPrivate: false,
@@ -358,10 +379,10 @@ export default {
       isTyping: false,
       changeTime: false,
       timeStamp: '',
-      isTypingUser:{},
+      isTypingUser: {},
       repliedId: null,
       editedId: null,
-      arrived:true,
+      arrived: true,
       selectedImage: null,
     }
   },
@@ -431,7 +452,7 @@ export default {
                   Authorization: `JWT ${await jwtAuth.getAccessToken()}`
                 }
               })
-              this.arrived=false;
+              this.arrived = false;
               this.fetchMessages();
             }
           },
@@ -473,36 +494,41 @@ export default {
       return date.split(" ")[1].trim();
     },
     async sendMessage() {
-      if (this.isEdit) {
-        console.log("should change the message body");
-        this.new_message_body = '';
+      if (this.$refs.inputMessage.value !== "" || this.selectedImage !== null) {
+        if (this.isEdit) {
+          console.log("should change the message body");
+          this.new_message_body = '';
+        } else {
+          // console.log("in send");
+          this.websocket.send(JSON.stringify({
+            "command": "new_message",
+            "message": {
+              "body": this.new_message_body,
+              "reply_to_id": this.repliedId,
+              "image": this.base64Image
+            }
+          }))
+        }
+        this.repliedId = null;
+        this.isReply = false;
+        this.isEdit = false;
+        this.selectedImage = null;
+        this.$refs.fileInput.value = null;
       } else {
-        // console.log("in send");
-        this.websocket.send(JSON.stringify({
-          "command": "new_message",
-          "message": {
-            "body": this.new_message_body,
-            "reply_to_id": this.repliedId,
-            "image":this.base64Image
-          }
-        }))
+        alert("empty message");
       }
-      this.repliedId = null;
-      this.isReply = false;
-      this.isEdit = false;
-      this.selectedImage=null;
     },
-    async set_admin(user_id,is_staff){
+    async set_admin(user_id, is_staff) {
       this.websocket.send(JSON.stringify({
-        "command":"set_admin",
-        "user":user_id,
-        "is_staff":is_staff
+        "command": "set_admin",
+        "user": user_id,
+        "is_staff": is_staff
       }))
     },
     async selectRoom(room) {
       // console.log(JSON.stringify(this.currentChatRoom),JSON.stringify(room));
-      let jsonRoom=JSON.stringify(room);
-      if (JSON.stringify(this.currentChatRoom)==jsonRoom || JSON.stringify(this.currentPrivateRoom)==jsonRoom){
+      let jsonRoom = JSON.stringify(room);
+      if (JSON.stringify(this.currentChatRoom) == jsonRoom || JSON.stringify(this.currentPrivateRoom) == jsonRoom) {
         return;
       }
       this.isPrivate ? this.currentPrivateRoom = {...room} : this.currentChatRoom = {...room};
@@ -548,7 +574,7 @@ export default {
         console.log("close");
         // console.log(event.data);
       }
-      this.websocket.onmessage = async(event) => {
+      this.websocket.onmessage = async (event) => {
         let data = JSON.parse(event.data);
         if (!('command' in data)) {
           // message received from server
@@ -560,27 +586,22 @@ export default {
             this.messages = data["messages"];
             if (this.arrived)
               await this.scrollToEnd();
-          }
-          else if (command === "new_message") {
+          } else if (command === "new_message") {
             console.log(data['data']);
             this.new_message = data['data'];
             this.messages.push(this.new_message);
             this.new_message_body = '';
             await this.scrollToEnd();
-          }
-          else if (command==="set_admin"){
+          } else if (command === "set_admin") {
             console.log(data);
-          }
-          else if (command==="is_typing"){
+          } else if (command === "is_typing") {
             console.log("typing");
-            this.isTyping=true;
-            this.isTypingUser=data.data;
-          }
-          else if (command==="stop_typing"){
+            this.isTyping = true;
+            this.isTypingUser = data.data;
+          } else if (command === "stop_typing") {
             // console.log("stop");
-            this.isTyping=false;
-          }
-          else if (command==="image"){
+            this.isTyping = false;
+          } else if (command === "image") {
             console.log(data);
           }
         }
@@ -662,13 +683,13 @@ export default {
     startTyping() {
       this.isTyping = true;
       this.websocket.send(JSON.stringify({
-        "command":"is_typing",
+        "command": "is_typing",
       }))
       this.debounceStopTyping();
     },
     debounceStopTyping: debounce(function () {
       this.websocket.send(JSON.stringify({
-        "command":"stop_typing"
+        "command": "stop_typing"
       }))
       this.isTyping = false;
     }, 1000),
@@ -677,21 +698,21 @@ export default {
       this.timeStamp = newDate;
       return this.timeStamp;
     },
-    isGroupAdmin(userId){
+    isGroupAdmin(userId) {
       // console.log(this.currentChatRoom);
 
-      let admins=this.currentChatRoom.admins;
+      let admins = this.currentChatRoom.admins;
       // console.log(admins);
-      let result=admins.some((admin) => admin.user.id == userId);
+      let result = admins.some((admin) => admin.user.id == userId);
       return result;
 
     },
-    isGroupAdminStaff(userId){
-      let admins=this.currentChatRoom.admins;
-      let result=admins.find((admin) => admin.user.id == userId).is_staff;
+    isGroupAdminStaff(userId) {
+      let admins = this.currentChatRoom.admins;
+      let result = admins.find((admin) => admin.user.id == userId).is_staff;
       return result;
     },
-    goToAddParticipants(groupID){
+    goToAddParticipants(groupID) {
       this.$router.push(`/group/add/${groupID}`)
     },
     async handleFileChange(event) {
@@ -707,7 +728,7 @@ export default {
         reader.readAsDataURL(this.selectedImage);
         reader.onload = () => {
           // const base64Image = reader.result.split(',')[1];
-          this.base64Image=reader.result;
+          this.base64Image = reader.result;
           // return base64Image;
           // Send base64Image through WebSocket to Django backend
           // Example: this.websocket.send(base64Image);
@@ -738,7 +759,7 @@ export default {
     // this.isPrivate=false;
     console.log(this.isPrivate);
     if (!await jwtAuth.isAuthenticate())
-          this.$router.push('/login')
+      this.$router.push('/login')
     // if (!this.isPrivate){
 
     //   await this.fetchGroups()
