@@ -168,7 +168,7 @@
               <ul class="m-b-0" id="chatList">
                 <div v-for="(message) in messages" :key="message.id"
                      @contextmenu.prevent="onContextMenu($event, message.body, message.id)"
-                     style="margin-bottom: 1em">
+                     style="margin-bottom: 1em" ref="message">
                   <!--                  <div v-show="changeTime" class="time-stamp"-->
                   <!--                       style="margin: 0 auto; background: red; text-align: center; width: fit-content">-->
                   <!--                    {{ showTime(getFormattedDate(message.timestamp)) }}-->
@@ -310,7 +310,8 @@
 import {JWTAuth} from "../../../services/jwt";
 import axios from "axios";
 import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
-import {nextTick} from 'vue';
+// eslint-disable-next-line no-unused-vars
+import {nextTick, onMounted, onUpdated} from 'vue';
 import "../../../node_modules/bootstrap/dist/css/bootstrap.css";
 import footerMenu from '@/components/FooterMenu.vue';
 
@@ -483,9 +484,17 @@ export default {
       el.scrollIntoView({behavior: "smooth"});
     },
     async scrollToEnd() {
+      // let container = document.getElementById("chat-history");
       await nextTick();
-      let container = document.getElementById("chat-history");
-      container.scrollTop = container.scrollHeight;
+      // onUpdated(() => {
+        let el = this.$refs.message;
+        console.log("scrollToEnd", el);
+        let lastEl = el[el.length - 1];
+        lastEl.scrollIntoView({behavior: "smooth"});
+      // })
+      // const el = container.lastChild;
+      // console.log("scrollToEnd", el);
+      // container.scrollTop = container.scrollHeight;
     },
     getFormattedDate(date) {
       return date.split(" ")[0].trim();
