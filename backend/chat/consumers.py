@@ -83,10 +83,6 @@ class GroupConsumer(AsyncWebsocketConsumer):
             result=""
             await self.send_to_chat_message(result,command="stop_typing")
 
-        elif command=="image":
-            result=await self.chat_image(text_data_json)
-            await self.send_to_chat_message(result,command="image")
-
     
 
 
@@ -223,18 +219,6 @@ class GroupConsumer(AsyncWebsocketConsumer):
         return UserSerializer(user,many=False).data
     
 
-    @database_sync_to_async
-    def chat_image(self,text_data:dict):
-        base64_string=text_data["img"]
-        body=text_data.get( 'body', None ) 
-        chatImage=ChatImage.create_from_base64(base64_string=base64_string)
-        chatImage.sender=self.user
-        chatImage.chat=self.room
-        chatImage.body=body
-        chatImage.timestamp=datetime.datetime.now()
-        chatImage.save()
-        serialized=ChatImageSerializer(chatImage,many=False)
-        return serialized.data
 
 
 
@@ -254,6 +238,7 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         try:
             chat:PrivateChat=await self.get_private_chat(chat_id)
             self.chat=chat
+            self.chat_type=self.chat.__class__.__name__.lower()
             # check if the user is creator or the_other user
             current_user=self.scope['user']
             print(current_user)
@@ -373,6 +358,8 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
             
         reply_to_id=text_data["message"]["reply_to_id"]
         body=text_data["message"]["body"]
+        base64_image=text_data["message"].get("image",None)
+
         try:
             replied_message=Message.objects.get(pk=reply_to_id) if reply_to_id!=None else None
         except:
@@ -380,14 +367,22 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         print(user)
         
 
-
-        message:Message=Message.objects.create(sender=user,chat=self.chat,body=body,reply_to=replied_message,timestamp=datetime.datetime.now())
-
+        pv:PrivateChat=self.chat
+        print(pv)
+        # message:Message=Message.objects.create(sender=user,chat=group,body=body,reply_to=replied_message,timestamp=datetime.datetime.now())
+        message=Message.create_from_base64(base64_string=base64_image) if  base64_image else Message()
+        message.sender=user
+        message.chat=pv
+        message.body=body
+        message.reply_to=replied_message
+        message.timestamp=datetime.datetime.now()
+        message.save()
         
         serialized=MessageSerializer(message,many=False)
         print(serialized.data)
         # self.send_to_chat_message(serialized.data)
         return serialized.data
+
 
 
     @database_sync_to_async
@@ -396,10 +391,10 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         print(self.room_group_name,self.user)
         # user=User.objects.get(pk=user.id)
         
-        messages=Message.message_order(self,self.chat,"privatechat")
+        messages=Message.message_order(self,self.chat,self.chat_type)
         
         dict_messages=MessageSerializer(messages,many=True).data
-        print(messages)
+        # print(messages)
         group_serialized=PrivateChatSerializer(self.chat,many=False).data
         return {
             "command":"fetch_messages",
