@@ -330,9 +330,10 @@ import axios from "axios";
 import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
 import "../../../node_modules/bootstrap/dist/css/bootstrap.css";
 import footerMenu from '@/components/FooterMenu.vue';
-
+import $ from 'jquery';
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 import debounce from "lodash/debounce";
+import { nextTick } from "vue";
 
 
 const baseURL = "http://localhost:8000";
@@ -514,43 +515,21 @@ export default {
       return height;
       // })
     },
-    scrollToEnd() {
-      // let container = document.getElementById("chat-history");
-      // await nextTick();
-      // onUpdated(() => {
-        // let el = this.$refs.message;
-        // console.log("scrollToEnd", el);
-        // let lastEl = el[el.length - 1];
-        // lastEl.scrollIntoView({behavior: "smooth"});
-      // })
-      // const el = container.lastChild;
-      // console.log("scrollToEnd", el);
-      // container.scrollTop = container.scrollHeight;
-      // nextTick();
-      // await nextTick();
-      this.$nextTick(() => {
-        let container = document.getElementById("chat-history");
-        let imgsHeight = this.imgHeights();
-        // console.log("scrooooooooooooooooool before", container.scrollHeight, imgsHeight);
-        let scrollHeight = container.scrollHeight;
-        let result = imgsHeight + scrollHeight;
-        // console.log("finalllllllllllllllllllllllll", result);
-        container.scrollTop = result;
-        // container.scrollBy(0, 9999999);
-        // container.scrollTop = 9999999999;
-      })
-      // this.$forceUpdate();
-      // this.$nextTick(() => {
-      // console.log("scrooooooooooooooooool after", container.scrollHeight);
-      // })
-      // onMounted(() => {
-      // })
-      // container.scroll();
-      // console.log(test, "scrollToEnd")
-      // eslint-disable-next-line vue/valid-next-tick
-      // await this.$nextTick(() => {
-      // container.scrollTo(0, 90000000);
-      // })
+    async scrollToEnd() {
+
+        await nextTick();
+        let ht=0;
+        // console.log($('.clearfix'));
+        $("#chat-history div").each((index,el)=>{
+          // console.log(el,index);
+          ht+=$(el).height();
+        })
+        $("#chat-history").animate({scrollTop: ht});
+    },
+    async scrollForNewMessage(){
+      await nextTick();
+      let container = document.getElementById("chat-history");
+      container.scrollTop=container.scrollHeight;
     },
     getFormattedDate(date) {
       return date.split(" ")[0].trim();
@@ -672,7 +651,8 @@ export default {
             this.new_message = data['data'];
             this.messages.push(this.new_message);
             this.new_message_body = '';
-            await this.scrollToEnd();
+            // await this.scrollToEnd();
+            await this.scrollForNewMessage();
           } else if (command === "set_admin") {
             console.log(data);
           } else if (command === "is_typing") {

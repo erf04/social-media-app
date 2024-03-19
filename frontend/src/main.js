@@ -2,11 +2,12 @@ import { createApp } from 'vue'
 import mitt from "mitt";
 import App from './App.vue'
 import router from './router.js'
-import $ from 'jquery'
+// import $ from 'jquery'
+// import 'expose-loader?$!expose-loader?jQuery!jquery'
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
 import ContextMenu from '@imengyu/vue3-context-menu'
-
-window.$ = $;
+// eslint-disable-next-line 
+const $ = require('jquery');
 
 const emitter = mitt();
 const app = createApp(App);
