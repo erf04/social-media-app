@@ -74,10 +74,17 @@
                   <img :src="getAbsoluteUrl(member.image)" style="width: 30px; height: 30px; border-radius: 50%"/>
                   <div>
                     <h3>{{ member.username }}</h3>
-                    <button class="btn btn-success" style="background-color: green;"
-                            v-if="(user.id === this.currentChatRoom.creator.id || (isGroupAdmin(user.id) && isGroupAdminStaff(user.id))) && (member.id !== this.currentChatRoom.creator.id && !isGroupAdmin(member.id))"
-                            @click="set_admin(member.id,false)">set admin
-                    </button>
+                    <div ref="setAdmin" class="d-flex justify-content-between align-items-center"
+                         style="gap: 5px"
+                         v-if="(user.id === this.currentChatRoom.creator.id || (isGroupAdmin(user.id) && isGroupAdminStaff(user.id))) && (member.id !== this.currentChatRoom.creator.id && !isGroupAdmin(member.id))">
+                      <button class="btn btn-success" style="background-color: green;"
+                              @click="set_admin(member.id, setAdminStatus)">set admin
+                      </button>
+                      <div>
+                        <label>Is staff?</label>
+                        <input type="checkbox" ref="setAdminStatus" v-model="setAdminStatus" />
+                      </div>
+                    </div>
                     <small v-if="isGroupAdmin(member.id)"><b>admin</b></small>
                     <small v-if="member.id === currentChatRoom.creator.id"><b>creator</b></small>
                     <p>last seen</p>
@@ -122,7 +129,7 @@
                v-if="currentChatRoom!==null || currentPrivateRoom !== null"
           >
             <div class="d-flex align-items-center justify-content-center" ref="bottomBtn" style="opacity: 0; background-color: darkcyan; border-radius: 50%; position: absolute;
-                 width: 40px; height: 40px; bottom: 90px; right: 40px; z-index: 99;">
+                 width: 40px; height: 40px; bottom: 120px; right: 40px; z-index: 99;">
               <div>
                 <button @click="scrollToEnd" style="background: none">
                   <svg style="width: 25px; height: 25px" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -164,7 +171,7 @@
                 </div>
               </div>
             </div>
-            <div @scroll="sagi($event)" class="chat-history py-1" id="chat-history" ref="chatHistory">
+            <div @scroll="bottomButtonHandler($event)" class="chat-history py-1" id="chat-history" ref="chatHistory">
               <ul class="m-b-0" id="chatList">
                 <div v-for="(message) in messages" :key="message.id"
                      @contextmenu.prevent="onContextMenu($event, message.body, message.id)"
@@ -198,7 +205,7 @@
                         <div class="mt-2">
                           <img v-if="message.image!==null" :src="getAbsoluteUrl(message.image)" alt="" width="auto"
                                style="max-height: 400px; max-width: 250px" height="auto">
-                          <p>
+                          <p class="m-0">
                             {{ message.body }}
                           </p>
                         </div>
@@ -229,7 +236,7 @@
                         <div class="mt-2">
                           <img v-if="message.image!==null" :src="getAbsoluteUrl(message.image)" alt="" width="auto"
                                style="max-height: 400px; max-width: 250px" height="auto">
-                          <p>
+                          <p class="m-0">
                             {{ message.body }}
                           </p>
                         </div>
@@ -245,16 +252,24 @@
             <div class="chat-message clearfix">
               <div v-show="isReply" ref="repliedMessage" class="alert alert-success mb-0 p-0 px-3" role="alert">
                 <div class="d-flex justify-content-between align-items-center">
-                  <div></div>
-                  <div>
-                    <span @click="cancelReply" class="close d-flex align-items-center">&times;</span>
-                  </div>
+                 <div ref="replyData"></div>
+                 <span @click="cancelReply" class="close">&times;</span>
                 </div>
               </div>
               <div v-show="isEdit" ref="editedMessage" class="alert alert-info mb-0 p-0 px-3" role="alert"></div>
               <div class="input-group mb-0">
                 <div class="input-group-prepend">
-                  <span class="input-group-text"><i class="fa fa-send"></i></span>
+                  <span class="input-group-text" style="cursor: pointer" @click="sendMessage">
+                    <svg style="width: 20px; height: 30px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" xml:space="preserve">
+                      <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+                        <path d="M 2.849 87.151 c -0.801 -0.801 -0.8 -2.099 0 -2.899 l 29.441 -29.441 c 0.8 -0.8 2.098 -0.801 2.899 0 s 0.8 2.099 0 2.899 L 5.748 87.151 C 4.947 87.952 3.649 87.952 2.849 87.151 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(80,211,161); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                        <path d="M 0.916 65.892 c -0.801 -0.801 -0.8 -2.099 0 -2.899 l 11.08 -11.08 c 0.8 -0.8 2.098 -0.801 2.899 0 c 0.801 0.801 0.8 2.099 0 2.899 l -11.08 11.08 C 3.015 66.692 1.717 66.692 0.916 65.892 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(80,211,161); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                        <path d="M 24.108 89.084 c -0.8 -0.8 -0.8 -2.099 0 -2.899 l 11.08 -11.08 c 0.8 -0.8 2.099 -0.8 2.899 0 c 0.8 0.8 0.8 2.099 0 2.899 l -11.08 11.08 C 26.207 89.884 24.909 89.884 24.108 89.084 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(80,211,161); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                        <path d="M 89.399 0.601 c -0.53 -0.53 -1.306 -0.729 -2.025 -0.518 L 1.475 25.207 c -0.778 0.228 -1.348 0.891 -1.457 1.693 c -0.086 0.642 0.136 1.278 0.582 1.724 c 0.11 0.11 0.235 0.21 0.372 0.294 l 25.292 15.628 c 0.436 0.269 0.956 0.365 1.459 0.27 l 21.538 -4.079 C 65.667 32.684 78.597 18.514 89.399 0.601 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(80,211,161); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                        <path d="M 89.399 0.601 c 0.53 0.53 0.729 1.306 0.518 2.025 L 64.793 88.525 c -0.228 0.778 -0.891 1.348 -1.693 1.457 c -0.642 0.086 -1.278 -0.136 -1.724 -0.582 c -0.11 -0.11 -0.21 -0.235 -0.294 -0.372 L 45.452 63.736 c -0.269 -0.436 -0.365 -0.956 -0.27 -1.459 l 4.079 -21.538 L 89.399 0.601 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(60,187,139); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                      </g>
+                  </svg>
+                  </span>
                 </div>
                 <input @input="startTyping" @keyup.enter="sendMessage()" v-model="new_message_body" type="text"
                        class="form-control p-2"
@@ -271,6 +286,7 @@
               <input id="img-input" type="file" ref="fileInput" @change="handleFileChange">
             </div>
           </div>
+          <div class="loader" id="loader"></div>
         </div>
       </div>
     </div>
@@ -291,27 +307,27 @@
 // who send message                        ok
 // profile (posts), user profile (about & posts)
 // loading icon for fetch messages,main page and etc
-// is typing      ok
+// is typing                               ok
 // add private chat creation
 // enter in login page (or signup)         ok
 // href and a tag for replied messages     ok
-// loading icon for fetching messages
-// send btn
-// min height for chat log & min width for messages
-// is staff field for set admin
+// loading icon for fetching messages      ok
+// send btn                                ok
+// min height for chat log & min width for messages       ok
+// is staff field for set admin        ok
 // remain group with reload
-// more options in context menu (bring from chatroom)
-// close button for reply
+// more options in context menu (bring from chatroom)     ok
+// close button for reply             ok
 // got to profile in search result
 // footer isn't at the bottom of the page     ok
-// set admin front
-// scroll to end btn
+// set admin front                ok
+// scroll to end btn              ok
+// image in reply alert box
+// online offline green circle
 
 import {JWTAuth} from "../../../services/jwt";
 import axios from "axios";
 import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
-// eslint-disable-next-line no-unused-vars
-import {nextTick, onMounted, onUpdated} from 'vue';
 import "../../../node_modules/bootstrap/dist/css/bootstrap.css";
 import footerMenu from '@/components/FooterMenu.vue';
 
@@ -385,24 +401,11 @@ export default {
       editedId: null,
       arrived: true,
       selectedImage: null,
+      setAdminStatus: false,
     }
   },
   computed: {},
   methods: {
-    sagi(e) {
-      // console.log("scroll", e.target.scrollTop);
-      const height = e.target.scrollHeight - e.target.clientHeight;
-      if (height - e.target.scrollTop > 300) {
-        // alert("bottom btn");
-        // this.$refs.bottomBtn.style.display = "block";
-        this.$refs.bottomBtn.style.transition = "0.3s";
-        this.$refs.bottomBtn.style.opacity = "1";
-      } else {
-        // this.$refs.bottomBtn.style.display = "none";
-        this.$refs.bottomBtn.style.transition = "0.3s";
-        this.$refs.bottomBtn.style.opacity = "0";
-      }
-    },
     onContextMenu(e, message, id) {
       e.preventDefault();
       console.log("contextmenu", id);
@@ -413,7 +416,7 @@ export default {
           {
             label: "Reply",
             onClick: () => {
-              this.$refs.repliedMessage.childNodes[0].childNodes[0].innerHTML = message;
+              this.$refs.replyData.innerHTML = message;
               this.$refs.inputMessage.focus();
               this.isReply = true;
               this.repliedId = id;
@@ -468,6 +471,23 @@ export default {
         ]
       });
     },
+    bottomButtonHandler(e) {
+      // console.log("scrollTop", e.target.scrollTop);
+      const height = e.target.scrollHeight - e.target.clientHeight;
+      // if (e.target.scrollTop === e.target.scrollHeight) {
+      // }
+      // console.log("scrollHeight", e.target.scrollHeight);
+      if (height - e.target.scrollTop > 300) {
+        // alert("bottom btn");
+        // this.$refs.bottomBtn.style.display = "block";
+        this.$refs.bottomBtn.style.transition = "0.3s";
+        this.$refs.bottomBtn.style.opacity = "1";
+      } else {
+        // this.$refs.bottomBtn.style.display = "none";
+        this.$refs.bottomBtn.style.transition = "0.3s";
+        this.$refs.bottomBtn.style.opacity = "0";
+      }
+    },
     cancelReply() {
       this.repliedId = null;
       this.isReply = false;
@@ -480,10 +500,21 @@ export default {
       setTimeout(() => {
         elParent.style.backgroundColor = "inherit";
       }, 1500);
-      // console.log("goToRepliedMessage", el.parentNode);
       el.scrollIntoView({behavior: "smooth"});
     },
-    async scrollToEnd() {
+    imgHeights() {
+      // await nextTick();
+      // this.$nextTick(() => {
+      const imgs = document.querySelectorAll("#chat-history img");
+      let height = 0;
+      imgs.forEach(img => {
+        height += img.height;
+      })
+      console.log("height imgsssssssssssssssssssssss" , height);
+      return height;
+      // })
+    },
+    scrollToEnd() {
       // let container = document.getElementById("chat-history");
       // await nextTick();
       // onUpdated(() => {
@@ -495,9 +526,31 @@ export default {
       // const el = container.lastChild;
       // console.log("scrollToEnd", el);
       // container.scrollTop = container.scrollHeight;
-      await nextTick();
-      let container = document.getElementById("chat-history");
-      container.scrollTop = container.scrollHeight;
+      // nextTick();
+      // await nextTick();
+      this.$nextTick(() => {
+        let container = document.getElementById("chat-history");
+        let imgsHeight = this.imgHeights();
+        // console.log("scrooooooooooooooooool before", container.scrollHeight, imgsHeight);
+        let scrollHeight = container.scrollHeight;
+        let result = imgsHeight + scrollHeight;
+        // console.log("finalllllllllllllllllllllllll", result);
+        container.scrollTop = result;
+        // container.scrollBy(0, 9999999);
+        // container.scrollTop = 9999999999;
+      })
+      // this.$forceUpdate();
+      // this.$nextTick(() => {
+      // console.log("scrooooooooooooooooool after", container.scrollHeight);
+      // })
+      // onMounted(() => {
+      // })
+      // container.scroll();
+      // console.log(test, "scrollToEnd")
+      // eslint-disable-next-line vue/valid-next-tick
+      // await this.$nextTick(() => {
+      // container.scrollTo(0, 90000000);
+      // })
     },
     getFormattedDate(date) {
       return date.split(" ")[0].trim();
@@ -506,7 +559,6 @@ export default {
       return date.split(" ")[1].trim();
     },
     async sendMessage() {
-      
         if (this.isEdit) {
           console.log("should change the message body");
           this.new_message_body = '';
@@ -527,7 +579,6 @@ export default {
         this.selectedImage = null;
         this.$refs.fileInput.value = null;
         this.base64Image=null;
-      
     },
     async set_admin(user_id, is_staff) {
       this.websocket.send(JSON.stringify({
@@ -535,8 +586,21 @@ export default {
         "user": user_id,
         "is_staff": is_staff
       }))
+      this.$refs.setAdmin[0].style.transition = "1s";
+      this.$refs.setAdmin[0].innerHTML = is_staff ? "User status set. (Staffed)" : "User status set. (Not Staffed)";
+      setTimeout(() => {
+        this.$refs.setAdmin[0].style.opacity = "0";
+      }, 1000);
+      setTimeout(() => {
+        this.$refs.setAdmin[0].innerHTML = "<small><b>admin</b></small>";
+        this.$refs.setAdmin[0].style.opacity = "1";
+      }, 2000);
     },
     async selectRoom(room) {
+      this.showLoader();
+      setTimeout(() => {
+        this.hideLoader();
+      }, 1500);
       // console.log(JSON.stringify(this.currentChatRoom),JSON.stringify(room));
       let jsonRoom = JSON.stringify(room);
       if (JSON.stringify(this.currentChatRoom) == jsonRoom || JSON.stringify(this.currentPrivateRoom) == jsonRoom) {
@@ -664,7 +728,6 @@ export default {
     async searchHandler() {
       // console.log(this.isPrivate);
       if (!this.isPrivate) {
-
         let body = {
           "key": this.searchValue
         }
@@ -681,7 +744,6 @@ export default {
             })
 
       } else {
-
         let body = {
           "key": this.searchValue
         }
@@ -696,7 +758,6 @@ export default {
             .catch(err => {
               console.log(err);
             })
-
       }
     },
     startTyping() {
@@ -741,8 +802,6 @@ export default {
       }
       await this.uploadImage();
       this.$refs.inputMessage.focus();
-
-
     },
     async uploadImage() {
       if (this.selectedImage) {
@@ -758,6 +817,14 @@ export default {
       }
     },
 
+    showLoader() {
+      const loader = document.getElementById("loader");
+      loader.style.display = "block";
+    },
+    hideLoader() {
+      const loader = document.getElementById("loader");
+      loader.style.display = "none";
+    }
   },
   watch: {
     groupInfo(n) {
@@ -770,7 +837,6 @@ export default {
     timeStamp() {
       this.changeTime = true;
     }
-
   },
   async mounted() {
     this.user = await jwtAuth.getCurrentUser();
@@ -782,16 +848,7 @@ export default {
     console.log(this.isPrivate);
     if (!await jwtAuth.isAuthenticate())
       this.$router.push('/login')
-    // if (!this.isPrivate){
-
-    //   await this.fetchGroups()
-    // }
-    // else
-    //   await this.fetchPrivateRooms()
   },
-  created() {
-    // this.currentChatRoom=null;
-  }
 }
 </script>
 
@@ -1083,7 +1140,7 @@ ul {
 
 .close {
   color: #aaa;
-  float: right;
+  //float: right;
   font-size: 28px;
   font-weight: bold;
 }
@@ -1093,6 +1150,27 @@ ul {
   color: black;
   text-decoration: none;
   cursor: pointer;
+}
+
+.loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  backdrop-filter: opacity(0);
+  height: 50px;
+  animation: spin 1s linear infinite;
+  //background-color: red;
+  display: none;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 </style>
