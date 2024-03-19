@@ -1140,7 +1140,7 @@ ul {
 
 .close {
   color: #aaa;
-  //float: right;
+  /* float: right; */
   font-size: 28px;
   font-weight: bold;
 }
@@ -1164,7 +1164,7 @@ ul {
   backdrop-filter: opacity(0);
   height: 50px;
   animation: spin 1s linear infinite;
-  //background-color: red;
+  /* background-color: red; */
   display: none;
 }
 

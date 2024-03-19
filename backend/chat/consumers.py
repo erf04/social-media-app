@@ -199,9 +199,10 @@ class GroupConsumer(AsyncWebsocketConsumer):
         user_id=text_data['user']
         admins=self.room.admins.all()
         try:
-            admin=GroupAdmin.objects.get(user=self.user)
+            admin=GroupAdmin.objects.get(user=self.user,group=self.room)
         except:
             admin=None
+            
         if (admin in admins and admin.is_staff) or (self.user == self.room.creator):
             new_admin=User.objects.get(pk=user_id)
             
