@@ -324,6 +324,7 @@
 // scroll to end btn              ok
 // image in reply alert box
 // online offline green circle
+// send set admin message to group
 
 import {JWTAuth} from "../../../services/jwt";
 import axios from "axios";
@@ -331,11 +332,11 @@ import ReconnectingWebSocket from "@/lib/reconnecting-websocket.min";
 import "../../../node_modules/bootstrap/dist/css/bootstrap.css";
 import footerMenu from '@/components/FooterMenu.vue';
 import $ from 'jquery';
-const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 import debounce from "lodash/debounce";
 import { nextTick } from "vue";
 
 
+const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 const baseURL = "http://localhost:8000";
 
 // eslint-disable-next-line no-unused-vars
