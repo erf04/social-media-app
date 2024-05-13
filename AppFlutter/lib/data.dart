@@ -266,7 +266,7 @@ class HttpClient {
 }
 
 Future<List<Course>> getCourses() async {
-  final response = await HttpClient.dio.get('http://localhost:8000/');
+  final response = await HttpClient.dio.get('auth/users/');
   if (response != null) {
     print(response.data);
   } else {

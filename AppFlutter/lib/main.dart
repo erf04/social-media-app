@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_application_2/chat.dart';
 import 'package:flutter_application_2/coursePage.dart';
 import 'package:flutter_application_2/data.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -50,11 +51,11 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
-      home: const CoursePage(),
-      //   home: Stack(children: [
-      //     const Positioned.fill(child: MainPage()),
-      //     Positioned(bottom: 0, left: 0, right: 0, child: _BottomNavigation())
-      //   ]),
+      home: const ChatScreen(),
+      // home: Stack(children: [
+      //   const Positioned.fill(child: MainPage()),
+      //   Positioned(bottom: 0, left: 0, right: 0, child: _BottomNavigation())
+      // ]),
       // );
       //}
     );
