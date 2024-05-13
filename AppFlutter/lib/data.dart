@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:io';
 
 class StoryData {
   StoryData(
@@ -262,16 +264,27 @@ class Teacher {
 }
 
 class HttpClient {
-  static Dio dio = Dio(BaseOptions(baseUrl: 'http://localhost:8000/'));
+  static Dio instance = Dio(BaseOptions(baseUrl: 'http://10.0.2.2:8000/'));
+}
+
+Future<String> getLocalIpAddress() async {
+  try {
+    List<InternetAddress> list = await InternetAddress.lookup('google.com');
+    return list[0].address;
+  } on SocketException catch (_) {
+    return 'Failed to get IP address.';
+  }
 }
 
 Future<List<Course>> getCourses() async {
-  final response = await HttpClient.dio.get('auth/users/');
-  if (response != null) {
-    print(response.data);
-  } else {
-    print("RIDIN");
-  }
-  final List<Course> courses = [];
-  return courses;
+  // var url = Uri.parse('http://localhost:8000/hello/');
+  // var response = await http.get(
+  //   url,
+  // );
+  final response = await HttpClient.instance.get('hello/');
+  if (response != null)
+    print(response);
+  else
+    print("Null");
+  return [];
 }

@@ -13,7 +13,7 @@ import 'package:flutter_application_2/loginSignUp.dart';
 import 'package:flutter_application_2/splash.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-void main() {
+void main() async {
   getCourses();
   runApp(const MyApp());
 }

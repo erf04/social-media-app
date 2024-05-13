@@ -20,25 +20,28 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreen extends State<ChatScreen> {
+  String myIp = HttpClient.instance.options.baseUrl;
   bool signup = false;
   Color myColor = Colors.white.withOpacity(0.5);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-      title: Row(
-        children: [
-          Image.asset("assets.img.icons.LOGO.svg"),
-          const SizedBox(
-            width: 8,
-          ),
-          Text(
-            "LeadLearn",
-            style: Theme.of(context).textTheme.bodyLarge,
-          )
-        ],
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Assets.img.icons.logo.svg(width: 60, height: 40),
+            const SizedBox(
+              width: 8,
+            ),
+            Text(
+              "LeadLearn",
+              style: Theme.of(context).textTheme.bodyLarge,
+            )
+          ],
+        ),
       ),
-    ));
+      body: SafeArea(child: Text(myIp)),
+    );
   }
 }

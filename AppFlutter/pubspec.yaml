@@ -41,6 +41,7 @@ dependencies:
   smooth_page_indicator: ^1.1.0
   sizing: ^1.1.2
   dio: ^5.4.2+1
+  http: ^1.2.1
   
 dev_dependencies:
   build_runner:
