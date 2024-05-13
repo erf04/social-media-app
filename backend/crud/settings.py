@@ -214,9 +214,7 @@ DJOSER = {
         'user_create': ['rest_framework.permissions.AllowAny'],
         'user_delete': ['djoser.permissions.CurrentUserOrAdmin'],
     },
-    'CORS_ALLOWED_ORIGINS': [
-        "http://localhost:8080",  # Add your front-end origin here
-    ],
+    'CORS_ALLOWED_ORIGINS': ["*"],
 }
 
 CHANNEL_LAYERS = {
