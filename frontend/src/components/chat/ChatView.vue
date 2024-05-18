@@ -325,6 +325,9 @@
 // image in reply alert box
 // online offline green circle
 // send set admin message to group
+// seen message 
+// last message
+// like and save message 
 
 import {JWTAuth} from "../../../services/jwt";
 import axios from "axios";
@@ -664,6 +667,9 @@ export default {
             // console.log("stop");
             this.isTyping = false;
           } else if (command === "image") {
+            console.log(data);
+          }
+          else if (command=="add_viewer"){
             console.log(data);
           }
         }
