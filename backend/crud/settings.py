@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-kq1mmt!d6+e$jxwh8x$5w0t1qyswc*8!r86c-6xze8_o^&31uz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -151,9 +151,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #cors config
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",  # Your Vue.js development server
-]
+CORS_ALLOW_ALL_ORIGINS = True
 
 REST_FRAMEWORK = {
 
@@ -216,9 +214,7 @@ DJOSER = {
         'user_create': ['rest_framework.permissions.AllowAny'],
         'user_delete': ['djoser.permissions.CurrentUserOrAdmin'],
     },
-    'CORS_ALLOWED_ORIGINS': [
-        "http://localhost:8080",  # Add your front-end origin here
-    ],
+    'CORS_ALLOWED_ORIGINS': ["*"],
 }
 
 CHANNEL_LAYERS = {
