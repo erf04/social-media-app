@@ -51,11 +51,12 @@ class MessageSerializer(serializers.ModelSerializer):
     timestamp=serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S",read_only=True)
     liked_by=UserSerializer(many=True, required=False)
     saved_by=UserSerializer(many=True,required=False)
+    seen_by=UserSerializer(many=True,required=False)
     reply_to=serializers.SerializerMethodField()
     type=serializers.SerializerMethodField()
     class Meta:
         model=Message
-        fields=('id','sender','reply_to','liked_by','saved_by','body','timestamp','type','image')
+        fields=('id','sender','reply_to','liked_by','saved_by','seen_by','body','timestamp','type','image')
 
     def get_reply_to(self, obj:Message):
         if obj.reply_to:

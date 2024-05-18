@@ -83,6 +83,15 @@ class GroupConsumer(AsyncWebsocketConsumer):
             result=""
             await self.send_to_chat_message(result,command="stop_typing")
 
+        elif command=="add_viewer":
+            result=await self.add_viewer(text_data_json)
+            if (result!=None):
+                await self.send_to_chat_message(result,command="add_viewer")
+            else:
+                self.send(json.dumps({
+                    "message":"unexpected error"
+                }))
+
     
 
 
@@ -218,6 +227,21 @@ class GroupConsumer(AsyncWebsocketConsumer):
     async def is_typing(self):
         user= self.user
         return UserSerializer(user,many=False).data
+    
+    @database_sync_to_async
+    def add_viewer(self,text_data:dict):
+        message_id=text_data["message_id"]
+        user=self.user
+        try:
+            message=Message.objects.get(pk=message_id)
+            message.seen_by.add(user)
+        except:
+            self.send(json.dumps({
+                "error":f"message with id: {message_id} dosn't exist"
+            }))
+
+        return MessageSerializer(message,many=False)
+
     
 
 
