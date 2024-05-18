@@ -90,7 +90,6 @@ class AbstractMessage(models.Model):
     reply_to=models.ForeignKey('self',on_delete=models.CASCADE,null=True,blank=True)  # for replying to a message
     image=models.ImageField(upload_to="chat_images/",null=True,blank=True)
 
-
     class Meta:
         abstract=True
     
@@ -104,6 +103,7 @@ class Message(AbstractMessage):
     reply_to=models.ForeignKey('self',on_delete=models.SET_NULL,null=True,blank=True)  # for replying to a message
     liked_by=models.ManyToManyField(User,related_name='message_likes',blank=True)
     saved_by=models.ManyToManyField(User,related_name='message_saves',blank=True)
+    seen_by=models.ManyToManyField(User,related_name="message_seens",blank=True)
 
     def message_order(self,room,type):
         # chat_id=Group.objects.get(name=roomname,participants=user).id
