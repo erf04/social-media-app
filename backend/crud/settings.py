@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'channels',
     # doc
     'rest_framework_swagger',
+    'drf_yasg',
     #custom apps
     'api',
     'chat',

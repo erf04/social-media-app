@@ -11,11 +11,15 @@ from rest_framework import permissions,generics
 from rest_framework.parsers import MultiPartParser, FormParser
 from chat.serializers import CompleteUserSerializer
 from rest_framework import generics
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 # Create your views here.
 
 
 @api_view(['GET'])
 def hello(request:Request):
+
     return Response(
         {"message":"hello world"},status=status.HTTP_200_OK)
 
@@ -56,6 +60,34 @@ def show_allposts(request:Request):
     return Response(serialized.data,status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(
+    method="get",
+    operation_description="get user posts",
+    
+    manual_parameters=[
+        openapi.Parameter(
+            "Authorization",
+            openapi.IN_HEADER,
+            description="your jwt access token",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            description="A list of loggedin-user posts",
+            schema=openapi.Schema(
+                type=openapi.TYPE_ARRAY,
+                        items=openapi.Schema(
+                        title="user posts",
+                        type=openapi.TYPE_OBJECT,
+                        properties={field_name: openapi.Schema(type=field_instance.__class__.__name__)
+                                    for field_name, field_instance in PostSerializer().get_fields().items()}
+                    )
+            )
+        )
+    }
+)
 @api_view(['GET'])
 @permission_classes([IsOwnerOrReadOnly])
 def showUserPosts(request:Request):
