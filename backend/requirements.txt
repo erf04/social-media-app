@@ -10,3 +10,4 @@ social-auth-app-django==5.4.0
 daphne==4.0.0
 channels==4.0.0
 asgiref==3.7.2
+django-rest-swagger==2.2.0

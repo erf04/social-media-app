@@ -51,6 +51,9 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     #websocket 
     'channels',
+    # doc
+    'rest_framework_swagger',
+    'drf_yasg',
     #custom apps
     'api',
     'chat',
@@ -158,9 +161,13 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
 
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',    
 
 }
+
+LOGIN_URL = 'auth/jwt/create/'
+LOGOUT_URL = 'rest_framework:logout'
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
