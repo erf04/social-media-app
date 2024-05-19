@@ -525,7 +525,8 @@ export default {
           // console.log(el,index);
           ht+=$(el).height();
         })
-        $("#chat-history").animate({scrollTop: ht});
+        $("#chat-history").animate({scrollTop: ht}, 0);
+        // this.hideLoader();
     },
     async scrollForNewMessage(){
       await nextTick();
@@ -578,9 +579,9 @@ export default {
     },
     async selectRoom(room) {
       this.showLoader();
-      setTimeout(() => {
-        this.hideLoader();
-      }, 1500);
+      // setTimeout(() => {
+      //   this.hideLoader();
+      // }, 1500);
       // console.log(JSON.stringify(this.currentChatRoom),JSON.stringify(room));
       let jsonRoom = JSON.stringify(room);
       if (JSON.stringify(this.currentChatRoom) == jsonRoom || JSON.stringify(this.currentPrivateRoom) == jsonRoom) {
@@ -645,8 +646,12 @@ export default {
             console.log(data);
             this.messages = data["messages"];
             console.log(`this.arrived:${this.arrived}`);
-            if (this.arrived)
+            if (this.arrived) {
               await this.scrollToEnd();
+            }
+            // $("#chat-history").scrollTop(99999999999);
+            await nextTick();
+            this.hideLoader();
           } else if (command === "new_message") {
             console.log(data['data']);
             this.new_message = data['data'];
