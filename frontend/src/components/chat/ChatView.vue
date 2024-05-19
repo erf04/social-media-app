@@ -180,7 +180,7 @@
                   <!--                       style="margin: 0 auto; background: red; text-align: center; width: fit-content">-->
                   <!--                    {{ showTime(getFormattedDate(message.timestamp)) }}-->
                   <!--                  </div>-->
-                  <li class="clearfix"
+                  <li class="clearfix" :id="`a${message.id}`"
                       :style="message.sender.id === user.id ? `text-align: end` : `text-align: start`">
                     <div v-if="message.sender.id === user.id">
                       <div :ref="message.id" class="message-data text-right m-0">
@@ -476,12 +476,37 @@ export default {
         ]
       });
     },
+    isScrolledIntoView(el) {
+      var rect = el.getBoundingClientRect();
+      var elemTop = rect.top;
+      var elemBottom = rect.bottom;
+
+      // Only completely visible elements return true:
+      var isVisible = (elemTop >= 0) && (elemBottom <= window.innerHeight);
+      return isVisible;
+    },
     bottomButtonHandler(e) {
       // console.log("scrollTop", e.target.scrollTop);
       const height = e.target.scrollHeight - e.target.clientHeight;
       // if (e.target.scrollTop === e.target.scrollHeight) {
       // }
       // console.log("scrollHeight", e.target.scrollHeight);
+      // console.log(e.target.scrollTop);
+
+      this.messages.forEach(message => {
+        const element = document.getElementById(`a${message.id}`);
+        if (this.isScrolledIntoView(element)) {
+          this.sendViewer(message.id);
+          // console.log(`Div ${message.id} is in view!`);
+        }
+        // else {
+        //   console.log(`Div ${message.id} not in view!`);
+        // }
+      });
+      // console.log(element, "elementtttttttttttttttttttttttttt");
+      // console.log(element.scrollIntoView(), "boooooooooooooooooooooooooooooooool");
+      
+      
       if (height - e.target.scrollTop > 300) {
         // alert("bottom btn");
         // this.$refs.bottomBtn.style.display = "block";
@@ -515,12 +540,12 @@ export default {
       imgs.forEach(img => {
         height += img.height;
       })
-      console.log("height imgsssssssssssssssssssssss" , height);
+      // console.log("height imgsssssssssssssssssssssss" , height);
       return height;
       // })
     },
     async scrollToEnd() {
-
+        
         await nextTick();
         let ht=0;
         // console.log($('.clearfix'));
@@ -528,7 +553,7 @@ export default {
           // console.log(el,index);
           ht+=$(el).height();
         })
-        $("#chat-history").animate({scrollTop: ht}, 0);
+        $("#chat-history").animate({scrollTop: ht});
         // this.hideLoader();
     },
     async scrollForNewMessage(){
@@ -652,7 +677,7 @@ export default {
             if (this.arrived) {
               await this.scrollToEnd();
             }
-            // $("#chat-history").scrollTop(99999999999);
+            // $("#chat-history").scrollTop($("#chat-history").scrollHeight)
             await nextTick();
             this.hideLoader();
           } else if (command === "new_message") {
@@ -674,11 +699,18 @@ export default {
           } else if (command === "image") {
             console.log(data);
           }
-          else if (command=="add_viewer"){
+          else if (command == "add_viewer"){
             console.log(data);
           }
         }
       }
+    },
+
+    sendViewer(id) {
+      this.websocket.send(JSON.stringify({
+        "message_id" : id,
+        "command": "add_viewer",
+      }))
     },
 
     goToGroupCreationForm() {
@@ -771,13 +803,9 @@ export default {
       return this.timeStamp;
     },
     isGroupAdmin(userId) {
-      // console.log(this.currentChatRoom);
-
       let admins = this.currentChatRoom.admins;
-      // console.log(admins);
       let result = admins.some((admin) => admin.user.id == userId);
       return result;
-
     },
     isGroupAdminStaff(userId) {
       let admins = this.currentChatRoom.admins;
@@ -816,7 +844,20 @@ export default {
     hideLoader() {
       const loader = document.getElementById("loader");
       loader.style.display = "none";
-    }
+    },
+    pedarsag() {
+      const divElement = $('#a222');
+      console.log("kgatttttttttttttttttttttttttttttttttt", divElement);
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            console.log('User has reached the div');
+            // Perform any action you want when user reaches the div
+          }
+        });
+      });
+      observer.observe(divElement);
+    },
   },
   watch: {
     groupInfo(n) {
@@ -830,6 +871,7 @@ export default {
       this.changeTime = true;
     }
   },
+
   async mounted() {
     this.user = await jwtAuth.getCurrentUser();
     // console.log("messages:"+this.messages);
@@ -838,9 +880,12 @@ export default {
     this.groups = null;
     // this.isPrivate=false;
     console.log(this.isPrivate);
-    if (!await jwtAuth.isAuthenticate())
+    if (!await jwtAuth.isAuthenticate()) {
       this.$router.push('/login')
-  },
+    }
+    // await nextTick();
+    // this.pedarsag();
+    },
 }
 </script>
 
