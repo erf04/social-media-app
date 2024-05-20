@@ -22,6 +22,7 @@ urlpatterns = [
     path('users/filter/',views.filterCompletedUsers.as_view()),
     path('follower/add/',views.add_following),
     path('follower/remove/',views.remove_follower),
+    path('complete-user/me/',views.get_complete_user,)
     
 
     

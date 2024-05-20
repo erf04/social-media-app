@@ -199,6 +199,13 @@ def remove_follower(request:Request):
     }
     return Response(data=response,status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def get_complete_user(request:Request):
+    user=request.user
+    serialized=CompleteUserSerializer(user,many=False)
+    return Response(data=serialized.data,status=status.HTTP_200_OK)
+
 
 
     
