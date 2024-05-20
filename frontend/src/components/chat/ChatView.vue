@@ -180,16 +180,18 @@
                   <!--                       style="margin: 0 auto; background: red; text-align: center; width: fit-content">-->
                   <!--                    {{ showTime(getFormattedDate(message.timestamp)) }}-->
                   <!--                  </div>-->
-                  <li class="clearfix"
+                  <li class="clearfix" :id="`a${message.id}`"
                       :style="message.sender.id === user.id ? `text-align: end` : `text-align: start`">
                     <div v-if="message.sender.id === user.id">
                       <div :ref="message.id" class="message-data text-right m-0">
+                      <button @click="goToProfile(message.sender)">
                         <span class="message-data-time">
                           <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>
                           <span v-else-if="getFormattedDate(message.timestamp) === yesterdayTime"> Yesterday </span>
                           <span v-else> {{ getFormattedDate(message.timestamp) }} </span>
                         </span>
                         <img :src="getAbsoluteUrl(message.sender.image)" alt="user profile picture"/>
+                      </button>
                       </div>
                       <div ref="whoSend" class="message other-message">
                         <h6>
@@ -209,13 +211,24 @@
                             {{ message.body }}
                           </p>
                         </div>
-                        <div style="text-align: start; font-size: small">
-                          {{ getFormattedTime(message.timestamp) }}
+                        <div style="text-align: start; font-size: small; display: flex; align-items: baseline; gap: 10px">
+                          <div style="width: 20px; height: 20px" v-if="message.seen_by.length <= 1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                            </svg>
+                          </div>
+                          <div v-else>
+                            <img src="../../assets/double-tick.png" alt="seen" />
+                          </div>
+                          <div>
+                            {{ getFormattedTime(message.timestamp) }}
+                          </div>
                         </div>
                       </div>
                     </div>
                     <div v-else>
                       <div class="message-data m-0" :ref="message.id">
+                      <button @click="goToProfile(message.sender)">
                         <span class="message-data-time">
     <!--                      <span> {{ message.sender.username }} </span>-->
                           <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>
@@ -223,6 +236,7 @@
                           <span v-else> {{ getFormattedDate(message.timestamp) }} </span>
                         </span>
                         <img :src="getAbsoluteUrl(message.sender.image)" alt="user profile picture"/>
+                      </button>
                       </div>
                       <div class="message my-message">
                         <h6>{{ message.sender.username }}</h6>
@@ -242,6 +256,7 @@
                         </div>
                         <div style="text-align: end; font-size: small">
                           {{ getFormattedTime(message.timestamp) }}
+                          
                         </div>
                       </div>
                     </div>
@@ -337,7 +352,6 @@ import footerMenu from '@/components/FooterMenu.vue';
 import $ from 'jquery';
 import debounce from "lodash/debounce";
 import { nextTick } from "vue";
-
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 const baseURL = "http://localhost:8000";
@@ -466,7 +480,7 @@ export default {
             }
           },
           {
-            label: "A submenu",
+            label: "Seen By",
             children: [
               {label: "Item1"},
               {label: "Item2"},
@@ -476,19 +490,41 @@ export default {
         ]
       });
     },
+    goToProfile(sender) {
+      const userTemp = user.username;
+      if (userTemp == sender.username) 
+        this.$router.push("/profile")
+      else 
+        this.$router.push(`/${sender.username}`)
+    },
+    isScrolledIntoView(el) {
+      var rect = el.getBoundingClientRect();
+      var elemTop = rect.top;
+      var elemBottom = rect.bottom;
+
+      // Only completely visible elements return true:
+      var isVisible = (elemTop >= 0) && (elemBottom <= window.innerHeight);
+      return isVisible;
+    },
     bottomButtonHandler(e) {
       // console.log("scrollTop", e.target.scrollTop);
       const height = e.target.scrollHeight - e.target.clientHeight;
       // if (e.target.scrollTop === e.target.scrollHeight) {
       // }
       // console.log("scrollHeight", e.target.scrollHeight);
+      // console.log(e.target.scrollTop);
+
+      this.messages.forEach(message => {
+        const element = document.getElementById(`a${message.id}`);
+        if (this.isScrolledIntoView(element)) {
+          this.sendViewer(message.id);
+        }
+      });
+      
       if (height - e.target.scrollTop > 300) {
-        // alert("bottom btn");
-        // this.$refs.bottomBtn.style.display = "block";
         this.$refs.bottomBtn.style.transition = "0.3s";
         this.$refs.bottomBtn.style.opacity = "1";
       } else {
-        // this.$refs.bottomBtn.style.display = "none";
         this.$refs.bottomBtn.style.transition = "0.3s";
         this.$refs.bottomBtn.style.opacity = "0";
       }
@@ -507,6 +543,21 @@ export default {
       }, 1500);
       el.scrollIntoView({behavior: "smooth"});
     },
+    // async userData() {
+    //   const user = await jwtAuth.getCurrentUser();
+    //   axios.post(`${baseURL}/get-user/`, {
+    //     username: user==null?null: user.username
+    //   })
+    //       .then(response => {
+    //         this.userInfo = response.data;
+    //       })
+    //       .catch(err => {
+    //         console.log(err);
+    //       })
+    //   // this.userInfo = user;
+    //   // this.userInfo.userId = user==null?null: user.id;
+    //   console.log(user);
+    // },
     imgHeights() {
       // await nextTick();
       // this.$nextTick(() => {
@@ -515,12 +566,12 @@ export default {
       imgs.forEach(img => {
         height += img.height;
       })
-      console.log("height imgsssssssssssssssssssssss" , height);
+      // console.log("height imgsssssssssssssssssssssss" , height);
       return height;
       // })
     },
     async scrollToEnd() {
-
+        
         await nextTick();
         let ht=0;
         // console.log($('.clearfix'));
@@ -529,6 +580,7 @@ export default {
           ht+=$(el).height();
         })
         $("#chat-history").animate({scrollTop: ht});
+        // this.hideLoader();
     },
     async scrollForNewMessage(){
       await nextTick();
@@ -581,9 +633,9 @@ export default {
     },
     async selectRoom(room) {
       this.showLoader();
-      setTimeout(() => {
-        this.hideLoader();
-      }, 1500);
+      // setTimeout(() => {
+      //   this.hideLoader();
+      // }, 1500);
       // console.log(JSON.stringify(this.currentChatRoom),JSON.stringify(room));
       let jsonRoom = JSON.stringify(room);
       if (JSON.stringify(this.currentChatRoom) == jsonRoom || JSON.stringify(this.currentPrivateRoom) == jsonRoom) {
@@ -648,8 +700,12 @@ export default {
             console.log(data);
             this.messages = data["messages"];
             console.log(`this.arrived:${this.arrived}`);
-            if (this.arrived)
+            if (this.arrived) {
               await this.scrollToEnd();
+            }
+            // $("#chat-history").scrollTop($("#chat-history").scrollHeight)
+            await nextTick();
+            this.hideLoader();
           } else if (command === "new_message") {
             console.log(data['data']);
             this.new_message = data['data'];
@@ -669,11 +725,18 @@ export default {
           } else if (command === "image") {
             console.log(data);
           }
-          else if (command=="add_viewer"){
+          else if (command == "add_viewer"){
             console.log(data);
           }
         }
       }
+    },
+
+    sendViewer(id) {
+      this.websocket.send(JSON.stringify({
+        "message_id" : id,
+        "command": "add_viewer",
+      }))
     },
 
     goToGroupCreationForm() {
@@ -766,13 +829,9 @@ export default {
       return this.timeStamp;
     },
     isGroupAdmin(userId) {
-      // console.log(this.currentChatRoom);
-
       let admins = this.currentChatRoom.admins;
-      // console.log(admins);
       let result = admins.some((admin) => admin.user.id == userId);
       return result;
-
     },
     isGroupAdminStaff(userId) {
       let admins = this.currentChatRoom.admins;
@@ -811,7 +870,8 @@ export default {
     hideLoader() {
       const loader = document.getElementById("loader");
       loader.style.display = "none";
-    }
+    },
+
   },
   watch: {
     groupInfo(n) {
@@ -825,6 +885,7 @@ export default {
       this.changeTime = true;
     }
   },
+
   async mounted() {
     this.user = await jwtAuth.getCurrentUser();
     // console.log("messages:"+this.messages);
@@ -833,9 +894,12 @@ export default {
     this.groups = null;
     // this.isPrivate=false;
     console.log(this.isPrivate);
-    if (!await jwtAuth.isAuthenticate())
+    if (!await jwtAuth.isAuthenticate()) {
       this.$router.push('/login')
-  },
+    }
+    // await nextTick();
+    // this.pedarsag();
+    },
 }
 </script>
 

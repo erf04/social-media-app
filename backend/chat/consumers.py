@@ -240,7 +240,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
                 "error":f"message with id: {message_id} dosn't exist"
             }))
 
-        return MessageSerializer(message,many=False)
+        return MessageSerializer(message,many=False).data
 
     
 
