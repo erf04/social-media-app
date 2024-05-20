@@ -209,8 +209,18 @@
                             {{ message.body }}
                           </p>
                         </div>
-                        <div style="text-align: start; font-size: small">
-                          {{ getFormattedTime(message.timestamp) }}
+                        <div style="text-align: start; font-size: small; display: flex; align-items: baseline; gap: 10px">
+                          <div style="width: 20px; height: 20px" v-if="message.seen_by.length <= 1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                            </svg>
+                          </div>
+                          <div v-else>
+                            <img src="../../assets/double-tick.png" alt="seen" />
+                          </div>
+                          <div>
+                            {{ getFormattedTime(message.timestamp) }}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -241,7 +251,8 @@
                           </p>
                         </div>
                         <div style="text-align: end; font-size: small">
-                          {{ getFormattedTime(message.timestamp) }}
+                          <p> {{ getFormattedTime(message.timestamp) }} </p>
+                          
                         </div>
                       </div>
                     </div>
@@ -466,7 +477,7 @@ export default {
             }
           },
           {
-            label: "A submenu",
+            label: "Seen By",
             children: [
               {label: "Item1"},
               {label: "Item2"},
