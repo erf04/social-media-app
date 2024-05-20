@@ -1,7 +1,7 @@
 <template>
-  <div class="container">
+  <div class="container" style="margin-bottom: 5rem">
     <div v-for="(post, index) in posts" :key="post.id" class="card mb-5"
-         style="margin: 0 auto; min-height: 300px; width: 25rem">
+         style="margin: 0 auto; min-height: 300px; width: 25rem;">
       <div class="p-2 pb-0 mt-0 d-flex justify-content-between align-items-center">
         <div class="d-flex" style="gap: 5px">
           <button @click="GoToUserPage(post.author.username)">

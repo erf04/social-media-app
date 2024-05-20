@@ -184,12 +184,14 @@
                       :style="message.sender.id === user.id ? `text-align: end` : `text-align: start`">
                     <div v-if="message.sender.id === user.id">
                       <div :ref="message.id" class="message-data text-right m-0">
+                      <button @click="goToProfile(message.sender)">
                         <span class="message-data-time">
                           <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>
                           <span v-else-if="getFormattedDate(message.timestamp) === yesterdayTime"> Yesterday </span>
                           <span v-else> {{ getFormattedDate(message.timestamp) }} </span>
                         </span>
                         <img :src="getAbsoluteUrl(message.sender.image)" alt="user profile picture"/>
+                      </button>
                       </div>
                       <div ref="whoSend" class="message other-message">
                         <h6>
@@ -226,6 +228,7 @@
                     </div>
                     <div v-else>
                       <div class="message-data m-0" :ref="message.id">
+                      <button @click="goToProfile(message.sender)">
                         <span class="message-data-time">
     <!--                      <span> {{ message.sender.username }} </span>-->
                           <span v-if="getFormattedDate(message.timestamp) === todayTime"> Today </span>
@@ -233,6 +236,7 @@
                           <span v-else> {{ getFormattedDate(message.timestamp) }} </span>
                         </span>
                         <img :src="getAbsoluteUrl(message.sender.image)" alt="user profile picture"/>
+                      </button>
                       </div>
                       <div class="message my-message">
                         <h6>{{ message.sender.username }}</h6>
@@ -251,7 +255,7 @@
                           </p>
                         </div>
                         <div style="text-align: end; font-size: small">
-                          <p> {{ getFormattedTime(message.timestamp) }} </p>
+                          {{ getFormattedTime(message.timestamp) }}
                           
                         </div>
                       </div>
@@ -348,7 +352,6 @@ import footerMenu from '@/components/FooterMenu.vue';
 import $ from 'jquery';
 import debounce from "lodash/debounce";
 import { nextTick } from "vue";
-
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 const baseURL = "http://localhost:8000";
@@ -487,6 +490,13 @@ export default {
         ]
       });
     },
+    goToProfile(sender) {
+      const userTemp = user.username;
+      if (userTemp == sender.username) 
+        this.$router.push("/profile")
+      else 
+        this.$router.push(`/${sender.username}`)
+    },
     isScrolledIntoView(el) {
       var rect = el.getBoundingClientRect();
       var elemTop = rect.top;
@@ -508,23 +518,13 @@ export default {
         const element = document.getElementById(`a${message.id}`);
         if (this.isScrolledIntoView(element)) {
           this.sendViewer(message.id);
-          // console.log(`Div ${message.id} is in view!`);
         }
-        // else {
-        //   console.log(`Div ${message.id} not in view!`);
-        // }
       });
-      // console.log(element, "elementtttttttttttttttttttttttttt");
-      // console.log(element.scrollIntoView(), "boooooooooooooooooooooooooooooooool");
-      
       
       if (height - e.target.scrollTop > 300) {
-        // alert("bottom btn");
-        // this.$refs.bottomBtn.style.display = "block";
         this.$refs.bottomBtn.style.transition = "0.3s";
         this.$refs.bottomBtn.style.opacity = "1";
       } else {
-        // this.$refs.bottomBtn.style.display = "none";
         this.$refs.bottomBtn.style.transition = "0.3s";
         this.$refs.bottomBtn.style.opacity = "0";
       }
@@ -543,6 +543,21 @@ export default {
       }, 1500);
       el.scrollIntoView({behavior: "smooth"});
     },
+    // async userData() {
+    //   const user = await jwtAuth.getCurrentUser();
+    //   axios.post(`${baseURL}/get-user/`, {
+    //     username: user==null?null: user.username
+    //   })
+    //       .then(response => {
+    //         this.userInfo = response.data;
+    //       })
+    //       .catch(err => {
+    //         console.log(err);
+    //       })
+    //   // this.userInfo = user;
+    //   // this.userInfo.userId = user==null?null: user.id;
+    //   console.log(user);
+    // },
     imgHeights() {
       // await nextTick();
       // this.$nextTick(() => {
@@ -856,19 +871,7 @@ export default {
       const loader = document.getElementById("loader");
       loader.style.display = "none";
     },
-    pedarsag() {
-      const divElement = $('#a222');
-      console.log("kgatttttttttttttttttttttttttttttttttt", divElement);
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            console.log('User has reached the div');
-            // Perform any action you want when user reaches the div
-          }
-        });
-      });
-      observer.observe(divElement);
-    },
+
   },
   watch: {
     groupInfo(n) {
