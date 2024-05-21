@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_application_2/ChatList.dart';
+import 'package:flutter_application_2/SharedPreferencesFile.dart';
 import 'package:flutter_application_2/chat.dart';
 import 'package:flutter_application_2/coursePage.dart';
 import 'package:flutter_application_2/data.dart';
@@ -10,11 +12,14 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_application_2/gen/assets.gen.dart';
 import 'package:flutter_application_2/home.dart';
 import 'package:flutter_application_2/loginSignUp.dart';
+import 'package:flutter_application_2/profile.dart';
 import 'package:flutter_application_2/splash.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
-  getCourses();
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedPreferencesManager.instance.init();
   runApp(const MyApp());
 }
 
@@ -51,7 +56,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
-      home: const ChatScreen(),
+      home: AuthScreen(),
+      //const SplashScreen(),
       // home: Stack(children: [
       //   const Positioned.fill(child: MainPage()),
       //   Positioned(bottom: 0, left: 0, right: 0, child: _BottomNavigation())

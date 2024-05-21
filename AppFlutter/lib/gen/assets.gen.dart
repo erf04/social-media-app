@@ -237,7 +237,11 @@ class $AssetsImgPostsSmallGen {
 class Assets {
   Assets._();
 
+  static const AssetGenImage download = AssetGenImage('assets/download.jpg');
   static const $AssetsImgGen img = $AssetsImgGen();
+
+  /// List of all assets
+  static List<AssetGenImage> get values => [download];
 }
 
 class AssetGenImage {
