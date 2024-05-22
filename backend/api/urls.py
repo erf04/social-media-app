@@ -20,7 +20,8 @@ urlpatterns = [
     path('follower/add/',views.add_following),
     path('follower/remove/',views.remove_follower),
     path('complete-user/me/',views.get_complete_user),
-    path('posts/',views.PostAPIView.as_view())
+    path('posts/',views.PostAPIView.as_view()),
+    path('post/add-like/',views.like_post)
     
 
     

@@ -27,6 +27,15 @@ post_serialized=openapi.Schema(
         "author":user_serialized,
         "content":openapi.Schema(type=openapi.TYPE_FILE),
         "description":openapi.Schema(type=openapi.TYPE_STRING),
+        "liked_by":openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            items=user_serialized
+        ),              
+        "saved_by":openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            items=user_serialized
+        ),
+
 
     }
 )

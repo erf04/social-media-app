@@ -294,6 +294,39 @@ class PostAPIView(APIView):
         posts=Post.objects.filter(author__username=username)
         serialized=PostSerializer(posts,many=True)
         return Response(data=serialized.data,status=status.HTTP_200_OK)
+    
+
+@swagger_auto_schema(
+        method="POST",
+        operation_description="add user to a post liked_by field",
+        manual_parameters=[
+            swagger_helper.authorization_param,
+            openapi.Parameter(
+                name="post_id",
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_INTEGER,
+                required=True
+            )
+        ],
+        responses={
+            200:swagger_helper.post_serialized,
+            404:"not found"
+        }
+)
+
+@api_view(["POST"])
+@permission_classes([permissions.IsAuthenticated])
+def like_post(request:Request):
+    user=request.user
+    post_id=request.data["post_id"]
+    try:
+        post=Post.objects.get(post_id)
+        post.liked_by.add(user)
+        serialized=PostSerializer(post,many=False)
+        return Response(serialized.data,status=status.HTTP_200_OK)
+    except:
+        return Response({"error":"post not found"},status=status.HTTP_404_NOT_FOUND)
+    
 
 
 
