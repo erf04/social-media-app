@@ -9,5 +9,5 @@ urlpatterns = [
     path('groups/filter',views.filter_groups),
     path('pv/filter',views.filter_pv),
     path('message/delete/',views.delete_message),
-    
+    path('websocket-docs/', views.websocket_docs, name='websocket-docs'),
 ]

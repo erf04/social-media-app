@@ -13,9 +13,10 @@ from chat.serializers import CompleteUserSerializer
 from rest_framework import generics
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from drf_yasg.inspectors import SerializerInspector
+from  . import swagger_helper
 
 # Create your views here.
-
 
 @api_view(['GET'])
 def hello(request:Request):
@@ -52,7 +53,12 @@ def createTask(request:Request):
         return  Response(serialized.data,status=status.HTTP_201_CREATED)
     return Response(serialized.errors,status=status.HTTP_400_BAD_REQUEST)
 
-
+@swagger_auto_schema(
+        method="GET",
+        responses={
+            200:swagger_helper.post_serialized
+        }
+)
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def show_allposts(request:Request):
@@ -85,7 +91,7 @@ def show_allposts(request:Request):
                                     for field_name, field_instance in PostSerializer().get_fields().items()}
                     )
             )
-        )
+        ),
     }
 )
 @api_view(['GET'])
@@ -95,6 +101,38 @@ def showUserPosts(request:Request):
     posts= Post.objects.filter(author=request.user)
     serialized=PostSerializer(posts, many=True)
     return Response(serialized.data,status=status.HTTP_200_OK)
+
+
+@swagger_auto_schema(
+        method="POST",
+        operation_description="create a post",
+        manual_parameters=[
+            openapi.Parameter(
+            "title",
+            openapi.IN_QUERY,
+            type=openapi.TYPE_STRING,
+            required=True
+            ),
+            openapi.Parameter(
+            "description",
+            openapi.IN_QUERY,
+            description="description",
+            type=openapi.TYPE_STRING,
+            required=True
+            ),
+            
+            openapi.Parameter(
+            "content",
+            openapi.IN_FORM,
+            description="the file of the post in a proper form",
+            type=openapi.TYPE_STRING,
+            required=True
+            ),
+            
+        ],
+
+
+)
 
 @api_view(['POST','PUT'])
 @permission_classes([permissions.IsAuthenticated])
@@ -115,13 +153,31 @@ def create_post(request:Request):
         return  Response("Error", status=status.HTTP_503_SERVICE_UNAVAILABLE)
     
 
+@swagger_auto_schema(
+        method="POST",
+        operation_description="to pass serailized user by username given",
+        manual_parameters=[
+            openapi.Parameter(
+            "username",
+            openapi.IN_QUERY,
+            description="username",
+            type=openapi.TYPE_STRING,
+            required=True
+
+
+            )
+        ],
+        responses={
+            200:swagger_helper.user_serialized
+        }
+)
 
 @api_view(['POST'])
 def getUserByUsername(request:Request):
     username = request.data['username']
     user= User.objects.get(username=username)
     serializer = UserSerializer(user)
-    return Response(serializer.data)
+    return Response(serializer.data,status=status.HTTP_200_OK)
 
 
 class getAllCompletedUsers(generics.ListAPIView):

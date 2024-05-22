@@ -1,0 +1,32 @@
+from drf_yasg import openapi
+
+user_serialized=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+
+                    "id":openapi.Schema(
+                        type=openapi.TYPE_INTEGER
+                    ),
+                    "username":openapi.Schema(
+                        type=openapi.TYPE_STRING
+                    ),
+                    "email":openapi.Schema(
+                        type=openapi.TYPE_STRING
+                    ),
+                    "image":openapi.Schema(
+                        type=openapi.TYPE_STRING
+                    ),
+
+                }   
+)
+
+post_serialized=openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "title":openapi.Schema(type=openapi.TYPE_STRING),
+        "author":user_serialized,
+        "content":openapi.Schema(type=openapi.TYPE_FILE),
+        "description":openapi.Schema(type=openapi.TYPE_STRING),
+
+    }
+)

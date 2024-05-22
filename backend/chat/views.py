@@ -15,6 +15,8 @@ from django.db.models import Q
 from datetime import datetime
 from .serializers import CompleteUserSerializer
 from itertools import chain
+from .websocket_doc import documentation
+import markdown2
 
 class GroupApiView(APIView):
     permission_classes=[permissions.IsAuthenticated]
@@ -112,3 +114,11 @@ def delete_message(request):
     message_id = request.data["message_id"]
     message = Message.objects.get(pk=message_id).delete()
     return Response({"message": "deleted"}, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def websocket_docs(request:Request):
+    html_content = markdown2.markdown(documentation)
+    return render(request,"websocket_swagger.html",{
+        "documentation":html_content
+    })

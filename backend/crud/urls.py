@@ -19,12 +19,17 @@ from django.urls import path,include
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
+from swagger_models import CustomSchemaGenerator
 
 schema_view = get_schema_view(
    openapi.Info(
       title="My API",
       default_version='v1',
-      description="Test description",
+      description="""
+        ## API Documentation
+
+        For WebSocket API documentation, visit [WebSocket Docs](/chat/websocket-docs/).
+        """,
       terms_of_service="https://www.google.com/policies/terms/",
       contact=openapi.Contact(email="contact@myapi.local"),
       license=openapi.License(name="BSD License"),
@@ -32,6 +37,10 @@ schema_view = get_schema_view(
     public=True,
     permission_classes=(permissions.AllowAny,),
 )
+# schema_view.schema.get_link('retrieve').field_inspectors.append(CustomFieldInspector)
+# schema_view.get_link('retrieve').field_inspectors.append(CustomFieldInspector)
+
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
