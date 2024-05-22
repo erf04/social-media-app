@@ -30,3 +30,11 @@ post_serialized=openapi.Schema(
 
     }
 )
+
+follower_serialized=openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+      "follower":user_serialized,
+      "following":user_serialized, 
+    }   
+)

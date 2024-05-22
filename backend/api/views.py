@@ -15,6 +15,8 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from drf_yasg.inspectors import SerializerInspector
 from  . import swagger_helper
+from rest_framework.views import APIView
+
 
 # Create your views here.
 
@@ -25,33 +27,6 @@ def hello(request:Request):
         {"message":"hello world"},status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
-def getTasks(request:Request):
-    tasks = Task.objects.all()
-    serializer = TaskSerializer(tasks, many=True)
-    if tasks.exists():
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    else:
-        return Response({"message": "No tasks found"}, status=status.HTTP_204_NO_CONTENT)
- 
-
-@api_view(['GET'])
-
-def getTask(request, id):
-    task = get_object_or_404(Task, pk=id)
-    serializer = TaskSerializer(task)
-    print(serializer)
-    return Response(data=serializer.data, status=status.HTTP_200_OK)
-
-
-@api_view(['POST'])
-def createTask(request:Request):
-    serialized=TaskSerializer(data=request.data)
-    if serialized.is_valid():
-        serialized.save()
-        return  Response(serialized.data,status=status.HTTP_201_CREATED)
-    return Response(serialized.errors,status=status.HTTP_400_BAD_REQUEST)
 
 @swagger_auto_schema(
         method="GET",
@@ -66,41 +41,12 @@ def show_allposts(request:Request):
     return Response(serialized.data,status=status.HTTP_200_OK)
 
 
-@swagger_auto_schema(
-    method="get",
-    operation_description="get user posts",
-    
-    manual_parameters=[
-        openapi.Parameter(
-            "Authorization",
-            openapi.IN_HEADER,
-            description="your jwt access token",
-            type=openapi.TYPE_STRING,
-            required=True
-        )
-    ],
-    responses={
-        200: openapi.Response(
-            description="A list of loggedin-user posts",
-            schema=openapi.Schema(
-                type=openapi.TYPE_ARRAY,
-                        items=openapi.Schema(
-                        title="user posts",
-                        type=openapi.TYPE_OBJECT,
-                        properties={field_name: openapi.Schema(type=field_instance.__class__.__name__)
-                                    for field_name, field_instance in PostSerializer().get_fields().items()}
-                    )
-            )
-        ),
-    }
-)
-@api_view(['GET'])
-@permission_classes([IsOwnerOrReadOnly])
-def showUserPosts(request:Request):
-    print(request.user)
-    posts= Post.objects.filter(author=request.user)
-    serialized=PostSerializer(posts, many=True)
-    return Response(serialized.data,status=status.HTTP_200_OK)
+
+# @api_view(['GET'])
+# @permission_classes([IsOwnerOrReadOnly])
+# def showUserPosts(request:Request):
+#     print(request.user)
+
 
 
 @swagger_auto_schema(
@@ -225,6 +171,21 @@ class filterCompletedUsers(generics.ListAPIView):
 
 
 
+@swagger_auto_schema(
+        method="post",
+        manual_parameters=[
+            openapi.Parameter(
+                "following_id",
+                openapi.IN_QUERY,
+                description="Following user id",
+                type=openapi.TYPE_INTEGER, 
+                required=True
+            )
+        ],
+        responses={
+            201:swagger_helper.follower_serialized
+        }
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def add_following(request:Request):
@@ -243,6 +204,20 @@ def get_followers(request:Request):
 def get_followings(request:Request):
     pass
 
+
+@swagger_auto_schema(
+        method="post",
+        manual_parameters=[
+            openapi.Parameter(
+            "following_id",
+            openapi.IN_QUERY,
+            description="id of the user you want to remove from your follower list",
+            type=openapi.TYPE_INTEGER,
+            )
+
+        ],
+)
+
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def remove_follower(request:Request):
@@ -253,7 +228,7 @@ def remove_follower(request:Request):
     response={
         "message":f"user with username:{followed.username} unfollowed by {request.user.username}"
     }
-    return Response(data=response,status=status.HTTP_200_OK)
+    return Response(data=response,status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
@@ -261,6 +236,72 @@ def get_complete_user(request:Request):
     user=request.user
     serialized=CompleteUserSerializer(user,many=False)
     return Response(data=serialized.data,status=status.HTTP_200_OK)
+
+
+
+
+
+
+class PostAPIView(APIView):
+
+    permission_classes=[permissions.IsAuthenticated]
+    @swagger_auto_schema(
+    # method="get",
+    operation_description="get user posts",
+    
+    manual_parameters=[
+        openapi.Parameter(
+            "Authorization",
+            openapi.IN_HEADER,
+            description="your jwt access token",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            description="A list of loggedin-user posts",
+            schema=openapi.Schema(
+                type=openapi.TYPE_ARRAY,
+                        items=openapi.Schema(
+                        title="user posts",
+                        type=openapi.TYPE_OBJECT,
+                        properties={field_name: openapi.Schema(type=field_instance.__class__.__name__)
+                                    for field_name, field_instance in PostSerializer().get_fields().items()}
+                    )
+            )
+        ),
+    }
+)
+
+    def get(self,request:Request):
+        posts= Post.objects.filter(author=request.user)
+        serialized=PostSerializer(posts, many=True)
+        return Response(serialized.data,status=status.HTTP_200_OK)
+    
+
+    @swagger_auto_schema(
+            operation_description="get posts by author username",
+            manual_parameters=[
+                openapi.Parameter(
+                    "username",
+                    openapi.IN_QUERY,
+                    description="the author username",
+                    type=openapi.TYPE_STRING   
+                )
+            ],
+            responses={
+                200:swagger_helper.post_serialized
+            }
+    )
+    
+    def post(self,request:Request):
+        # data=request.data
+        username=request.data["username"]
+        posts=Post.objects.filter(author__username=username)
+        serialized=PostSerializer(posts,many=True)
+        return Response(data=serialized.data,status=status.HTTP_200_OK)
+
 
 
 

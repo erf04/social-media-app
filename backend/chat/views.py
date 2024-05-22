@@ -15,7 +15,6 @@ from django.db.models import Q
 from datetime import datetime
 from .serializers import CompleteUserSerializer
 from itertools import chain
-from .websocket_doc import documentation
 import markdown2
 
 class GroupApiView(APIView):
