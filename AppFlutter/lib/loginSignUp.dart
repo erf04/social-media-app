@@ -1,19 +1,11 @@
-import 'package:dio/dio.dart';
-import 'package:dotted_border/dotted_border.dart';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_application_2/SharedPreferencesFile.dart';
 import 'package:flutter_application_2/data.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+
 import 'package:flutter_application_2/gen/assets.gen.dart';
 import 'package:flutter_application_2/home.dart';
-import 'package:flutter_application_2/loginSignUp.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -97,7 +89,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       physics: const BouncingScrollPhysics(),
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(40, 40, 40, 10),
-                        child: signup ? _Signup() : _Login(),
+                        child: signup ? _Signup() : const _Login(),
                       ),
                     ),
                   ))
@@ -112,7 +104,7 @@ class _AuthScreenState extends State<AuthScreen> {
 }
 
 class _Login extends StatefulWidget {
-  _Login({
+  const _Login({
     super.key,
   });
 
@@ -193,7 +185,7 @@ class LoginState extends State<_Login> {
         ),
         TextField(
           controller: myControllerUserName,
-          decoration: InputDecoration(label: Text('Username')),
+          decoration:const InputDecoration(label: Text('Username')),
         ),
         myPassField,
         const SizedBox(
@@ -364,7 +356,7 @@ class _Signup extends StatelessWidget {
         ),
         TextField(
           controller: myControllerUserName,
-          decoration: InputDecoration(label: Text('Username')),
+          decoration: const InputDecoration(label: Text('Username')),
         ),
         myEmail,
         myPassField1,

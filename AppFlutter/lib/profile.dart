@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_application_2/data.dart';
 import 'package:flutter_application_2/gen/assets.gen.dart';
 import 'package:flutter_application_2/loginSignUp.dart';
+import 'package:flutter_application_2/showPost.dart';
 import 'package:flutter_application_2/splash.dart';
+import 'package:flutter_application_2/main.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 class InstagramProfileScreen extends StatefulWidget {
@@ -64,24 +67,6 @@ class PostInfo {
 }
 
 class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
-  // User _$UserFromJson(Map<String, dynamic> json) {
-  //   return User(
-  //       id: json['id'] as int,
-  //       userName: json['username'] as String,
-  //       email: json['email'] as String,
-  //       image: json['image'] as String);
-  // }
-
-  // PostInfo _$PostInfoFromJson(Map<String, dynamic> json) {
-  //   return PostInfo(
-  //     title: json['title'] as String,
-  //     author: _$UserFromJson(json['author']),
-  //     created_at: json['dateOfBirth'],
-  //     content: json['content'],
-  //     description: json['description'],
-  //   );
-  // }
-
   Future<List<PostInfo?>> getPosts() async {
     verifyToken? myToken = await SplashScreenState.verifyAccess(context);
     if (myToken == verifyToken.verified) {
@@ -93,7 +78,11 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
         for (var i in response.data) {
           PostInfo newPostInfo = PostInfo(
               title: i["title"],
-              author: i["author"],
+              author: User(
+                  id: i["author"]["id"],
+                  userName: i["author"]["username"],
+                  email: i["author"]["email"],
+                  image: i["author"]["image"]),
               description: i["description"],
               content: i["content"],
               created_at: i["created_at"]);
@@ -134,34 +123,7 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            const Icon(
-              CupertinoIcons.back,
-              size: 24,
-              color: Colors.white,
-            ),
-            const SizedBox(
-              width: 12,
-            ),
-            ClipRRect(
-                borderRadius: BorderRadius.circular(32),
-                child: Assets.download.image(width: 40, height: 40)),
-            const SizedBox(
-              width: 12,
-            ),
-            Text(
-              'LeadLearn > Profile',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge!
-                  .copyWith(color: Colors.white),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.blue, // Blue theme
-      ),
+      appBar: myAppBar(context, ' > Profile'),
       body: FutureBuilder<ProfileInfo?>(
           future: getProfileInfo(),
           builder: (context, snapshot) {
@@ -175,9 +137,25 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
                 children: [
                   SizedBox(height: 20),
                   CircleAvatar(
-                    radius: 60,
-                    backgroundImage: NetworkImage(
-                        'http://10.0.2.2:8000/api${snapshot.data?.image}'),
+                    backgroundColor: Colors.transparent,
+                    radius: 80,
+                    child: ClipOval(
+                      child: Container(
+                        child: CachedNetworkImage(
+                          imageUrl:
+                              'http://10.0.2.2:8000/api${snapshot.data?.image}',
+                          placeholder: (context, url) =>
+                              Center(child: CircularProgressIndicator()),
+                          errorWidget: (context, url, error) =>
+                              Center(child: Icon(Icons.error)),
+                          fit: BoxFit.cover,
+                          width: 160,
+                          height: 160,
+                        ),
+                      ),
+                    ),
+                    // backgroundImage: NetworkImage(
+                    //     'http://10.0.2.2:8000/api${snapshot.data?.image}'),
                   ),
                   SizedBox(height: 20),
                   Text(
@@ -226,7 +204,7 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
                       onPressed: () {
                         // Action to perform when button is pressed
                       },
-                      child: Text(
+                      child: const Text(
                         'Follow',
                         style: TextStyle(
                           color: Colors.white,
@@ -236,7 +214,7 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  FutureBuilder(
+                  FutureBuilder<List<PostInfo?>>(
                       future: getPosts(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
@@ -247,28 +225,66 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
                         } else if (snapshot.hasData) {
                           return Expanded(
                             child: GridView.builder(
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                              ),
-                              itemBuilder: (context, index) {
-                                // Replace with actual content (images, posts, etc.)
-                                return Container(
-                                    margin: EdgeInsets.all(5),
-                                    color: Colors.blue[100],
-                                    child: Center());
-                              },
-                              itemCount: 10, // Replace with actual post count
-                            ),
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                ),
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) {
+                                  // Replace with actual content (images, posts, etc.)
+                                  return Padding(
+                                    padding: const EdgeInsets.all(2.0),
+                                    child: Container(
+                                      width: 150,
+                                      height: 150,
+                                      decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          shape: BoxShape.rectangle,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(2)),
+                                          boxShadow: [
+                                            BoxShadow(blurRadius: 2)
+                                          ]),
+                                      child: InkWell(
+                                        onTap: () {
+                                          ShowPost showPost = ShowPost();
+                                          showPost.declarePost(
+                                              snapshot.data![index]);
+                                          Navigator.of(context).pushReplacement(
+                                              CupertinoPageRoute(
+                                                  builder: (context) {
+                                            return showPost;
+                                          }));
+                                        },
+                                        child: ClipRRect(
+                                          child: CachedNetworkImage(
+                                            imageUrl:
+                                                'http://10.0.2.2:8000/api${snapshot.data![index]!.content}',
+                                            placeholder: (context, url) =>
+                                                const Center(
+                                                    child:
+                                                        CircularProgressIndicator()),
+                                            errorWidget: (context, url,
+                                                    error) =>
+                                                const Center(
+                                                    child: Icon(Icons.error)),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                  // Replace with actual post count
+                                }),
                           );
                         } else {
-                          return Text('No data');
+                          return const Text('No data');
                         }
                       }),
                 ],
               );
             } else {
-              return Text('No data');
+              return const Text('No data');
             }
           }),
     );

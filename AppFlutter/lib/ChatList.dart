@@ -11,10 +11,9 @@ class ChatList extends StatefulWidget {
 
 class _ChatListState extends State<ChatList> {
   int selectedIndex = -1;
-  final PageController _pageController = PageController();
+  //final PageController _pageController = PageController();
   @override
   Widget build(BuildContext context) {
-    Color mycolor = Colors.black;
     List<String> chatNames = [
       'chat1',
       'chat2',

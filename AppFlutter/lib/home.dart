@@ -1,12 +1,8 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_application_2/data.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter_application_2/gen/assets.gen.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});

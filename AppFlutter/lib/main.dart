@@ -1,21 +1,10 @@
-import 'package:dotted_border/dotted_border.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_application_2/ChatList.dart';
+import 'package:flutter_application_2/ChatPage.dart';
 import 'package:flutter_application_2/SharedPreferencesFile.dart';
-import 'package:flutter_application_2/chat.dart';
-import 'package:flutter_application_2/coursePage.dart';
-import 'package:flutter_application_2/data.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_application_2/gen/assets.gen.dart';
-import 'package:flutter_application_2/home.dart';
-import 'package:flutter_application_2/loginSignUp.dart';
 import 'package:flutter_application_2/profile.dart';
-import 'package:flutter_application_2/splash.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,7 +45,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
-      home: AuthScreen(),
+      home: InstagramProfileScreen(),
       //const SplashScreen(),
       // home: Stack(children: [
       //   const Positioned.fill(child: MainPage()),
@@ -193,3 +182,34 @@ class _BottomNavigation extends StatelessWidget {
     );
   }
 }
+
+  AppBar myAppBar(BuildContext context , String additionalText) {
+    return AppBar(
+      title: Row(
+        children: [
+          const Icon(
+            CupertinoIcons.back,
+            size: 24,
+            color: Colors.white,
+          ),
+          const SizedBox(
+            width: 12,
+          ),
+          ClipRRect(
+              borderRadius: BorderRadius.circular(32),
+              child: Assets.download.image(width: 40, height: 40)),
+          const SizedBox(
+            width: 12,
+          ),
+          Text(
+            'LeadLearn$additionalText',
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge!
+                .copyWith(color: Colors.white),
+          ),
+        ],
+      ),
+      backgroundColor: Colors.blue, // Blue theme
+    );
+  }
