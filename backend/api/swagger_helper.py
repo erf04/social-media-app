@@ -38,3 +38,11 @@ follower_serialized=openapi.Schema(
       "following":user_serialized, 
     }   
 )
+
+authorization_param=openapi.Parameter(
+                "Authorization",
+                openapi.IN_HEADER,
+                description="access token",
+                type=openapi.TYPE_STRING,
+                required=True                
+            )

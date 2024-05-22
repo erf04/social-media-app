@@ -42,13 +42,6 @@ def show_allposts(request:Request):
 
 
 
-# @api_view(['GET'])
-# @permission_classes([IsOwnerOrReadOnly])
-# def showUserPosts(request:Request):
-#     print(request.user)
-
-
-
 @swagger_auto_schema(
         method="POST",
         operation_description="create a post",
