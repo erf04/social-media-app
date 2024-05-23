@@ -26,9 +26,11 @@ class PostSerializer(serializers.ModelSerializer):
 
     author=UserSerializer(many=False,required=False)
     created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+    liked_by=UserSerializer(many=True)
+    saved_by=UserSerializer(many=True)
     class Meta:
         model = Post
-        fields = ["title","author","description","content","created_at"]
+        fields = ["title","author","description","content","created_at","liked_by","saved_by"]
 
 
     def save(self,**kwargs):

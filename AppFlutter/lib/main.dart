@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/ChatPage.dart';
@@ -183,33 +182,38 @@ class _BottomNavigation extends StatelessWidget {
   }
 }
 
-  AppBar myAppBar(BuildContext context , String additionalText) {
-    return AppBar(
-      title: Row(
-        children: [
-          const Icon(
+AppBar myAppBar(BuildContext context, String additionalText) {
+  return AppBar(
+    title: Row(
+      children: [
+        IconButton(
+          icon: const Icon(
             CupertinoIcons.back,
             size: 24,
-            color: Colors.white,
           ),
-          const SizedBox(
-            width: 12,
-          ),
-          ClipRRect(
-              borderRadius: BorderRadius.circular(32),
-              child: Assets.download.image(width: 40, height: 40)),
-          const SizedBox(
-            width: 12,
-          ),
-          Text(
-            'LeadLearn$additionalText',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge!
-                .copyWith(color: Colors.white),
-          ),
-        ],
-      ),
-      backgroundColor: Colors.blue, // Blue theme
-    );
-  }
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          color: Colors.white,
+        ),
+        const SizedBox(
+          width: 12,
+        ),
+        ClipRRect(
+            borderRadius: BorderRadius.circular(32),
+            child: Assets.download.image(width: 40, height: 40)),
+        const SizedBox(
+          width: 12,
+        ),
+        Text(
+          'LeadLearn$additionalText',
+          style: Theme.of(context)
+              .textTheme
+              .titleLarge!
+              .copyWith(color: Colors.white),
+        ),
+      ],
+    ),
+    backgroundColor: Colors.blue, // Blue theme
+  );
+}

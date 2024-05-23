@@ -9,11 +9,14 @@ class ShowPost extends StatefulWidget {
   @override
   _ShowPostState createState() => myShowPost;
   declarePost(PostInfo? postinfo) => myShowPost.myPost = postinfo;
+  liked(bool boolean) => myShowPost.isLiked = boolean;
+  saved(bool boolean) => myShowPost.isSaved = boolean;
 }
 
 class _ShowPostState extends State<ShowPost> {
   PostInfo? myPost;
   bool isLiked = false;
+  bool isSaved = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +24,7 @@ class _ShowPostState extends State<ShowPost> {
       body: SafeArea(
           child: Column(
         children: [
-          SizedBox(height: 10,),
+
           Padding(
             padding: const EdgeInsets.all(4.0),
             child: Container(
@@ -31,7 +34,9 @@ class _ShowPostState extends State<ShowPost> {
                 child: CachedNetworkImage(
                   imageUrl: 'http://10.0.2.2:8000/api${myPost!.content}',
                   placeholder: (context, url) =>
-                      const Center(child: CircularProgressIndicator()),
+                      const Center(child: Center(
+                        child: CircularProgressIndicator())
+                        ),
                   errorWidget: (context, url, error) =>
                       const Center(child: Icon(Icons.error)),
                   fit: BoxFit.cover,
@@ -44,7 +49,11 @@ class _ShowPostState extends State<ShowPost> {
               Padding(
                 padding: EdgeInsets.all(8),
                 child: IconButton(
-                  icon: Icon(isLiked ? CupertinoIcons.heart_fill :CupertinoIcons.heart, size: 30,),
+                  icon: Icon(
+                    isLiked ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
+                    color: isLiked? Colors.red : Colors.black,
+                    size: 30,
+                  ),
                   onPressed: () {
                     setState(() {
                       isLiked = !isLiked;
@@ -52,24 +61,37 @@ class _ShowPostState extends State<ShowPost> {
                   },
                 ),
               ),
-                            Padding(
+              Padding(
                 padding: EdgeInsets.all(8),
                 child: IconButton(
-                  icon: Icon(CupertinoIcons.chat_bubble, size: 30,),
-                  onPressed: () {
-                    setState(() {
-                      isLiked = !isLiked;
-                    });
-                  },
+                  icon: Icon(
+                    CupertinoIcons.chat_bubble,
+                    size: 30,
+                  ),
+                  onPressed: () {},
                 ),
               ),
-                            Padding(
+              Padding(
                 padding: EdgeInsets.all(8),
                 child: IconButton(
-                  icon: Icon(CupertinoIcons.share, size: 30,),
+                  icon: Icon(
+                    CupertinoIcons.reply,
+                    size: 30,
+                  ),
+                  onPressed: () {},
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: IconButton(
+                  icon: Icon(
+                    isSaved ? CupertinoIcons.bookmark_fill :CupertinoIcons.bookmark,
+
+                    size: 30,
+                  ),
                   onPressed: () {
                     setState(() {
-                      isLiked = !isLiked;
+                      isSaved = !isSaved;
                     });
                   },
                 ),

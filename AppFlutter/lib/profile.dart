@@ -7,9 +7,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_application_2/data.dart';
 import 'package:flutter_application_2/gen/assets.gen.dart';
 import 'package:flutter_application_2/loginSignUp.dart';
+import 'package:flutter_application_2/main.dart';
 import 'package:flutter_application_2/showPost.dart';
 import 'package:flutter_application_2/splash.dart';
-import 'package:flutter_application_2/main.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 class InstagramProfileScreen extends StatefulWidget {
@@ -57,12 +57,16 @@ class PostInfo {
   String description;
   String content;
   String? created_at;
+  List<User> savedby;
+  List<User> likedby;
   PostInfo({
     required this.title,
     required this.author,
     required this.description,
     required this.content,
     required this.created_at,
+    required this.savedby,
+    required this.likedby,
   });
 }
 
@@ -76,6 +80,24 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
       if (response.statusCode == 200) {
         List<PostInfo> postInfos = [];
         for (var i in response.data) {
+          List<User> likedby = [];
+          List<User> savedby = [];
+          for (var j in i["liked_by"]) {
+            User myUser = User(
+                id: j["id"],
+                userName: j["username"],
+                email: j["email"],
+                image: j["image"]);
+            likedby.add(myUser);
+          }
+          for (var j in i["saved_by"]) {
+            User myUser = User(
+                id: j["id"],
+                userName: j["username"],
+                email: j["email"],
+                image: j["image"]);
+            savedby.add(myUser);
+          }
           PostInfo newPostInfo = PostInfo(
               title: i["title"],
               author: User(
@@ -83,6 +105,8 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
                   userName: i["author"]["username"],
                   email: i["author"]["email"],
                   image: i["author"]["image"]),
+              savedby: savedby,
+              likedby: likedby,
               description: i["description"],
               content: i["content"],
               created_at: i["created_at"]);
@@ -128,7 +152,9 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
           future: getProfileInfo(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
+              return Center(
+                child: CircularProgressIndicator()
+                );
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else if (snapshot.hasData) {
@@ -219,7 +245,9 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return CircularProgressIndicator();
+                          return Center(
+                            child: CircularProgressIndicator()
+                            );
                         } else if (snapshot.hasError) {
                           return Text('Error: ${snapshot.error}');
                         } else if (snapshot.hasData) {
@@ -250,6 +278,7 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
                                           ShowPost showPost = ShowPost();
                                           showPost.declarePost(
                                               snapshot.data![index]);
+
                                           Navigator.of(context).pushReplacement(
                                               CupertinoPageRoute(
                                                   builder: (context) {
@@ -263,7 +292,9 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
                                             placeholder: (context, url) =>
                                                 const Center(
                                                     child:
-                                                        CircularProgressIndicator()),
+                                                        Center(
+                                                          child: CircularProgressIndicator()
+                                                          )),
                                             errorWidget: (context, url,
                                                     error) =>
                                                 const Center(
@@ -278,13 +309,13 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
                                 }),
                           );
                         } else {
-                          return const Text('No data');
+                          return const Center(child: Text('No data'));
                         }
                       }),
                 ],
               );
             } else {
-              return const Text('No data');
+              return const Center(child: Text('No data'));
             }
           }),
     );

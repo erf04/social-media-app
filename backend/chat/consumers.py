@@ -89,7 +89,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
                 await self.send_to_chat_message(result,command="add_viewer")
             else:
                 self.send(json.dumps({
-                    "message":"unexpected error"
+                    "message":"unexpected error" 
                 }))
 
     

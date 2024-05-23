@@ -11,18 +11,17 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path("hello/",views.hello,name="hello"),
-    path("tasks/",views.getTasks,name="getTasks"),
-    path("tasks/<int:id>/",views.getTask,name="getTask"),
-    path("tasks/create/",views.createTask,name="createTask"),
     path('posts/all',views.show_allposts, name='all-posts'),
-    path('posts/',views.showUserPosts,name="show-user-posts"),
+    # path('posts/',views.showUserPosts,name="show-user-posts"),
     path('posts/create/',views.create_post),
     path('get-user/',views.getUserByUsername,name="getUser"),
     path('users/all/',views.getAllCompletedUsers.as_view()),
     path('users/filter/',views.filterCompletedUsers.as_view()),
     path('follower/add/',views.add_following),
     path('follower/remove/',views.remove_follower),
-    path('complete-user/me/',views.get_complete_user,)
+    path('complete-user/me/',views.get_complete_user),
+    path('posts/',views.PostAPIView.as_view()),
+    path('post/add-like/',views.like_post)
     
 
     
