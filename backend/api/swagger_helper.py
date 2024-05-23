@@ -23,6 +23,7 @@ user_serialized=openapi.Schema(
 post_serialized=openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
+        "id":openapi.Schema(type=openapi.TYPE_INTEGER),
         "title":openapi.Schema(type=openapi.TYPE_STRING),
         "author":user_serialized,
         "content":openapi.Schema(type=openapi.TYPE_FILE),
@@ -43,6 +44,7 @@ post_serialized=openapi.Schema(
 follower_serialized=openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
+        "id":openapi.Schema(type=openapi.TYPE_INTEGER),
       "follower":user_serialized,
       "following":user_serialized, 
     }   
