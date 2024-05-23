@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import *
 from datetime import datetime
+from rest_framework.request import Request
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model=Task
@@ -22,15 +23,17 @@ class UserSerializer(serializers.ModelSerializer):
 #         fields= ['followers', 'following']
 
 
+
 class PostSerializer(serializers.ModelSerializer):
 
     author=UserSerializer(many=False,required=False)
     created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
     liked_by=UserSerializer(many=True)
     saved_by=UserSerializer(many=True)
+    is_liked_by_user=serializers.SerializerMethodField()
     class Meta:
         model = Post
-        fields = ["title","author","description","content","created_at","liked_by","saved_by"]
+        fields = ["title","author","description","content","created_at","liked_by","saved_by","is_liked_by_user"]
 
 
     def save(self,**kwargs):
@@ -39,7 +42,10 @@ class PostSerializer(serializers.ModelSerializer):
         self.validated_data['author']=author
         self.validated_data['created_at']=creation_date
         return super().save()  # Call the parent's save() method
-    
+
+    def get_is_liked_by_user(self,obj:Post):
+        request:Request=self.context.get('request')
+        return obj.liked_by==request.user
 
 
 

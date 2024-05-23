@@ -296,6 +296,8 @@ class PostAPIView(APIView):
         return Response(data=serialized.data,status=status.HTTP_200_OK)
     
 
+    
+
 @swagger_auto_schema(
         method="POST",
         operation_description="add user to a post liked_by field",
@@ -320,10 +322,50 @@ def like_post(request:Request):
     user=request.user
     post_id=request.data["post_id"]
     try:
-        post=Post.objects.get(post_id)
+        post=Post.objects.get(id=post_id)
         post.liked_by.add(user)
         serialized=PostSerializer(post,many=False)
         return Response(serialized.data,status=status.HTTP_200_OK)
+    except:
+        return Response({"error":"post not found"},status=status.HTTP_404_NOT_FOUND)
+    
+
+
+# class PostListView(generics.RetrieveAPIView):
+#     queryset = Post.objects.all()
+#     serializer_class = PostSerializer
+#     def get_serializer_context(self):
+#         context = super().get_serializer_context()
+#         context.update({"request": self.request})
+#         return context
+
+@swagger_auto_schema(
+        method="POST",
+        operation_description="return is_liked=true if the user liked the post and reverse",
+        manual_parameters=[
+            swagger_helper.authorization_param,
+            openapi.Parameter(
+                name="post_id",
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                required=True
+            )
+        ],
+        responses={
+            200:"is_liked=true/false",404:"not found"
+        }
+)
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def is_liked_by_user(request:Request):
+    user=request.user
+    post_id=request.data["post_id"]
+    try:
+        post=Post.objects.get(id=post_id)
+        if user in post.liked_by.all():
+            return Response({"is_liked":True},status=status.HTTP_200_OK)
+        else:
+            return Response({"is_liked":False},status=status.HTTP_200_OK)
     except:
         return Response({"error":"post not found"},status=status.HTTP_404_NOT_FOUND)
     
