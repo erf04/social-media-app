@@ -33,7 +33,7 @@ class PostSerializer(serializers.ModelSerializer):
     # is_liked_by_user=serializers.SerializerMethodField()
     class Meta:
         model = Post
-        fields = ["title","author","description","content","created_at","liked_by","saved_by"]
+        fields = ["title","author","description","content","created_at","liked_by","saved_by","id"]
 
 
     def save(self,**kwargs):

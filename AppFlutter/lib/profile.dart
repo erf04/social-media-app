@@ -52,6 +52,7 @@ class User {
 }
 
 class PostInfo {
+  int? postId;
   String title;
   User author;
   String description;
@@ -60,6 +61,7 @@ class PostInfo {
   List<User> savedby;
   List<User> likedby;
   PostInfo({
+    required this.postId,
     required this.title,
     required this.author,
     required this.description,
@@ -99,6 +101,7 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
             savedby.add(myUser);
           }
           PostInfo newPostInfo = PostInfo(
+            postId: i["id"],
               title: i["title"],
               author: User(
                   id: i["author"]["id"],
@@ -152,9 +155,7 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
           future: getProfileInfo(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: CircularProgressIndicator()
-                );
+              return Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else if (snapshot.hasData) {
@@ -245,9 +246,7 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return Center(
-                            child: CircularProgressIndicator()
-                            );
+                          return Center(child: CircularProgressIndicator());
                         } else if (snapshot.hasError) {
                           return Text('Error: ${snapshot.error}');
                         } else if (snapshot.hasData) {
@@ -291,10 +290,9 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
                                                 'http://10.0.2.2:8000/api${snapshot.data![index]!.content}',
                                             placeholder: (context, url) =>
                                                 const Center(
-                                                    child:
-                                                        Center(
-                                                          child: CircularProgressIndicator()
-                                                          )),
+                                                    child: Center(
+                                                        child:
+                                                            CircularProgressIndicator())),
                                             errorWidget: (context, url,
                                                     error) =>
                                                 const Center(
