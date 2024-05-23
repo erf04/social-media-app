@@ -30,10 +30,10 @@ class PostSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
     liked_by=UserSerializer(many=True)
     saved_by=UserSerializer(many=True)
-    is_liked_by_user=serializers.SerializerMethodField()
+    # is_liked_by_user=serializers.SerializerMethodField()
     class Meta:
         model = Post
-        fields = ["title","author","description","content","created_at","liked_by","saved_by","is_liked_by_user"]
+        fields = ["title","author","description","content","created_at","liked_by","saved_by"]
 
 
     def save(self,**kwargs):
@@ -42,10 +42,6 @@ class PostSerializer(serializers.ModelSerializer):
         self.validated_data['author']=author
         self.validated_data['created_at']=creation_date
         return super().save()  # Call the parent's save() method
-
-    def get_is_liked_by_user(self,obj:Post):
-        request:Request=self.context.get('request')
-        return obj.liked_by==request.user
 
 
 

@@ -22,7 +22,8 @@ urlpatterns = [
     path('complete-user/me/',views.get_complete_user),
     path('posts/',views.PostAPIView.as_view()),
     path('post/add-like/',views.like_post),
-    path('post/liked/',views.is_liked_by_user)
+    path('post/liked/',views.is_liked_by_user),
+    path('post/remove-like/',views.dislike_post)
     
 
     
