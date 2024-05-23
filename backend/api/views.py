@@ -370,6 +370,37 @@ def is_liked_by_user(request:Request):
         return Response({"error":"post not found"},status=status.HTTP_404_NOT_FOUND)
     
 
+@swagger_auto_schema(
+        method="post",
+        operation_description="dislike a post",
+        manual_parameters=[
+            swagger_helper.authorization_param,
+            openapi.Parameter(
+                name="post_id",
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_INTEGER,
+                required=True
+            )
+        ],
+        responses={
+            200:swagger_helper.post_serialized,
+            204:"post doesn't exist",
+            401:"unauthorized"
+        }
+)
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def dislike_post(request:Request):
+    post_id=request.data['post_id']
+    try:
+        post=Post.objects.get(id=post_id)
+        post.liked_by.remove(request.user)
+        serialized=PostSerializer(post,many=False)
+        return Response(serialized.data,status=status.HTTP_200_OK)
+    except:
+        return Response(data={"error":f"post with id {post_id} doesn't exist"},status=status.HTTP_204_NO_CONTENT)
+
+
 
 
 
