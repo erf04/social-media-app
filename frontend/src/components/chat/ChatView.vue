@@ -665,7 +665,7 @@ export default {
       if (JSON.stringify(this.currentChatRoom) == jsonRoom || JSON.stringify(this.currentPrivateRoom) == jsonRoom) {
         return;
       }
-      console.log(this.currentChatRoom, "roooooooooooooooooooooooooooooom");
+      // console.log(this.currentChatRoom, "roooooooooooooooooooooooooooooom");
       this.isPrivate ? this.currentPrivateRoom = {...room} : this.currentChatRoom = {...room};
 
       await this.handleRoom(room.id, this.isPrivate ? chatType.PRIVATE : chatType.GROUP);

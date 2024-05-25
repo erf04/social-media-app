@@ -12,3 +12,4 @@ channels==4.0.0
 asgiref==3.7.2
 django-rest-swagger==2.2.0
 markdown2==2.4.13
+drf-yasg==1.21.7
