@@ -235,7 +235,5 @@ def delete_message(request):
 
 @api_view(["GET"])
 def websocket_docs(request:Request):
-    html_content = markdown2.markdown(documentation)
-    return render(request,"websocket_swagger.html",{
-        "documentation":html_content
-    })
+    # html_content = markdown2.markdown(documentation)
+    return render(request,"websocket_swagger.html")
