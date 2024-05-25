@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/data.dart';
@@ -63,16 +65,6 @@ class _ChatPageState extends State<ChatPage> {
   final List<String> messages = [];
   final TextEditingController _controller = TextEditingController();
 
-  void _sendMessage() {
-    print("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
-    print(_controller.text);
-    if (_controller.text.isNotEmpty) {
-      print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-      messages.add(_controller.text);
-      webSocketClient.channel!.sink.add(_controller.text);
-    }
-  }
-
   @override
   void initState() {
     webSocketClient.context = context;
@@ -124,7 +116,10 @@ class _ChatPageState extends State<ChatPage> {
                   IconButton(
                     icon: Icon(Icons.send),
                     onPressed: () {
-                        _sendMessage;
+                      if (_controller.text.isNotEmpty) {
+                        messages.add(_controller.text);
+                        webSocketClient.channel!.sink.add(jsonEncode(_controller.text));
+                      }
                     },
                   ),
                 ],
@@ -151,7 +146,10 @@ class _ChatPageState extends State<ChatPage> {
                           IconButton(
                             icon: Icon(Icons.send),
                             onPressed: () {
-                              _sendMessage;
+                              if (_controller.text.isNotEmpty) {
+                                messages.add(_controller.text);
+                                webSocketClient.channel!.sink.add(_controller.text);
+                              }
                             },
                           ),
                         ],
