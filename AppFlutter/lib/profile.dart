@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,6 +12,7 @@ import 'package:flutter_application_2/loginSignUp.dart';
 import 'package:flutter_application_2/main.dart';
 import 'package:flutter_application_2/showPost.dart';
 import 'package:flutter_application_2/splash.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 class InstagramProfileScreen extends StatefulWidget {
@@ -101,7 +104,7 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
             savedby.add(myUser);
           }
           PostInfo newPostInfo = PostInfo(
-            postId: i["id"],
+              postId: i["id"],
               title: i["title"],
               author: User(
                   id: i["author"]["id"],
@@ -147,6 +150,96 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
     return null;
   }
 
+  Future<void> _showMyDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button to close dialog
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Choose the source!'),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton(
+                  child: Text('Camera'),
+                  onPressed: () {
+                    _pickImage(ImageSource.camera);
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                    child: Text('Gallery'),
+                    onPressed: () {
+                      _pickImage(ImageSource.gallery);
+                      Navigator.of(context).pop();
+                    }),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  File? _image;
+  File? _video;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No item selected.');
+      }
+    });
+  }
+
+  Future<void> _pickVideo(ImageSource source) async {
+    final pickedFile = await _picker.pickVideo(source: source);
+
+    setState(() {
+      if (pickedFile != null) {
+        _video = File(pickedFile.path);
+      } else {
+        print('No video selected.');
+      }
+    });
+  }
+
+  Container createNewPost() {
+    return Container(
+      width: 150,
+      height: 150,
+      decoration: const BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.all(Radius.circular(2)),
+          boxShadow: [BoxShadow(blurRadius: 2)]),
+      child: InkWell(
+        onTap: () {
+          _showMyDialog(context);
+        },
+        child: ClipRRect(
+            child: Center(
+                child: Container(
+          width: 90,
+          height: 90,
+          decoration: const BoxDecoration(
+              shape: BoxShape.circle, color: Colors.black12),
+          child: const Icon(
+            CupertinoIcons.plus,
+            size: 60,
+            color: Colors.black38,
+          ),
+        ))),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,8 +274,6 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
                         ),
                       ),
                     ),
-                    // backgroundImage: NetworkImage(
-                    //     'http://10.0.2.2:8000/api${snapshot.data?.image}'),
                   ),
                   SizedBox(height: 20),
                   Text(
@@ -256,8 +347,15 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
                                     SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 3,
                                 ),
-                                itemCount: snapshot.data!.length,
+                                itemCount: snapshot.data!.length + 1,
                                 itemBuilder: (context, index) {
+                                  if (index == 0) {
+                                    return Padding(
+                                      padding: const EdgeInsets.all(2.0),
+                                      child: createNewPost(),
+                                    );
+                                  }
+
                                   // Replace with actual content (images, posts, etc.)
                                   return Padding(
                                     padding: const EdgeInsets.all(2.0),
@@ -276,7 +374,7 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
                                         onTap: () {
                                           ShowPost showPost = ShowPost();
                                           showPost.declarePost(
-                                              snapshot.data![index]);
+                                              snapshot.data![index - 1]);
 
                                           Navigator.of(context).pushReplacement(
                                               CupertinoPageRoute(
@@ -287,7 +385,7 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
                                         child: ClipRRect(
                                           child: CachedNetworkImage(
                                             imageUrl:
-                                                'http://10.0.2.2:8000/api${snapshot.data![index]!.content}',
+                                                'http://10.0.2.2:8000/api${snapshot.data![index - 1]!.content}',
                                             placeholder: (context, url) =>
                                                 const Center(
                                                     child: Center(
