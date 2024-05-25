@@ -56,7 +56,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        
+
         
         command = text_data_json["command"]
         # self.send_to_chat_message(text_data)
