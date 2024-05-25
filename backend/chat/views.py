@@ -15,13 +15,49 @@ from django.db.models import Q
 from datetime import datetime
 from .serializers import CompleteUserSerializer
 from itertools import chain
+import markdown2
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from . import swagger_helper
 
 class GroupApiView(APIView):
     permission_classes=[permissions.IsAuthenticated]
+    @swagger_auto_schema(
+        type=openapi.TYPE_OBJECT,
+        manual_parameters=[
+            swagger_helper.authorization_param
+        ],
+        responses={
+            200:swagger_helper.group_serialized
+        }
+    )
+
     def get(self,request:Request):
         groups=Group.objects.filter(participants=request.user)
         serialized=GroupSerializer(groups,many=True)
         return Response(serialized.data,status=status.HTTP_200_OK)
+    
+    @swagger_auto_schema(
+        type=openapi.TYPE_OBJECT,
+        manual_parameters=[
+            swagger_helper.authorization_param,
+            openapi.Parameter(
+                "group_name",
+                openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+                required=True                
+            ),
+            openapi.Parameter(
+                "image",
+                openapi.IN_QUERY,
+                type=openapi.TYPE_FILE,
+                required=True                
+            ),
+        ],
+        responses={
+            201:swagger_helper.group_serialized
+        }
+    )
 
     def post(self,request:Request): 
         group_name=request.data['group_name']
@@ -42,10 +78,45 @@ class GroupApiView(APIView):
 
 class PrivateRoomView(APIView):
     permission_classes=[permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+            manual_parameters=[swagger_helper.authorization_param],
+            operation_description="get private rooms the user involves",
+            responses={
+                200:openapi.Schema(
+                type=openapi.TYPE_ARRAY,
+                items=swagger_helper.private_chat_serialized
+
+                )
+            }
+
+    )
     def get(self,request:Request):
         private_chats=PrivateChat.objects.filter(Q(creator=request.user) | Q(the_other=request.user))
         serialized=PrivateChatSerializer(private_chats,many=True)
         return Response(serialized.data,status=status.HTTP_200_OK)
+    
+
+    @swagger_auto_schema(
+            type=openapi.TYPE_OBJECT,
+            manual_parameters=[
+                swagger_helper.authorization_param,
+                openapi.Parameter(
+                "other_id",
+                openapi.IN_QUERY,
+                description="the second user id",
+                type=openapi.TYPE_INTEGER,
+                required=True  
+                )
+            ],
+            operation_description="create or get the private room with a follower or following",
+            responses={
+                200:swagger_helper.private_chat_serialized,
+                201:swagger_helper.private_chat_serialized,
+                
+            }
+
+    )
 
     def post(self,request:Request):
         other_id=request.data["other_id"]
@@ -57,6 +128,34 @@ class PrivateRoomView(APIView):
         return Response(serialized.data,status=status.HTTP_200_OK)
     
 
+
+@swagger_auto_schema(
+        method="post",
+        type=openapi.TYPE_OBJECT,
+        manual_parameters=[
+            swagger_helper.authorization_param,
+            openapi.Parameter(
+                name="participants",
+                type=openapi.TYPE_ARRAY,
+                in_=openapi.IN_QUERY,
+                items=openapi.Schema(
+                    type=openapi.TYPE_INTEGER,
+                    description="the participants id's to add to the group",
+
+                ),
+                required=True
+            ),
+            openapi.Parameter(
+                name="group_id",
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_INTEGER,
+                required=True
+            )
+        ],
+        responses={
+            200:swagger_helper.group_serialized  
+        }
+)
 @api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
 def add_participants_to_group(request:Request):
@@ -74,6 +173,26 @@ def add_participants_to_group(request:Request):
     return Response(serialized.data,status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(
+        method="get",
+        operation_description="get follower and followings",
+        manual_parameters=[
+            swagger_helper.authorization_param,
+
+        ],
+        responses={
+            200:openapi.Schema(
+                type=openapi.TYPE_ARRAY,
+                        items=openapi.Schema(
+                        title="user posts",
+                        type=openapi.TYPE_OBJECT,
+                        properties={field_name: openapi.Schema(type=field_instance.__class__.__name__)
+                                    for field_name, field_instance in CompleteUserSerializer().get_fields().items()}
+                    )
+                )
+
+        }
+)
 @api_view(["GET"])
 @permission_classes([permissions.IsAuthenticated])
 def get_followers_and_followings(request:Request):
@@ -90,7 +209,7 @@ def get_followers_and_followings(request:Request):
 @permission_classes([permissions.IsAuthenticated])
 def filter_groups(request:Request):
     key=request.data["key"]
-    groups=Group.objects.filter(participants=request.user).filter(name__contains=key.lower())
+    groups=Group.objects.filter(participants=request.user).filter(name__icontains=key)
     serialized=GroupSerializer(groups,many=True)
     return Response(serialized.data,status=status.HTTP_200_OK)
 
@@ -100,8 +219,8 @@ def filter_groups(request:Request):
 def filter_pv(request:Request):
     key=request.data["key"]
     user=request.user
-    private_chats1=PrivateChat.objects.filter(creator=request.user).filter(the_other__username__contains=key.lower())
-    private_chats2=PrivateChat.objects.filter(the_other=request.user).filter(creator__username__contains=key.lower())
+    private_chats1=PrivateChat.objects.filter(creator=request.user).filter(the_other__username__icontains=key)
+    private_chats2=PrivateChat.objects.filter(the_other=request.user).filter(creator__username__icontains=key)
     private_chats=private_chats1 | private_chats2
     serialized=PrivateChatSerializer(private_chats,many=True)
     return Response(serialized.data,status=status.HTTP_200_OK)
@@ -112,3 +231,11 @@ def delete_message(request):
     message_id = request.data["message_id"]
     message = Message.objects.get(pk=message_id).delete()
     return Response({"message": "deleted"}, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def websocket_docs(request:Request):
+    html_content = markdown2.markdown(documentation)
+    return render(request,"websocket_swagger.html",{
+        "documentation":html_content
+    })

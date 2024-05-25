@@ -9,6 +9,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_application_2/gen/assets.gen.dart';
 import 'package:flutter_application_2/home.dart';
 import 'package:flutter_application_2/loginSignUp.dart';
+import 'package:flutter_application_2/profile.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 

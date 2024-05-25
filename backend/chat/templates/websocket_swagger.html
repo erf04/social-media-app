@@ -1,0 +1,81 @@
+<!-- templates/custom_swagger_ui.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom API Documentation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/4.0.0/github-markdown.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 45px;
+        }
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <div class="markdown-body">
+        <h2>WebSocket API</h2>
+        <h3>Connection URL for Groups</h3>
+        <p><code>ws://localhost:8000/ws/groups/{group_id}/</code></p>
+        <h3>Connection URL for pv's</h3>
+        <p><code>ws://localhost:8000/ws/pv/{pv_id}/</code></p>
+        <h3>Messages</h3>
+        <h4>Request</h4>
+        <p>Connect to the WebSocket server using the URL above. Send messages in JSON format. Example:</p>
+        <pre><code>{
+    "command": "fetch_messages",
+    <!-- "channel": "chat" -->
+}</code></pre>
+        <h4>Response</h4>
+        <p>The server will respond with messages in JSON format. Example:</p>
+        <pre><code>{
+    "command":"fetch_messages",
+    "messages": MessageSerializer,
+    "chat_info":ChatSerializer
+}
+</code></pre>
+        <h3>Example Python Client</h3>
+        <pre><code>import asyncio
+import websockets
+import json
+
+async def hello():
+    uri = "ws://yourdomain.com/ws/some_path/"
+    async with websockets.connect(uri) as websocket:
+        await websocket.send(json.dumps({
+            "type": "subscribe",
+            "channel": "chat"
+        }))
+
+        response = await websocket.recv()
+        print(f"&lt; {response}")
+
+asyncio.get_event_loop().run_until_complete(hello())</code></pre>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui-bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            const ui = SwaggerUIBundle({
+                url: "/swagger.json",
+                dom_id: '#swagger-ui',
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                layout: "BaseLayout" // Correct the layout to a valid option
+            });
+        };
+    </script>
+</body>
+</html>
