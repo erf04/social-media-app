@@ -5,6 +5,7 @@ import 'package:flutter_application_2/data.dart';
 import 'package:flutter_application_2/gen/assets.gen.dart';
 import 'package:flutter_application_2/main.dart';
 import 'package:flutter_application_2/profile.dart';
+import 'package:flutter_application_2/splash.dart';
 import 'package:flutter_application_2/websocketManage.dart';
 
 class ChatPage extends StatefulWidget {
@@ -63,32 +64,49 @@ class _ChatPageState extends State<ChatPage> {
   final TextEditingController _controller = TextEditingController();
 
   void _sendMessage() {
+    print("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
+    print(_controller.text);
     if (_controller.text.isNotEmpty) {
-      //webSocketClient.channel.sink.add(_controller.text);
+      print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+      messages.add(_controller.text);
+      webSocketClient.channel!.sink.add(_controller.text);
     }
   }
 
   @override
+  void initState() {
+    webSocketClient.context = context;
+    webSocketClient.connect();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    //webSocketClient.groupIdSet(1);
+    webSocketClient.context = context;
     return Scaffold(
       appBar: myAppBar(context, ''),
       body: Container(
         child: Column(
           children: [
             StreamBuilder(
-                stream: webSocketClient.channel!.stream,
+                stream: webSocketClient.channel?.stream,
                 builder: (context, snapshot) {
-                  if (snapshot.hasData)
-                    return messageBlockBuilder(snapshot);
-                  else if (snapshot.hasError)
-                    return Text('${snapshot.error}');
-                  else if (snapshot.connectionState == ConnectionState.waiting)
+                  if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
-                  else
-                    return Text('no data');
-                }),
-            Padding(
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (snapshot.hasData) {
+                    messages.add(snapshot.data.toString());
+                    return Column(
+                      children: [
+                        ListView.builder(
+                          itemCount: messages.length,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              title: Text(messages[index]),
+                            );
+                          },
+                        ),
+                                    Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
@@ -105,11 +123,42 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                   IconButton(
                     icon: Icon(Icons.send),
-                    onPressed: _sendMessage,
+                    onPressed: () {
+                        _sendMessage;
+                    },
                   ),
                 ],
               ),
             ),
+                      ],
+                    );
+                  } else {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _controller,
+                              decoration: InputDecoration(
+                                hintText: 'Type a message',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.send),
+                            onPressed: () {
+                              _sendMessage;
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                }),
           ],
         ),
       ),

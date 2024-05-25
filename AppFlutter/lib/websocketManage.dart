@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_2/data.dart';
+import 'package:flutter_application_2/loginSignUp.dart';
+import 'package:flutter_application_2/splash.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class WebSocketManager {
@@ -8,22 +11,27 @@ class WebSocketManager {
   Timer? _reconnectTimer;
   final Duration reconnectInterval;
   bool _shouldReconnect = true;
-
+  BuildContext? context;
   WebSocketManager({
     required this.url,
     this.reconnectInterval = const Duration(seconds: 5),
   });
 
-  void connect() {
-    channel = WebSocketChannel.connect(Uri.parse(url));
-    channel?.stream.listen(
-      (message) {
-        // Handle incoming messages
-        print('Received: $message');
-      },
-      onDone: _onDone,
-      onError: _onError,
-    );
+  void connect() async {
+    verifyToken? myVerify = await SplashScreenState.verifyAccess(this.context!);
+    channel = null;
+    if (myVerify == verifyToken.verified) {
+      String? myAccess = await LoginState.getAccessToken();
+      channel = WebSocketChannel.connect(Uri.parse(url + '?token=${myAccess}'));
+      channel?.stream.listen(
+        (message) {
+          // Handle incoming messages
+          print('Received: $message');
+        },
+        onDone: _onDone,
+        onError: _onError,
+      );
+    }
   }
 
   void _onDone() {
