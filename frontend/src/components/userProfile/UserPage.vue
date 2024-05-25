@@ -41,7 +41,6 @@
     </div>
     <userInfo v-if="showUserInfo" :userInfo="userInfo" />
     <userPosts v-if="showPosts" :userInfo="userInfo" />
-
     <!--    </form>-->
   </div>
 
@@ -75,8 +74,6 @@ export default {
       })
           .then(response => {
             this.userInfo = response.data;
-            console.log(this.userInfo)
-            // console.log(response.data);
           })
           .catch(error => {
             console.log(error);
