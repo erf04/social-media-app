@@ -56,9 +56,9 @@ class _ShowPostState extends State<ShowPost> {
             },
           ),
           data: {"post_id": myPost!.postId});
-      if (response.statusCode == 200)
-        return response.data;
-      else
+      if (response.statusCode == 200) {
+        return response.data["is_liked"];
+      } else
         return null;
     } else {
       return null;
@@ -112,22 +112,28 @@ class _ShowPostState extends State<ShowPost> {
                             setState(() {
                               if (isLiked!) {
                                 removeLikePost();
-                                //isLiked = !isLiked!;
                               } else {
                                 likePost();
-                                //isLiked = !isLiked!;
                               }
                             });
                           },
                         );
+                      } else if (snapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        print(snapshot.error);
+                        return Text('Error');
+                        // else {
+                        //   return IconButton(
+                        //       icon: const Icon(
+                        //         CupertinoIcons.heart,
+                        //         color: Colors.black,
+                        //         size: 30,
+                        //       ),
+                        //       onPressed: () {});
                       } else {
-                        return IconButton(
-                            icon: const Icon(
-                              CupertinoIcons.heart,
-                              color: Colors.black,
-                              size: 30,
-                            ),
-                            onPressed: () {});
+                        return Text("NO DATA");
                       }
                     }),
               ),
