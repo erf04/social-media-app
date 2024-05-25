@@ -12,8 +12,6 @@
   </div>
 </template>
 
-// saved and like button for post in user page and profile page
-
 <script>
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -137,13 +135,13 @@ export default {
           Authorization:`JWT ${await jwtAuth.getAccessToken()}`
         }
       })
-        .then(response => {
-          this.posts = response.data;
-          console.log(response.data);
-        })
-        .catch(err => {
-          console.log(err);
-        })
+          .then(response => {
+            this.posts = response.data;
+            console.log(response.data);
+          })
+          .catch(err => {
+            console.log(err);
+          })
     }
 
   },

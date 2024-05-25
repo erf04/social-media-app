@@ -312,37 +312,41 @@
 <script>
 
 // flexible the #chat-history
-// add user private chats to front         ok
-// fix reply                               ok
-// add group and add private chat          ok
-// able to add admin to a group --erfan    ok
-// fix token expiration** --erfan          ok
-// add participants (not complete)         ok
+// add user private chats to front                            ok
+// fix reply                                                  ok
+// add group and add private chat                             ok
+// able to add admin to a group --erfan                       ok
+// fix token expiration** --erfan                             ok
+// add participants (not complete)                            ok
 // last seen
-// who send message                        ok
+// who send message                                           ok
 // profile (posts), user profile (about & posts)
-// loading icon for fetch messages,main page and etc
-// is typing                               ok
+// loading icon for fetch messages, main page and etc         
+// is typing                                                  ok
 // add private chat creation
-// enter in login page (or signup)         ok
-// href and a tag for replied messages     ok
-// loading icon for fetching messages      ok
-// send btn                                ok
-// min height for chat log & min width for messages       ok
-// is staff field for set admin        ok
+// enter in login page (or signup)                            ok
+// href and a tag for replied messages                        ok
+// loading icon for fetching messages                         ok
+// send btn                                                   ok
+// min height for chat log & min width for messages           ok
+// is staff field for set admin                               ok
 // remain group with reload
-// more options in context menu (bring from chatroom)     ok
-// close button for reply             ok
-// got to profile in search result
-// footer isn't at the bottom of the page     ok
-// set admin front                ok
-// scroll to end btn              ok
+// more options in context menu (bring from chatroom)         ok
+// close button for reply                                     ok
+// go to profile in search result                             ok
+// footer isn't at the bottom of the page                     ok
+// set admin front                                            ok
+// scroll to end btn                                          ok
 // image in reply alert box
 // online offline green circle
 // send set admin message to group
-// seen message 
+// seen message                                               ok
 // last message
 // like and save message 
+// loader for already chat                                    ok
+// watch for ticks (seen) to change in moment
+// show userPage posts and don't allow to change photo
+// change photo user
 
 import {JWTAuth} from "../../../services/jwt";
 import axios from "axios";
@@ -421,13 +425,15 @@ export default {
       arrived: true,
       selectedImage: null,
       setAdminStatus: false,
+      viewers: [],
+      onceLoader: true,
     }
   },
   computed: {},
   methods: {
     onContextMenu(e, message, id) {
       e.preventDefault();
-      console.log("contextmenu", id);
+      this.seenBy(id);
       this.$contextmenu({
         x: e.x,
         y: e.y,
@@ -481,14 +487,23 @@ export default {
           },
           {
             label: "Seen By",
-            children: [
-              {label: "Item1"},
-              {label: "Item2"},
-              {label: "Item3"},
-            ]
+            children: this.viewers
           },
         ]
       });
+    },
+    seenBy(id) {
+      let result = [];
+      const userTemp = user.username;
+      this.messages.forEach(message => {
+        if (message.id == id && userTemp == message.sender.username) {
+          message.seen_by.forEach(data => {
+            result.push({label: data.username});
+          })
+        }
+      })
+      this.viewers = result;
+      return result
     },
     goToProfile(sender) {
       const userTemp = user.username;
@@ -632,7 +647,16 @@ export default {
       }, 2000);
     },
     async selectRoom(room) {
-      this.showLoader();
+      // this.currentChatRoom
+      if (this.onceLoader) {
+        this.showLoader();
+        this.onceLoader = false
+      }
+      if (this.currentChatRoom != null) {
+        if (this.currentChatRoom.id != room.id) {
+          this.showLoader()
+        }
+      }
       // setTimeout(() => {
       //   this.hideLoader();
       // }, 1500);
@@ -641,9 +665,11 @@ export default {
       if (JSON.stringify(this.currentChatRoom) == jsonRoom || JSON.stringify(this.currentPrivateRoom) == jsonRoom) {
         return;
       }
+      console.log(this.currentChatRoom, "roooooooooooooooooooooooooooooom");
       this.isPrivate ? this.currentPrivateRoom = {...room} : this.currentChatRoom = {...room};
 
       await this.handleRoom(room.id, this.isPrivate ? chatType.PRIVATE : chatType.GROUP);
+
 
       setInterval(async () => {
         if (!await jwtAuth.isAuthenticate()){
@@ -725,9 +751,9 @@ export default {
           } else if (command === "image") {
             console.log(data);
           }
-          else if (command == "add_viewer"){
-            console.log(data);
-          }
+          // else if (command == "add_viewer"){
+            // console.log(data);
+          // }
         }
       }
     },
