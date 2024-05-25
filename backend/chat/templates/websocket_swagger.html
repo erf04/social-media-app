@@ -26,12 +26,11 @@
     <div class="markdown-body">
         <h2>WebSocket API</h2>
         <h3>Connection URL for Groups</h3>
-        <p><code>ws://localhost:8000/ws/groups/{group_id}/</code></p>
+        <p><code>ws://localhost:8000/ws/groups/{group_id}/?token=${access_token}</code></p>
         <h3>Connection URL for pv's</h3>
-        <p><code>ws://localhost:8000/ws/pv/{pv_id}/</code></p>
-        <h3>Messages</h3>
-        <h4>Request</h4>
+        <p><code>ws://localhost:8000/ws/pv/{pv_id}/token=${access_token}</code></p>
         <p>Connect to the WebSocket server using the URL above. Send messages in JSON format. Example:</p>
+        <h4>Request</h4>
         <pre><code>{
     "command": "fetch_messages",
     <!-- "channel": "chat" -->
@@ -41,7 +40,34 @@
         <pre><code>{
     "command":"fetch_messages",
     "messages": MessageSerializer,
-    "chat_info":ChatSerializer
+    "chat_info":GroupSerializer or PvSerializer
+}
+</code></pre>
+        <h3>Messages</h3>
+        <h4>Request</h4>
+        <pre><code>{
+    "command": "fetch_messages",
+    <!-- "channel": "chat" -->
+}</code></pre>
+        <h4>Response</h4>
+        <p>The server will respond with messages in JSON format. Example:</p>
+        <pre><code>{
+    "command":"fetch_messages",
+    "messages": MessageSerializer,
+    "chat_info":GroupSerializer or PvSerializer
+}
+</code></pre>
+<h4>Request</h4>
+<pre><code>{
+"command": "fetch_messages",
+<!-- "channel": "chat" -->
+}</code></pre>
+<h4>Response</h4>
+<p>The server will respond with messages in JSON format. Example:</p>
+<pre><code>{
+"command":"fetch_messages",
+"messages": MessageSerializer,
+"chat_info":GroupSerializer or PvSerializer
 }
 </code></pre>
         <h3>Example Python Client</h3>

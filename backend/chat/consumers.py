@@ -36,6 +36,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
 
         
         await self.accept()
+        await self.send(text_data=json.dumps({"message":"connected successfully"}))
 
 #      @database_sync_to_async
 #      def add_to_group(self):
@@ -56,7 +57,11 @@ class GroupConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
+<<<<<<< HEAD
 
+=======
+        print(text_data_json)
+>>>>>>> 80964b8db15cd208ca539cc6040e23e5f80b66ef
         
         command = text_data_json["command"]
         # self.send_to_chat_message(text_data)
