@@ -165,6 +165,7 @@ export default {
 
     liked(index) {
       let elements = this.$refs.likeBounce;
+      console.log(elements, index, 'elllllllllllllllllllllllllllllllllll');
       if (this.likeStatus.like === true) {
         elements[index].classList.remove("bounce-enter-active");
         elements[index].classList.remove("bounce-leave-active");

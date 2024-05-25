@@ -12,8 +12,6 @@
   </div>
 </template>
 
-// saved and like button for post in user page and profile page
-
 <script>
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -21,12 +19,14 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import {JWTAuth} from '../../../services/jwt';
 import {mixins} from "@/mixins"
 import router from "@/router";
+// import { useRoute } from 'vue-router';
+import {useRoute} from "vue-router";
+
 
 const jwtAuth = new JWTAuth("http://localhost:8000/auth");
 const baseURL ="http://localhost:8000/api";
 export default {
   mixins: [mixins],
-  // props: ['imageSrc', 'caption'],
   data() {
     return {
       likeFillColor: [],
@@ -57,6 +57,7 @@ export default {
     }
   },
   mounted() {
+    this.name = useRoute().params.name;
     this.showUserPosts();
   },
   methods: {
@@ -132,18 +133,21 @@ export default {
     },
 
     async showUserPosts() {
-      axios.get(`${baseURL}/posts`,{
+      axios.post(`${baseURL}/posts/`, {
+          username: this.name
+        },
+        {
         headers:{
           Authorization:`JWT ${await jwtAuth.getAccessToken()}`
-        }
+        },
       })
-        .then(response => {
-          this.posts = response.data;
-          console.log(response.data);
-        })
-        .catch(err => {
-          console.log(err);
-        })
+          .then(response => {
+            this.posts = response.data;
+            console.log(response.data, "poooooooooooooooooooooooosts");
+          })
+          .catch(err => {
+            console.log(err);
+          })
     }
 
   },

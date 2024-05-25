@@ -1,16 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/ChatPage.dart';
+import 'package:flutter_application_2/ImageVideoPicker.dart';
 import 'package:flutter_application_2/SharedPreferencesFile.dart';
 import 'package:flutter_application_2/gen/assets.gen.dart';
 import 'package:flutter_application_2/profile.dart';
+import 'package:flutter_application_2/websocketManage.dart';
 
 void main() async {
+  
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPreferencesManager.instance.init();
   runApp(const MyApp());
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -44,7 +46,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
-      home: InstagramProfileScreen(),
+      home: ChatPage(),
       //const SplashScreen(),
       // home: Stack(children: [
       //   const Positioned.fill(child: MainPage()),

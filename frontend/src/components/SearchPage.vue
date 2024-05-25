@@ -12,13 +12,15 @@
     <div class="w-75 mx-auto">
       <div v-for="user in users" :key="user.pk">
         <div class="results mx-auto">
-          <div class="d-flex align-items-center" style="gap: 10px">
-            <img style="width: 30px; height: 30px; border-radius: 50%" :src="getAbsoluteUrl(user.image)" alt="">
-            <div>
-              <h6 class="m-0">{{ user.username }}</h6>
-              <p class="m-0" style="font-size: small">{{user.followers_count}} Followers</p>
+          <button @click="goToProfile(user)">
+            <div class="d-flex align-items-center" style="gap: 10px">
+                <img style="width: 30px; height: 30px; border-radius: 50%" :src="getAbsoluteUrl(user.image)" alt="">
+                <div>
+                  <h6 class="m-0">{{ user.username }}</h6>
+                  <p class="m-0" style="font-size: small">{{user.followers_count}} Followers</p>
+                </div>
             </div>
-          </div>
+          </button>
           <button v-text="user.is_following ? 'Following' : 'Follow'" ref="followBtn" class="followBtn" @mouseleave="leave($event.target)" @mouseenter="hover($event.target)" @click="followToggle($event.target,user.id)"></button>
         </div>
         <hr/>
@@ -50,6 +52,9 @@ export default {
     }
   },
   methods: {
+    goToProfile(resultUser) {
+      this.$router.push(`/${resultUser.username}`)
+    },
     async getAllUsers() {
       axios.get(`${baseURL}/users/all/`, {
         headers: {

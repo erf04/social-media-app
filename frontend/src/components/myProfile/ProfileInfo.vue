@@ -22,7 +22,7 @@
               <label>User Id</label>
             </div>
             <div class="col-md-6">
-              <p>{{ userInfo.pk }}</p>
+              <p>{{ userInfo.id }}</p>
             </div>
           </div>
           <div class="row">
