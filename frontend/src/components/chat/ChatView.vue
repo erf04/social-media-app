@@ -433,7 +433,6 @@ export default {
   methods: {
     onContextMenu(e, message, id) {
       e.preventDefault();
-      this.seenBy(id);
       this.$contextmenu({
         x: e.x,
         y: e.y,
@@ -492,18 +491,19 @@ export default {
         ]
       });
     },
-    seenBy(id) {
+    seenBy(message) {
       let result = [];
-      const userTemp = user.username;
-      this.messages.forEach(message => {
-        if (message.id == id && userTemp == message.sender.username) {
+      // const userTemp = user.username;
+      // this.messages.forEach(message => {
+        // if (userTemp == message.sender.username) {
           message.seen_by.forEach(data => {
+
             result.push({label: data.username});
           })
-        }
-      })
+        // }
+      // })
       this.viewers = result;
-      return result
+      // return result
     },
     goToProfile(sender) {
       const userTemp = user.username;
@@ -751,9 +751,11 @@ export default {
           } else if (command === "image") {
             console.log(data);
           }
-          // else if (command == "add_viewer"){
+          else if (command == "add_viewer"){
             // console.log(data);
-          // }
+            this.seenBy(data['data']);
+
+          }
         }
       }
     },
