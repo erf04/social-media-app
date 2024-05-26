@@ -98,37 +98,6 @@ class GroupConsumer(AsyncWebsocketConsumer):
     
 
 
-
-    @database_sync_to_async
-    def create_new_message(self,text_data:dict):
-        #reply_to,chat,body
-    #         user:User=self.scope['user']
-        sender_id=text_data["message"]["sender_id"]
-        user=User.objects.get(pk=sender_id)
-        print(sender_id)
-        if not user.is_authenticated:
-            return {'error':'Must be logged in'}
-
-        reply_to_id=text_data["message"]["reply_to_id"]
-        body=text_data["message"]["body"]
-        chat_name=self.room_name
-        try:
-            replied_message=Message.objects.get(pk=reply_to_id) if reply_to_id!=None else None
-        except:
-            return {"error":f"there is no message with id:{reply_to_id} to be a replied message"}
-        print(user)
-        group:Group=Group.objects.filter(participants=user,name=chat_name).first()
-        print(group)
-
-        message:Message=Message.objects.create(sender=user,chat=group,body=body,reply_to=replied_message,timestamp=datetime.datetime.now())
-
-
-        serialized=MessageSerializer(message,many=False)
-        # print(serialized.data)
-        # self.send_to_chat_message(serialized.data)
-        return serialized.data
-
-
     async def send_to_chat_message(self,text_data,command):
         
      
