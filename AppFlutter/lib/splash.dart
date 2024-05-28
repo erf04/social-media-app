@@ -28,6 +28,7 @@ class SplashScreenState extends State<SplashScreen> {
     String? myAccess = await LoginState.getAccessToken();
     //print(myAccess);
     if (myAccess == null) {
+      
       if (LoginState.getHasAccount() == null) {
         //print("ajab");
         Future.delayed(const Duration(seconds: 3)).then((value) {
@@ -37,15 +38,12 @@ class SplashScreenState extends State<SplashScreen> {
           }));
         });
       } else {
-        if (LoginState.getHasAccount() == null) {
-          //print("NEMIDOONAM CHITO SHODE");
           Future.delayed(const Duration(seconds: 3)).then((value) {
             Navigator.of(context)
                 .pushReplacement(CupertinoPageRoute(builder: (context) {
               return const AuthScreen();
             }));
           });
-        }
         return verifyToken.loggedOut;
       }
     }

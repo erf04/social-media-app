@@ -76,6 +76,7 @@ class PostInfo {
 }
 
 class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
+  
   Future<List<PostInfo?>> getPosts() async {
     verifyToken? myToken = await SplashScreenState.verifyAccess(context);
     if (myToken == verifyToken.verified) {

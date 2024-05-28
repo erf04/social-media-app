@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_2/ChatPage.dart';
 import 'package:flutter_application_2/data.dart';
 import 'package:flutter_application_2/loginSignUp.dart';
+import 'package:flutter_application_2/profile.dart';
 import 'package:flutter_application_2/splash.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -17,31 +19,26 @@ class WebSocketManager {
     this.reconnectInterval = const Duration(seconds: 5),
   });
 
-  void connect() async {
+  void connect(var channel) async {
     verifyToken? myVerify = await SplashScreenState.verifyAccess(this.context!);
-    channel = null;
     if (myVerify == verifyToken.verified) {
       String? myAccess = await LoginState.getAccessToken();
       channel = WebSocketChannel.connect(Uri.parse(url + '?token=${myAccess}'));
-      channel?.stream.listen(
-        (message) {
-          // Handle incoming messages
-          print('Received: $message');
-        },
-        onDone: _onDone,
-        onError: _onError,
-      );
+      // channel?.stream.listen(
+      //   onDone: _onDone,
+      //   onError: _onError,
+      // );
     }
   }
 
-  void _onDone() {
+  void onDone() {
     print('WebSocket connection closed');
     if (_shouldReconnect) {
       _scheduleReconnect();
     }
   }
 
-  void _onError(error) {
+  void onError(error) {
     print('WebSocket connection error: $error');
     if (_shouldReconnect) {
       _scheduleReconnect();
@@ -51,7 +48,7 @@ class WebSocketManager {
   void _scheduleReconnect() {
     if (_reconnectTimer != null) return;
     _reconnectTimer = Timer(reconnectInterval, () {
-      connect();
+      connect(channel);
       _reconnectTimer = null;
     });
   }
@@ -62,7 +59,7 @@ class WebSocketManager {
     _reconnectTimer?.cancel();
   }
 
-  void sendMessage(String message) {
+  void sendMessage(Map<String, dynamic> message) {
     channel?.sink.add(message);
   }
 

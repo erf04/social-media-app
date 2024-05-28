@@ -5,6 +5,7 @@ import 'package:flutter_application_2/ImageVideoPicker.dart';
 import 'package:flutter_application_2/SharedPreferencesFile.dart';
 import 'package:flutter_application_2/gen/assets.gen.dart';
 import 'package:flutter_application_2/profile.dart';
+import 'package:flutter_application_2/test.dart';
 import 'package:flutter_application_2/websocketManage.dart';
 
 void main() async {

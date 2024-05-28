@@ -108,7 +108,7 @@ class _OnBoardingState extends State<OnBoarding> {
                                 Navigator.of(context).pushReplacement(
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            const MainPage()));
+                                            const AuthScreen()));
                               } else {
                                 _pageController.animateToPage(page + 1,
                                     duration: const Duration(microseconds: 500),
