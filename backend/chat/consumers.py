@@ -36,7 +36,7 @@ class GroupConsumer(AsyncWebsocketConsumer):
 
         
         await self.accept()
-        await self.send(text_data=json.dumps({"message":"connected successfully"}))
+        # await self.send(text_data=json.dumps({"message":"connected successfully"}))
 
 #      @database_sync_to_async
 #      def add_to_group(self):
