@@ -284,6 +284,7 @@ class _PassFieldState extends State<PassField> {
                       fontWeight: FontWeight.w500,
                       color: Colors.blue))),
           label: const Text('Password')),
+          
     );
   }
 }
