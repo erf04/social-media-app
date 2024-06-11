@@ -721,6 +721,7 @@ export default {
           // message received from server
           console.log(data.error);
         } else {
+          // console.log(data);
           let command = data["command"]
           if (command === "fetch_messages") {
             console.log(data);
@@ -755,6 +756,10 @@ export default {
             // console.log(data);
             this.seenBy(data['data']);
 
+          }
+          else if (command=="notif"){
+            console.log("in notif");
+            console.log(data);
           }
         }
       }

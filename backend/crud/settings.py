@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'chat.apps.ChatConfig',
     #for work with rest api
     'rest_framework',
     #cleanup the unused media
@@ -56,7 +57,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     #custom apps
     'api',
-    'chat',
+    # 'chat',
     'game',
     
 ]

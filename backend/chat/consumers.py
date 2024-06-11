@@ -20,11 +20,11 @@ class GroupConsumer(AsyncWebsocketConsumer):
         print(room_id)
         self.room:Group=await self.get_room(room_id)
         self.room_type=self.room.__class__.__name__.lower()
-        self.room_name=self.room.name
-        group_name=self.room_name.replace(" ","_")
-        self.room_group_name = f"chat_{group_name}"
+        self.room_name=self.room.id
+        # group_name=self.room_name.replace(" ","_")
+        self.room_group_name = f"chat_{self.room_name}"
         print(f"user: {self.scope['user']}")
-
+        print(f"group {self.room_group_name}")
     
         self.user=copy.deepcopy(self.scope['user'])
         print(f"user: {self.user}")
