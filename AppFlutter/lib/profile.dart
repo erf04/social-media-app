@@ -244,175 +244,195 @@ class _InstagramProfileScreenState extends State<InstagramProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: myAppBar(context, ' > Profile'),
-      body: FutureBuilder<ProfileInfo?>(
-          future: getProfileInfo(),
+      body: FutureBuilder<verifyToken?>(
+          future: SplashScreenState.verifyAccess(context),
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else if (snapshot.hasData) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(height: 20),
-                  CircleAvatar(
-                    backgroundColor: Colors.transparent,
-                    radius: 80,
-                    child: ClipOval(
-                      child: Container(
-                        child: CachedNetworkImage(
-                          imageUrl:
-                              'http://10.0.2.2:8000/api${snapshot.data?.image}',
-                          placeholder: (context, url) =>
-                              Center(child: CircularProgressIndicator()),
-                          errorWidget: (context, url, error) =>
-                              Center(child: Icon(Icons.error)),
-                          fit: BoxFit.cover,
-                          width: 160,
-                          height: 160,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    snapshot.data!.userName,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Followers: ${snapshot.data!.followerCount}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Text(
-                        'Following: ${snapshot.data!.followingCount}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        fixedSize:
-                            Size(MediaQuery.of(context).size.width * 2 / 4, 40),
-                        backgroundColor: Colors.blueAccent, // Text color
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(8), // Border radius
-                          side: BorderSide(color: Colors.blue),
-                          // Border color
-                        ),
-                        elevation: 5, // Shadow depth
-                      ),
-                      onPressed: () {
-                        // Action to perform when button is pressed
-                      },
-                      child: const Text(
-                        'Follow',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  FutureBuilder<List<PostInfo?>>(
-                      future: getPosts(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
-                        } else if (snapshot.hasData) {
-                          return Expanded(
-                            child: GridView.builder(
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3,
+            if (snapshot.connectionState == ConnectionState.waiting)
+              return CircularProgressIndicator();
+            else if (snapshot.hasData &&
+                snapshot.data == verifyToken.verified) {
+              return FutureBuilder<ProfileInfo?>(
+                  future: getProfileInfo(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else if (snapshot.hasData) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          SizedBox(height: 20),
+                          CircleAvatar(
+                            backgroundColor: Colors.transparent,
+                            radius: 80,
+                            child: ClipOval(
+                              child: Container(
+                                child: CachedNetworkImage(
+                                  imageUrl:
+                                      'http://10.0.2.2:8000/api${snapshot.data?.image}',
+                                  placeholder: (context, url) => Center(
+                                      child: CircularProgressIndicator()),
+                                  errorWidget: (context, url, error) =>
+                                      Center(child: Icon(Icons.error)),
+                                  fit: BoxFit.cover,
+                                  width: 160,
+                                  height: 160,
                                 ),
-                                itemCount: snapshot.data!.length + 1,
-                                itemBuilder: (context, index) {
-                                  if (index == 0) {
-                                    return Padding(
-                                      padding: const EdgeInsets.all(2.0),
-                                      child: createNewPost(),
-                                    );
-                                  }
-
-                                  // Replace with actual content (images, posts, etc.)
-                                  return Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Container(
-                                      width: 150,
-                                      height: 150,
-                                      decoration: const BoxDecoration(
-                                          color: Colors.white,
-                                          shape: BoxShape.rectangle,
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(2)),
-                                          boxShadow: [
-                                            BoxShadow(blurRadius: 2)
-                                          ]),
-                                      child: InkWell(
-                                        onTap: () {
-                                          ShowPost showPost = ShowPost();
-                                          showPost.declarePost(
-                                              snapshot.data![index - 1]);
-
-                                          Navigator.of(context).pushReplacement(
-                                              CupertinoPageRoute(
-                                                  builder: (context) {
-                                            return showPost;
-                                          }));
-                                        },
-                                        child: ClipRRect(
-                                          child: CachedNetworkImage(
-                                            imageUrl:
-                                                'http://10.0.2.2:8000/api${snapshot.data![index - 1]!.content}',
-                                            placeholder: (context, url) =>
-                                                const Center(
-                                                    child: Center(
-                                                        child:
-                                                            CircularProgressIndicator())),
-                                            errorWidget: (context, url,
-                                                    error) =>
-                                                const Center(
-                                                    child: Icon(Icons.error)),
-                                            fit: BoxFit.cover,
-                                          ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          Text(
+                            snapshot.data!.userName,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Followers: ${snapshot.data!.followerCount}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              Text(
+                                'Following: ${snapshot.data!.followingCount}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                fixedSize: Size(
+                                    MediaQuery.of(context).size.width * 2 / 4,
+                                    40),
+                                backgroundColor:
+                                    Colors.blueAccent, // Text color
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(8), // Border radius
+                                  side: BorderSide(color: Colors.blue),
+                                  // Border color
+                                ),
+                                elevation: 5, // Shadow depth
+                              ),
+                              onPressed: () {
+                                // Action to perform when button is pressed
+                              },
+                              child: const Text(
+                                'Follow',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          FutureBuilder<List<PostInfo?>>(
+                              future: getPosts(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                      child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return Text('Error: ${snapshot.error}');
+                                } else if (snapshot.hasData) {
+                                  return Expanded(
+                                    child: GridView.builder(
+                                        gridDelegate:
+                                            SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 3,
                                         ),
-                                      ),
-                                    ),
+                                        itemCount: snapshot.data!.length + 1,
+                                        itemBuilder: (context, index) {
+                                          if (index == 0) {
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.all(2.0),
+                                              child: createNewPost(),
+                                            );
+                                          }
+
+                                          // Replace with actual content (images, posts, etc.)
+                                          return Padding(
+                                            padding: const EdgeInsets.all(2.0),
+                                            child: Container(
+                                              width: 150,
+                                              height: 150,
+                                              decoration: const BoxDecoration(
+                                                  color: Colors.white,
+                                                  shape: BoxShape.rectangle,
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(2)),
+                                                  boxShadow: [
+                                                    BoxShadow(blurRadius: 2)
+                                                  ]),
+                                              child: InkWell(
+                                                onTap: () {
+                                                  ShowPost showPost =
+                                                      ShowPost();
+                                                  showPost.declarePost(snapshot
+                                                      .data![index - 1]);
+
+                                                  Navigator.of(context)
+                                                      .pushReplacement(
+                                                          CupertinoPageRoute(
+                                                              builder:
+                                                                  (context) {
+                                                    return showPost;
+                                                  }));
+                                                },
+                                                child: ClipRRect(
+                                                  child: CachedNetworkImage(
+                                                    imageUrl:
+                                                        'http://10.0.2.2:8000/api${snapshot.data![index - 1]!.content}',
+                                                    placeholder: (context,
+                                                            url) =>
+                                                        const Center(
+                                                            child: Center(
+                                                                child:
+                                                                    CircularProgressIndicator())),
+                                                    errorWidget: (context, url,
+                                                            error) =>
+                                                        const Center(
+                                                            child: Icon(
+                                                                Icons.error)),
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                          // Replace with actual post count
+                                        }),
                                   );
-                                  // Replace with actual post count
-                                }),
-                          );
-                        } else {
-                          return const Center(child: Text('No data'));
-                        }
-                      }),
-                ],
-              );
-            } else {
-              return const Center(child: Text('No data'));
-            }
+                                } else {
+                                  return const Center(child: Text('No data'));
+                                }
+                              }),
+                        ],
+                      );
+                    } else {
+                      return const Center(child: Text('No data'));
+                    }
+                  });
+            } else
+              return AuthScreen();
           }),
     );
   }

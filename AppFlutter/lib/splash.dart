@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -8,7 +7,6 @@ import 'package:flutter_application_2/gen/assets.gen.dart';
 import 'package:flutter_application_2/home.dart';
 import 'package:flutter_application_2/loginSignUp.dart';
 import 'package:flutter_application_2/onBoarding.dart';
-
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -28,24 +26,16 @@ class SplashScreenState extends State<SplashScreen> {
     String? myAccess = await LoginState.getAccessToken();
     //print(myAccess);
     if (myAccess == null) {
-      if (LoginState.getHasAccount() == null) {
+      if (await LoginState.getHasAccount() == null) {
         //print("ajab");
-        Future.delayed(const Duration(seconds: 3)).then((value) {
+        Future.delayed(const Duration(milliseconds: 1)).then((value) {
           Navigator.of(context)
               .pushReplacement(CupertinoPageRoute(builder: (context) {
             return const OnBoarding();
           }));
         });
+        return null;
       } else {
-        if (LoginState.getHasAccount() == null) {
-          //print("NEMIDOONAM CHITO SHODE");
-          Future.delayed(const Duration(seconds: 3)).then((value) {
-            Navigator.of(context)
-                .pushReplacement(CupertinoPageRoute(builder: (context) {
-              return const AuthScreen();
-            }));
-          });
-        }
         return verifyToken.loggedOut;
       }
     }
@@ -63,7 +53,7 @@ class SplashScreenState extends State<SplashScreen> {
         return verifyToken.verified;
       }).catchError((onError) {
         //print("LETS SEE");
-        Future.delayed(const Duration(seconds: 3)).then((value) {
+        Future.delayed(const Duration(milliseconds: 1)).then((value) {
           Navigator.of(context)
               .pushReplacement(CupertinoPageRoute(builder: (context) {
             return const AuthScreen();
