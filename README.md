@@ -43,7 +43,7 @@ npm run serve
 
 #### Mobile Frontend (Flutter)
 ```bash
-cd flutter
+cd AppFlutter
 flutter pub get
 flutter run
 ```
